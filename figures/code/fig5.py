@@ -12,7 +12,7 @@ def quint(d, a, b):
     q = pd.qcut(d.r, 5, labels=False); return [d.r[q == i].mean() for i in range(5)], [stats.pearsonr(d[a][q == i], d[b][q == i])[0] for i in range(5)]
 ax = fig.add_subplot(gs[0, 0:3]); schem.perturbation_rules(ax); lab(ax, 'a', -0.04)
 ax = fig.add_subplot(gs[0, 3:6]); x, y = quint(BY, 't1', 't2'); ax.plot(x, y, 'o-', color=OI['purple'], ms=4, lw=1.2); ax.plot([-0.3, 0.6], [-0.3, 0.6], 'k:', lw=0.6)
-ax.axhline(0, color='0.8', lw=0.5); ax.set_xlabel('Coupling in healthy liver (GTEx)'); ax.set_ylabel('Concordance of fibrosis effects\n(437 biopsies)'); lab(ax, 'b')
+ax.axhline(0, color='0.8', lw=0.5); ax.set_xlabel('Coupling in healthy liver (GTEx)'); ax.set_ylabel('Concordance of stage effects'); lab(ax, 'b')
 ax = fig.add_subplot(gs[1, 0:2]); pos = ((G.Start + G.End) / 2).reindex(ED.index); ch = G.Chromosome.astype(str).reindex(ED.index)
 for (c, p0, col, tcol, nm) in [('11', 5.25e6, OI['red'], 't_HBG', 'HBG1/2 promoter edit'), ('2', 60.45e6, OI['blue'], 't_BCL11A', 'BCL11A enhancer edit (Casgevy)')]:
     w = (ch == c) & ((pos - p0).abs() < 1.5e6); xx = (pos[w] - p0) / 1e6; yy = ED.loc[w, tcol]
