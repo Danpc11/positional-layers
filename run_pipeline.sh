@@ -33,6 +33,7 @@ fi
 if stage architecture; then
   run $S/tad_test.py
   run $S/tad_bootstrap.py
+  run $S/pair_attributes.py
   run $S/hic_test.py
   run $S/hic_test_imr90.py
   run $S/boot_hic.py GM12878 cells_ebv-transformed_lymphocytes 200
