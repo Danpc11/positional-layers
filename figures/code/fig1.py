@@ -46,7 +46,7 @@ ax = fig.add_subplot(gs[2, 1])
 for lg, col in [(1, OI['blue']), (5, OI['green']), (20, OI['red'])]:
     ax.scatter(L[f'pred_L{lg}'], L[f'obs_gc_component_L{lg}'], s=9, color=col, lw=0, label=f'{lg} gene' + ('s' if lg > 1 else '') + f'  (r = {np.corrcoef(L[f"pred_L{lg}"], L[f"obs_gc_component_L{lg}"])[0, 1]:.2f})')
 m = max(L[[c for c in L.columns if c.startswith('obs')]].max().max(), L[[c for c in L.columns if c.startswith('pred')]].max().max()) * 1.05
-ax.plot([0, m], [0, m], 'k:', lw=0.7); ax.set_xlabel('Predicted, GC slope from odd chromosomes'); ax.set_ylabel('Observed, even chromosomes'); ax.legend(loc='upper left', fontsize=5.5)
+ax.plot([0, m], [0, m], 'k:', lw=0.7); ax.set_xlabel('Predicted, GC slope from odd chromosomes'); ax.set_ylabel('Observed, even chromosomes'); ax.legend(loc='lower right', fontsize=5.2, handletextpad=0.1)
 lab(ax, 'g')
 ax = fig.add_subplot(gs[2, 2]); g = S.groupby('true_lambda')[['naive', 'corrected']].median()
 ax.plot(g.index, g.naive, 'o-', color=OI['red'], ms=3, lw=1, label='naive'); ax.plot(g.index, g.corrected, 's-', color=OI['blue'], ms=3, lw=1, label='GC-corrected')
