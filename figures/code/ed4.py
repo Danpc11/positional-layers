@@ -1,10 +1,10 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Extended Data Fig. 4: heatmaps summarising the atlas, the laws and the perturbation rules."""
-import sys; sys.path.insert(0, os.path.dirname(__file__))
-from style import *
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
 import schem
-R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(A + 'isochore_law.csv'); E = pd.read_csv(A + 'eqtl_cis_test.csv')
+R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(OUTDIR + 'isochore_v2.csv'); L = L.rename(columns={**{f'held_pred_L{k}': f'pred_L{k}' for k in (1, 2, 5, 10, 20, 30)}, **{f'held_obs_L{k}': f'obs_gc_component_L{k}' for k in (1, 2, 5, 10, 20, 30)}}); E = pd.read_csv(A + 'eqtl_cis_test.csv')
 fig = plt.figure(figsize=(W, W * 0.95)); gs = fig.add_gridspec(2, 2, hspace=0.62, wspace=0.55, height_ratios=[1, 1.5])
 
 # a: per-tissue layer budget (tissues x layers)
@@ -30,7 +30,7 @@ ax = fig.add_subplot(gs[1, 0])
 im = ax.imshow(Mb[order], aspect='auto', cmap='RdBu_r', vmin=0.6, vmax=1.4)
 ax.set_xticks(range(len(dists))); ax.set_xticklabels([f'{d}' for d in dists], fontsize=5.4); ax.set_xlabel('Distance (genes)', fontsize=6)
 ax.set_yticks(range(len(Lr))); ax.set_yticklabels(Lr.tissue.values[order], fontsize=4.0)
-cb = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.02); cb.ax.tick_params(labelsize=5); cb.set_label('observed / predicted', fontsize=5.2)
+cb = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.02); cb.ax.tick_params(labelsize=5); cb.set_label('observed / predicted (held-out)', fontsize=5.2)
 ax.set_title('Isochore law holds at every distance', fontsize=6, loc='left', pad=4)
 for s in ax.spines.values(): s.set_visible(False)
 lab(ax, 'b', -0.42)

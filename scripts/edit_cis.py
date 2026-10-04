@@ -1,13 +1,13 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Do therapeutic CRISPR edits perturb the cis neighbours of the edited locus, in proportion to their baseline coupling?
 Baseline coupling: GTEx whole blood (GC- and technically corrected), computed earlier. Edits: BCL11A erythroid enhancer
 (chr2) and HBG1/2 promoters (chr11, beta-globin locus). Predictions are made from genomic position alone, before looking
 at the edited-cell data."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd, pyannotables as pa
 from scipy import stats
 CHR = [str(i) for i in range(1, 23)] + ['X']
-C = pd.read_csv('/mnt/user-data/uploads/GSE264491_merged_counts_csv.gz', index_col=0)
+C = pd.read_csv(DATA + 'edit/GSE264491_merged_counts.csv.gz', index_col=0)
 grp = ['unedited'] * 3 + ['BCL11A_enhancer'] * 3 + ['HBG1_2_promoter'] * 3
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]
 ann = G.loc[G.index.intersection(C.index), ['Chromosome', 'Start', 'End', 'gene_name']]; ann.columns = ['chr', 'start', 'end', 'sym']; ann['chr'] = ann.chr.astype(str)
@@ -17,7 +17,7 @@ def lfc(g): return cpm[[c for c, x in zip(C.columns, grp) if x == g]].mean(1) - 
 L = pd.DataFrame({'BCL11A_enhancer': lfc('BCL11A_enhancer'), 'HBG1_2_promoter': lfc('HBG1_2_promoter')})
 sd = cpm[[c for c, x in zip(C.columns, grp) if x == 'unedited']].std(1)
 # baseline coupling from GTEx whole blood
-P = pd.read_csv(DATA + 'pairs_whole_blood.csv.gz'); nb = {}
+P = pd.read_csv(OUTDIR + 'pairs_whole_blood.csv.gz'); nb = {}
 for a, b, r in zip(P.g1, P.g2, P.r): nb.setdefault(a, []).append((b, r)); nb.setdefault(b, []).append((a, r))
 def neighbours(target_sym, k=12):
     tid = ann.index[ann.sym == target_sym]
@@ -55,5 +55,5 @@ for col in ['BCL11A_enhancer', 'HBG1_2_promoter']:
     res.append({'edit': col, 'n_pairs_with_driver': len(big), 'pearson_pred_vs_obs': stats.pearsonr(big.r * drv, nbv)[0], 'slope': np.polyfit(big.r * drv, nbv, 1)[0],
                 'corr_lfc_neighbours_all_pairs': stats.pearsonr(d.l1, d.l2)[0], 'corr_shuffled': stats.pearsonr(d.l1, np.random.default_rng(1).permutation(d.l2.values))[0]})
 R = pd.DataFrame(res); print('\n=== Bystander model genome-wide ===\n' + R.round(3).to_string(index=False))
-NB.to_csv('/mnt/user-data/outputs/NAR_piloto/edit_BCL11A_neighbours.csv', index=False); NH.to_csv('/mnt/user-data/outputs/NAR_piloto/edit_HBG_neighbours.csv', index=False)
-W.to_csv('/mnt/user-data/outputs/NAR_piloto/edit_window_tests.csv', index=False); R.to_csv('/mnt/user-data/outputs/NAR_piloto/edit_bystander_model.csv', index=False)
+NB.to_csv(OUTDIR + 'edit_BCL11A_neighbours.csv', index=False); NH.to_csv(OUTDIR + 'edit_HBG_neighbours.csv', index=False)
+W.to_csv(OUTDIR + 'edit_window_tests.csv', index=False); R.to_csv(OUTDIR + 'edit_bystander_model.csv', index=False)

@@ -1,14 +1,14 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Test of the hub model: r = r0 + A*(1 + (c*/c)^(2/3))^(-3/2) versus a pure power law r = r0 + A*c^k.
 Pairs binned by Hi-C contact (all distances 25 kb-2 Mb); local slope of the coupling-contact relation across contact."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd
 from scipy.optimize import curve_fit
 hub = lambda c, r0, A, cs: r0 + A * (1 + (cs / c) ** (2 / 3)) ** (-1.5)
 pw = lambda c, r0, A, k: r0 + A * c ** k
 out = []
 for cell in ['GM12878', 'IMR90']:
-    H = pd.read_csv(fDATA + 'hic_coupling_{cell}.csv.gz'); H = H[H.contact_KR > 0]
+    H = pd.read_csv(OUTDIR + f'hic_coupling_{cell}.csv.gz'); H = H[H.contact_KR > 0]
     H['cb'] = pd.qcut(np.log10(H.contact_KR), 20, labels=False)
     b = H.groupby('cb').agg(c=('contact_KR', 'median'), r=('r', 'mean'), se=('r', lambda x: x.std() / np.sqrt(len(x))), d=('tss_distance', 'median'), n=('r', 'size'))
     w = 1 / b.se ** 2
@@ -23,4 +23,4 @@ for cell in ['GM12878', 'IMR90']:
     print(f'   distance at which contact = c* (separation = hub size): ~{dstar / 1e3:.0f} kb')
     print(b[['n', 'd', 'c', 'r', 'k_model', 'k_empirical']].round(4).to_string())
     b['cell'] = cell; out.append(b)
-pd.concat(out).to_csv('derivation_hub_model.csv')
+pd.concat(out).to_csv(OUTDIR + 'derivation_hub_model.csv')

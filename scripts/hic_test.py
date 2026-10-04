@@ -1,10 +1,10 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Distance vs 3D contact (GM12878 in situ Hi-C, KR, 25 kb) as predictors of cis coupling in GTEx EBV lymphocytes."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd, pyannotables as pa, statsmodels.formula.api as smf
 from scipy import stats
 CHR = [str(i) for i in range(1, 23)] + ['X']
-BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
+BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
 SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
 C = pd.read_csv(DATA + 'gtex/gene_reads_adult_gtex_v11_cells_ebv-transformed_lymphocytes_gct.gz', sep='\t', skiprows=2, index_col=0).drop(columns='Description')
 C.index = C.index.str.split('.').str[0]; C = C[~C.index.duplicated()]; samp = [x for x in C.columns if x in SA.index and pd.notna(SA.loc[x, 'SMRIN'])]; C = C[samp]
@@ -15,7 +15,7 @@ a = SA.loc[samp]; rin = a.SMRIN.astype(float).values; isch = pd.to_numeric(a.SMT
 T = np.column_stack([np.ones(len(rin)), rin, rin ** 2, isch, pd.get_dummies(a.SMNABTCH.astype(str), drop_first=True).values.astype(float), pd.get_dummies(a.SMGEBTCH.astype(str), drop_first=True).values.astype(float)])
 D = (D.T - T @ np.linalg.lstsq(T, D.T, rcond=None)[0]).T
 Z = (D - D.mean(1, keepdims=True)) / (D.std(1, keepdims=True) + 1e-9); pos = {g: i for i, g in enumerate(C.index)}
-H = pd.read_csv('/mnt/user-data/uploads/hic_contacts_GM12878_csv.gz', dtype={'chr': str}); E = pd.read_csv('/mnt/user-data/uploads/hic_expected_GM12878_csv.gz', dtype={'chr': str})
+H = pd.read_csv(DATA + 'hic/hic_contacts_GM12878.csv.gz', dtype={'chr': str}); E = pd.read_csv(DATA + 'hic/hic_expected_GM12878.csv.gz', dtype={'chr': str})
 H = H[H.g1.isin(pos) & H.g2.isin(pos)].copy()
 i1 = H.g1.map(pos).values; i2 = H.g2.map(pos).values; r = np.empty(len(H))
 for s in range(0, len(H), 200000): r[s:s + 200000] = (Z[i1[s:s + 200000]] * Z[i2[s:s + 200000]]).mean(1)
@@ -36,4 +36,4 @@ print(pd.DataFrame(rows).round(4).to_string(index=False))
 m1 = smf.ols('r ~ bs(log_d, df=5)', data=H).fit(); m2 = smf.ols('r ~ bs(log_d, df=5) + log_oe', data=H).fit(); m3 = smf.ols('r ~ bs(log_c, df=5)', data=H).fit(); m4 = smf.ols('r ~ bs(log_c, df=5) + bs(log_d, df=5)', data=H).fit()
 print(f"\nR2 distance only {m1.rsquared:.4f} | + O/E contact {m2.rsquared:.4f} (O/E coef {m2.params['log_oe']:.4f}, t {m2.tvalues['log_oe']:.1f})")
 print(f"R2 contact only {m3.rsquared:.4f} | contact + distance {m4.rsquared:.4f} | AIC distance {m1.aic:.0f} vs contact {m3.aic:.0f}")
-H.drop(columns='dbin').to_csv('hic_coupling_GM12878.csv.gz', index=False)
+H.drop(columns='dbin').to_csv(OUTDIR + 'hic_coupling_GM12878.csv.gz', index=False)

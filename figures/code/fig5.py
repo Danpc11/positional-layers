@@ -1,13 +1,13 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
-import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys
 import pyannotables as pa
 from scipy import stats
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]
-BY = pd.read_csv('/mnt/user-data/outputs/NAR_piloto/bystander_liver_t_stage.csv'); ED = pd.read_csv(DATA + 'edit_effects.csv', index_col=0)
-WB = pd.read_csv(A + 'pairs_whole_blood.csv.gz'); DR = pd.read_csv(DATA + 'drug_cis_results_thr3.csv'); CR = pd.read_csv(DATA + 'crispri_pairs.csv.gz')
+BY = pd.read_csv(OUTDIR + 'bystander_liver_t_stage.csv'); ED = pd.read_csv(OUTDIR + 'edit_effects.csv', index_col=0)
+WB = pd.read_csv(A + 'pairs_whole_blood.csv.gz'); DR = pd.read_csv(OUTDIR + 'drug_cis_results_thr3.csv'); CR = pd.read_csv(OUTDIR + 'crispri_pairs.csv.gz')
 import schem
-fig = plt.figure(figsize=(W, W * 0.9)); gs = fig.add_gridspec(3, 6, hspace=0.6, wspace=1.4)
+fig = plt.figure(figsize=(W * 0.92, W * 0.9)); gs = fig.add_gridspec(3, 6, hspace=0.6, wspace=1.4)
 def quint(d, a, b):
     q = pd.qcut(d.r, 5, labels=False); return [d.r[q == i].mean() for i in range(5)], [stats.pearsonr(d[a][q == i], d[b][q == i])[0] for i in range(5)]
 ax = fig.add_subplot(gs[0, 0:3]); schem.perturbation_rules(ax); lab(ax, 'a', -0.04)

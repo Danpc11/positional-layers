@@ -1,16 +1,18 @@
 """Replication of the cohesin effect on the cis layer in BeatAML2 (open data). Per-sample cis-excess score as in TCGA:
 neighbour products at 1-3 genes minus 20-30 genes, on GC-corrected expression. Covariates: blasts, monocytic score, log TMB, sex,
 specimen type. 10,000 label permutations on covariate-residualised scores."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd, pyannotables as pa, statsmodels.api as sm
 CHR = [str(i) for i in range(1, 23)] + ['X']
-BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
+BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
 G38 = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G38 = G38[~G38.index.duplicated()][['Chromosome', 'Start']]; G38.columns = ['chr', 'start']; G38['chr'] = G38.chr.astype(str); G38 = G38[G38.chr.isin(CHR)].join(BM[['gc']], how='inner')
-C = pd.read_csv('beataml_waves1to4_counts_dbgap.txt', sep='\t'); C['gid'] = C.stable_id.str.split('.').str[0]; sym = dict(zip(C.gid, C.display_label.astype(str)))
+C = pd.read_csv(DATA + 'beataml/beataml_waves1to4_counts_dbgap.txt', sep='\t'); C['gid'] = C.stable_id.str.split('.').str[0]; sym = dict(zip(C.gid, C.display_label.astype(str)))
 C = C.drop_duplicates('gid').set_index('gid')[[x for x in C.columns if x.startswith('BA')]]
-mp = pd.read_excel('beataml_waves1to4_sample_mapping.xlsx'); cl = pd.read_excel('beataml_wv1to4_clinical.xlsx')
+mp = pd.read_excel(DATA + 'beataml/beataml_waves1to4_sample_mapping.xlsx'); cl = pd.read_excel(DATA + 'beataml/beataml_wv1to4_clinical.xlsx')
 mp = mp[(mp.rna_control != 'yes') & mp.dbgap_rnaseq_sample.notna() & mp.dbgap_dnaseq_sample.notna()] if 'rna_control' in mp else mp
 pairs = mp[['dbgap_rnaseq_sample', 'dbgap_dnaseq_sample']].dropna().drop_duplicates('dbgap_rnaseq_sample')
-m = pd.read_csv('beataml_wes_wv1to4_mutations_dbgap.txt', sep='\t', low_memory=False); tmb = m.groupby('dbgap_sample_id').size()
+m = pd.read_csv(DATA + 'beataml/beataml_wes_wv1to4_mutations_dbgap.txt', sep='\t', low_memory=False); tmb = m.groupby('dbgap_sample_id').size()
 pairs = pairs[pairs.dbgap_rnaseq_sample.isin(C.columns) & pairs.dbgap_dnaseq_sample.isin(tmb.index)]
 C = C[pairs.dbgap_rnaseq_sample.values]; C = C.loc[C.index.intersection(G38.index)]; C = C[C.median(axis=1) >= 10]
 g = G38.loc[C.index].sort_values(['chr', 'start']); C = C.loc[g.index]; chrs = g.chr.values
@@ -33,7 +35,8 @@ for name, genes, cls in [('STAG2, any coding', ['STAG2'], None), ('STAG2, trunca
     mut = pd.Index(dna).isin(set(mm.dbgap_sample_id)).astype(float)
     Xs = (cov - cov.mean()) / cov.std(); Xd = sm.add_constant(pd.DataFrame({'mutant': mut}, index=cov.index).join(Xs))
     fit = sm.OLS(e, Xd).fit(cov_type='HC3'); base = e[mut == 0].mean(); r = e - sm.OLS(e, sm.add_constant(Xs.values)).fit().fittedvalues
-    obs = r[mut == 1].mean() - r[mut == 0].mean(); rng = np.random.default_rng(0); null = np.array([(lambda p: r[p == 1].mean() - r[p == 0].mean())(rng.permutation(mut)) for _ in range(10000)])
+    red = sm.OLS(e, sm.add_constant(Xs.values)).fit(); Xf = Xd.values; t_obs = fit.tvalues['mutant']; rng = np.random.default_rng(1)
+    tnull = np.array([sm.OLS(red.fittedvalues + rng.permutation(red.resid), Xf).fit(cov_type='HC3').tvalues[1] for _ in range(2000)])
     rows.append({'group': name, 'n_samples': len(e), 'n_mutant': int(mut.sum()), 'cis_excess_wt': base, 'raw_pct': 100 * (e[mut == 1].mean() - base) / base,
-                 'adj_pct': 100 * fit.params['mutant'] / base, 'ci_low': 100 * fit.conf_int().loc['mutant', 0] / base, 'ci_high': 100 * fit.conf_int().loc['mutant', 1] / base, 'p_perm': (np.sum(np.abs(null) >= abs(obs)) + 1) / 10001})
-R = pd.DataFrame(rows); R.to_csv('beataml_cohesin_replication.csv', index=False); pd.set_option('display.width', 200); print(R.round(4).to_string(index=False))
+                 'adj_pct': 100 * fit.params['mutant'] / base, 'ci_low': 100 * fit.conf_int().loc['mutant', 0] / base, 'ci_high': 100 * fit.conf_int().loc['mutant', 1] / base, 'se_pct': 100 * fit.bse['mutant'] / base, 'p_HC3': fit.pvalues['mutant'], 'p_freedman_lane': (np.sum(np.abs(tnull) >= abs(t_obs)) + 1) / 2001})
+R = pd.DataFrame(rows); R.to_csv(OUTDIR + 'beataml_freedman_lane.csv', index=False); pd.set_option('display.width', 200); print(R.round(4).to_string(index=False))

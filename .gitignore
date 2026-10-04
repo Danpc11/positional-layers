@@ -6,7 +6,6 @@ env/
 *.egg-info/
 build/
 dist/
-data/*
 !data/.gitkeep
 figures/output/
 *.npz
@@ -14,3 +13,6 @@ figures/output/
 *.hic
 *.csv.gz
 .DS_Store
+data/*
+!data/MANIFEST.md
+results/

@@ -1,10 +1,10 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Cis layer by orientation and intergenic distance of adjacent gene pairs, per GTEx tissue (after GC and technical correction)."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
-OUT = DATA + 'orientation_by_tissue.csv'; PAIRS = DATA + 'pair_correlations.parquet'
+OUT = OUTDIR + 'orientation_by_tissue.csv'; PAIRS = OUTDIR + 'pair_correlations.parquet'
 CHR = [str(i) for i in range(1, 23)] + ['X']
-BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
+BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
 G38 = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G38 = G38[~G38.index.duplicated()][['Chromosome', 'Start', 'End', 'Strand']]
 G38.columns = ['chr', 'start', 'end', 'strand']; G38['chr'] = G38.chr.astype(str); G38 = G38[G38.chr.isin(CHR)].join(BM[['gc', 'type']], how='inner')
 SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
@@ -34,5 +34,5 @@ for f in sys.argv[1:]:
     S = P.groupby(['orientation', 'dist_bin'], observed=True).r.agg(['size', 'mean']).reset_index().rename(columns={'size': 'n_pairs', 'mean': 'mean_r'})
     S['tissue'] = t; S['random_pair_floor'] = floor
     S.to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False)
-    P['tissue'] = t; P[['tissue', 'g1', 'g2', 'r', 'dist', 'orientation', 'pc']].to_csv(fDATA + 'pairs_{t}.csv.gz', index=False)
+    P['tissue'] = t; P[['tissue', 'g1', 'g2', 'r', 'dist', 'orientation', 'pc']].to_csv(OUTDIR + f'pairs_{t}.csv.gz', index=False)
     print(t, len(P), 'pairs; floor', round(floor, 4), flush=True)

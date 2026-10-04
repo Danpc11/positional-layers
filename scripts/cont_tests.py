@@ -1,18 +1,7 @@
-import numpy as np, pandas as pd, statsmodels.api as sm
-src = open('cohesin_v2.py').read(); src = src[:src.index('rows = []')]
-i0 = src.index("    hdr = pd.read_csv('GDC-PANCAN.gistic.tsv'"); i1 = src.index("    sym = g.sym.astype(str).values")
-src = src[:i0] + '''    Zc = np.load(f'cn_cont_{c}.npz', allow_pickle=True); CNd = pd.DataFrame(Zc['CN'], index=Zc['genes'], columns=Zc['samples'])
-    have = pd.Index(samp).isin(CNd.columns); D = D[:, have]; Y = Y[:, have]; samp = samp[have]
-    CNv = CNd.reindex(index=g.iloc[:, 0].values, columns=samp).fillna(0).values
-    global D_RAW; D_RAW = D.copy()
-    for i in range(D.shape[0]):                          # remove each gene's own continuous dosage effect (linear + quadratic)
-        x = CNv[i]
-        if np.std(x) < 1e-6: continue
-        X1 = np.column_stack([np.ones(len(x)), x, x ** 2]); D[i] -= X1 @ np.linalg.lstsq(X1, D[i], rcond=None)[0]
-''' + src[i1:]
-src = src.replace("'cna_burden': np.mean(CNv != 0, 0)", "'cna_burden': np.mean(np.abs(CNv) > 0.2, 0)")
-src = src.replace("SUB = {", "SUB = {'GBM': (['OLIG2', 'SOX2', 'PDGFRA'], ['CHI3L1', 'CD44', 'MET']), ")
-exec(src)
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
+import sys, os, numpy as np, pandas as pd, statsmodels.api as sm
+from lib_tumour import CHR, coding, prepare, trunc
 import sys, os
 WANT = sys.argv[1].split(',')
 def lagscore(D, chrs, lags):
@@ -20,7 +9,7 @@ def lagscore(D, chrs, lags):
     return np.mean([np.concatenate([Z[x[:-L]] * Z[x[L:]] for c in CHR for x in [np.where(chrs == c)[0]] if len(x) > L + 5], 0).mean(0) for L in lags], 0)
 an, te = [], []
 for c, gm in [x for x in [('BLCA', ['STAG2']), ('UCEC', ['CTCF']), ('STAD', None), ('COAD', None), ('GBM', None)] if x[0] in WANT]:
-    D, chrs, samp, cov = prepare(c); cna = cov.cna_burden.values
+    D, D_RAW, chrs, samp, cov = prepare(c, cn='continuous', return_raw=True); cna = cov.cna_burden.values
     for nm, M in [('raw', D_RAW), ('continuous CN corrected', D)]:
         far = lagscore(M, chrs, (20, 30)); near = lagscore(M, chrs, (1, 2, 3))
         an.append({'cohort': c, 'expression': nm, 'mean_far': far.mean(), 'rho_far_cna': pd.Series(far).corr(pd.Series(cna), method='spearman'), 'rho_cisexcess_cna': pd.Series(near - far).corr(pd.Series(cna), method='spearman')})
@@ -36,6 +25,6 @@ for c, gm in [x for x in [('BLCA', ['STAG2']), ('UCEC', ['CTCF']), ('STAD', None
                        'ci_low': 100 * fit.conf_int().loc['mutant', 0] / base, 'ci_high': 100 * fit.conf_int().loc['mutant', 1] / base, 'p_perm': (np.sum(np.abs(null) >= abs(obs)) + 1) / 10001})
     print(c, 'done', flush=True)
 A = pd.DataFrame(an); T = pd.DataFrame(te)
-A.to_csv('aneuploidy_continuousCN.csv', mode='a', header=not os.path.exists('aneuploidy_continuousCN.csv'), index=False)
-if len(T): T.to_csv('cohesin_continuousCN.csv', mode='a', header=not os.path.exists('cohesin_continuousCN.csv'), index=False)
+A.to_csv(OUTDIR + 'aneuploidy_continuousCN.csv', mode='a', header=not os.path.exists(OUTDIR + 'aneuploidy_continuousCN.csv'), index=False)
+if len(T): T.to_csv(OUTDIR + 'cohesin_continuousCN.csv', mode='a', header=not os.path.exists(OUTDIR + 'cohesin_continuousCN.csv'), index=False)
 pd.set_option('display.width', 200); print(A.round(3).to_string(index=False)); print(T.round(3).to_string(index=False))

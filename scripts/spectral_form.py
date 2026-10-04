@@ -1,13 +1,13 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Spectral form of the cis layer. Residual expression (GC + technical covariates removed), standardised per gene.
 Route A: autocorrelation rho(L) across samples -> fit exponential(s) -> lambda_acf.
 Route B: mean periodogram of the residual profiles along gene order -> fit discrete Lorentzian(s) + floor -> lambda_spec;
 compare with a power law + floor. Theory: exponential ACF <=> Lorentzian spectrum with the same lambda, no discrete peaks."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
 from scipy.optimize import curve_fit
 CHR = [str(i) for i in range(1, 23)] + ['X']; norm = lambda s: s.lower().replace('-', '_')
-BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
+BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
 G38 = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G38 = G38[~G38.index.duplicated()][['Chromosome', 'Start']]; G38.columns = ['chr', 'start']; G38['chr'] = G38.chr.astype(str); G38 = G38[G38.chr.isin(CHR)].join(BM[['gc']], how='inner')
 SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
 def resid_samples(D, F): F1 = np.column_stack([np.ones(F.shape[0]), F]); B = np.linalg.lstsq(F1, D.T, rcond=None)[0]; return (D.T - F1 @ B).T
@@ -16,9 +16,9 @@ def lor1(f, a, lam, c):     # discrete Lorentzian (spectrum of an exponential AC
     q = np.exp(-1 / lam); return c + a * (1 - q ** 2) / (1 - 2 * q * np.cos(2 * np.pi * f) + q ** 2)
 def lor2(f, a1, l1, a2, l2, c): return lor1(f, a1, l1, 0) + lor1(f, a2, l2, 0) + c
 def plaw(f, k, al, c): return c + k * f ** (-al)
-OUT = DATA + 'lorentz_results.csv'
+OUT = OUTDIR + 'lorentz_v2.csv'
 for t in sys.argv[1:]:
-    f = fDATA + 'gtex/gene_reads_adult_gtex_v11_{t}_gct.gz'
+    f = DATA + f'gtex/gene_reads_adult_gtex_v11_{t}_gct.gz'
     C = pd.read_csv(f, sep='\t', skiprows=2, index_col=0).drop(columns='Description'); C.index = C.index.str.split('.').str[0]; C = C[~C.index.duplicated()]
     samp = [x for x in C.columns if x in SA.index and pd.notna(SA.loc[x, 'SMRIN'])]; C = C[samp]; C = C.loc[C.index.intersection(G38.index)]; C = C[C.median(axis=1) >= 10]
     g = G38.loc[C.index].sort_values(['chr', 'start']); C = C.loc[g.index]; chrs = g.chr.values
@@ -42,13 +42,19 @@ for t in sys.argv[1:]:
         P = np.mean(np.abs(np.fft.rfft(Z[i], axis=0)[1:n // 2 + 1]) ** 2, axis=1) / n; fr = np.arange(1, n // 2 + 1) / n
         k = np.digitize(fr, bins) - 1; ok = (k >= 0) & (k < 60); np.add.at(acc, k[ok], P[ok]); np.add.at(cnt, k[ok], 1)
     m = cnt > 0; fx = np.sqrt(bins[:-1] * bins[1:])[m]; S = acc[m] / cnt[m]
+    # Review point 7: fit and evaluate on the SAME scale. The log of a bin-averaged periodogram has variance ~ 1/n_bin
+    # (n_bin = number of Fourier frequencies averaged in the bin), so fit log S with weights sqrt(n_bin) and compute the
+    # Gaussian AIC from the same weighted residual sum of squares.
+    wcnt = cnt[m]
     def fit(fun, p0, bnds):
-        p = curve_fit(fun, fx, S, p0=p0, bounds=bnds, maxfev=50000)[0]; r = np.log(S) - np.log(fun(fx, *p)); return p, np.sum(r ** 2)
+        lf = lambda f, *q: np.log(np.maximum(fun(f, *q), 1e-12))
+        p = curve_fit(lf, fx, np.log(S), p0=p0, bounds=bnds, sigma=1 / np.sqrt(wcnt), maxfev=200000)[0]
+        r = np.log(S) - lf(fx, *p); return p, np.sum(wcnt * r ** 2)
     pL1, rL1 = fit(lor1, [1, 5, 0.8], ([0, 0.3, 0], [100, 500, 10])); pL2, rL2 = fit(lor2, [0.3, 1, 0.5, 15, 0.8], ([0, 0.2, 0, 2, 0], [100, 5, 100, 500, 10])); pP, rP = fit(plaw, [0.01, 0.5, 0.8], ([0, 0, 0], [10, 3, 10]))
-    nf = len(fx); aic = lambda rss, k: nf * np.log(rss / nf) + 2 * k
+    nf = len(fx); aic = lambda rss, k: nf * np.log(rss / nf) + 2 * k + 2 * k * (k + 1) / (nf - k - 1)   # AICc
     resid = S / lor2(fx, *pL2); row = {'tissue': t, 'samples': Z.shape[1], 'lam_acf_1exp': e1[1], 'lam_acf_short': e2[1], 'lam_acf_long': e2[3], 'acf_rss_1exp': rss1, 'acf_rss_2exp': rss2,
         'lam_spec_1lor': pL1[1], 'lam_spec_short': pL2[1], 'lam_spec_long': pL2[3], 'AIC_lor1': aic(rL1, 3), 'AIC_lor2': aic(rL2, 5), 'AIC_powerlaw': aic(rP, 3), 'powerlaw_alpha': pP[1],
         'max_peak_over_fit': resid.max(), 'n_bins_over_1.5x_fit': int((resid > 1.5).sum())}
     pd.DataFrame([row]).to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False)
-    np.save(fDATA + 'spec_{t}.npy', np.vstack([fx, S, lor2(fx, *pL2), plaw(fx, *pP)]))
+    np.save(OUTDIR + f'spec_v2_{t}.npy', np.vstack([fx, S, lor2(fx, *pL2), plaw(fx, *pP)]))
     print(t, {k: round(v, 3) if isinstance(v, float) else v for k, v in row.items() if k != 'tissue'}, flush=True)

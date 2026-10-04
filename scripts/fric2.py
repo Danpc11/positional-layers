@@ -1,9 +1,9 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Friction 2: is the elevated clustering of active genes within TADs in tumours (Liang et al. 2026) a copy-number effect?
 Clustering z per sample: among the top-3,000 expressed protein-coding genes, number of TADs with >= 2 active genes versus
 200 random gene sets of the same size (as in their bootstrap test). TADs: segments between conserved boundaries
 (stability percentile >= 0.5, McArthur & Capra), genes placed with GRCh37 coordinates."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import glob, numpy as np, pandas as pd, pyannotables as pa
 from scipy import stats
 B = pd.read_csv(glob.glob(DATA + 'TAD-full/*/data/boundariesByStability/100kbBookendBoundaries_mainText/100kbBookendBoundaries_byStability.bed')[0], sep='\t')
@@ -25,11 +25,11 @@ def cluster_z(Y, ok_mask=None):
     return np.array(z)
 rows = []
 for c in ['BLCA', 'UCEC', 'STAD', 'COAD']:
-    z_ = np.load(fDATA + 'expr_{c}.npz', allow_pickle=True); X = z_['X']; genes = z_['genes']; samp = z_['samples']
+    z_ = np.load(OUTDIR + f'expr_{c}.npz', allow_pickle=True); X = z_['X']; genes = z_['genes']; samp = z_['samples']
     keep = pd.Index(genes).isin(tad.index[tad >= 0]); X = X[keep]; genes = genes[keep]; TI = tad.reindex(genes).values.astype(int)
     Y = np.log2(np.clip(2 ** X - 1, 0, None) / np.clip(2 ** X - 1, 0, None).sum(0) * 1e6 + 1)
     typ = np.array([s[13:15] for s in samp]); T = typ == '01'; N = typ == '11'
-    CNz = np.load(fDATA + 'cn_cont_{c}.npz', allow_pickle=True); CN = pd.DataFrame(CNz['CN'], index=CNz['genes'], columns=CNz['samples'])
+    CNz = np.load(OUTDIR + f'cn_cont_{c}.npz', allow_pickle=True); CN = pd.DataFrame(CNz['CN'], index=CNz['genes'], columns=CNz['samples'])
     tum = np.where(T & pd.Index(samp).isin(CN.columns))[0]; nor = np.where(N)[0]
     CNt = CN.reindex(index=genes, columns=samp[tum]).fillna(0).values; burden = np.mean(np.abs(CNt) > 0.2, 0)
     zN = cluster_z(Y[:, nor]); zT = cluster_z(Y[:, tum]); M = np.abs(CNt) <= 0.2; zT_clean = cluster_z(Y[:, tum], ok_mask=M)
@@ -38,4 +38,4 @@ for c in ['BLCA', 'UCEC', 'STAD', 'COAD']:
                  'rho_z_vs_CNA_burden': stats.spearmanr(zT, burden)[0], 'P_rho': stats.spearmanr(zT, burden)[1],
                  'z_tumour_CNA_genes_removed': np.nanmedian(zT_clean), 'z_normal_same_exclusion': np.nanmedian(zN_masked), 'P_clean_vs_normal_matched': stats.mannwhitneyu(zT_clean[np.isfinite(zT_clean)], zN_masked[np.isfinite(zN_masked)]).pvalue})
     print(c, 'done', flush=True)
-R = pd.DataFrame(rows); R.to_csv('friction2_tumour_tad_clustering.csv', index=False); pd.set_option('display.width', 250); print(R.round(4).to_string(index=False))
+R = pd.DataFrame(rows); R.to_csv(OUTDIR + 'friction2_tumour_tad_clustering.csv', index=False); pd.set_option('display.width', 250); print(R.round(4).to_string(index=False))

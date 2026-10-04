@@ -1,10 +1,10 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import glob, os, numpy as np, pandas as pd, statsmodels.formula.api as smf
 norm = lambda s: s.lower().replace('-', '_'); BINS = [-np.inf, 0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]
-P = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(DATA + 'pairs_*.csv.gz')}
-S = {norm(os.path.basename(f)[7:-7]): pd.read_csv(f) for f in glob.glob(DATA + 'shares_*.csv.gz')}
-Cc = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(DATA + 'coloc_*.csv.gz')}
+P = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(OUTDIR + 'pairs_*.csv.gz')}
+S = {norm(os.path.basename(f)[7:-7]): pd.read_csv(f) for f in glob.glob(OUTDIR + 'shares_*.csv.gz')}
+Cc = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(OUTDIR + 'coloc_*.csv.gz')}
 rows, dose = [], []
 for t in sorted(set(P) & set(S) & set(Cc)):
     d = P[t].merge(S[t], on=['g1', 'g2']).merge(Cc[t], on=['g1', 'g2']); d = d[(d.dist > 0) & d.fm1 & d.fm2].copy()
@@ -20,11 +20,11 @@ for t in sorted(set(P) & set(S) & set(Cc)):
     sm = d[(d.direction == 1) | (d.p_coloc == 0)]
     for lo, hi, lab in [(-1, 1e-9, '0'), (1e-9, 0.1, '0-0.1'), (0.1, 0.5, '0.1-0.5'), (0.5, 0.8, '0.5-0.8'), (0.8, 1.01, '>0.8')]:
         x = sm[(sm.p_coloc > lo) & (sm.p_coloc <= hi)]; dose.append({'tissue': t, 'p_coloc_bin': lab, 'n': len(x), 'mean_r': x.r.mean()})
-R = pd.DataFrame(rows); R.to_csv(DATA + 'coloc_cis_test.csv', index=False)
+R = pd.DataFrame(rows); R.to_csv(OUTDIR + 'coloc_cis_test.csv', index=False)
 pd.set_option('display.width', 250)
 print(R[['tissue', 'fine_mapped_pairs', 'n_coloc_same', 'n_coloc_opp', 'r_coloc_same', 'r_sig_shared_not_coloc', 'r_no_sharing', 'b_sig_same_alone', 'b_coloc_same', 'b_coloc_opp', 'b_sig_same_given_coloc']].round(3).to_string(index=False))
 print('\nmedians:'); print(R.drop(columns='tissue').median().round(4).to_string())
 print(f"\ncoloc_same > 0 in {(R.b_coloc_same > 0).sum()}/{len(R)} tissues (P<0.05 in {(R.p_coloc_same < 0.05).sum()}); coloc_opp < 0 in {(R.b_coloc_opp < 0).sum()}/{len(R)}")
 print(f"significant-variant sharing coefficient: alone {R.b_sig_same_alone.median():.3f} -> with colocalisation in the model {R.b_sig_same_given_coloc.median():.3f}")
-D = pd.DataFrame(dose); D.to_csv(DATA + 'coloc_dose_response.csv', index=False)
+D = pd.DataFrame(dose); D.to_csv(OUTDIR + 'coloc_dose_response.csv', index=False)
 print('\ndose-response (same-direction or none), median over tissues of mean r:'); print(D.groupby('p_coloc_bin', sort=False).agg(n=('n', 'sum'), median_r=('mean_r', 'median')).round(3).to_string())

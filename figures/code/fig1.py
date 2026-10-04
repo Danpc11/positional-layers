@@ -1,10 +1,11 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
-import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, DATA, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys
 import pyannotables as pa
-exec(open(DATA + 'theory_sim.py').read().split('out = {}')[0])
-R = pd.read_csv(A + 'atlas_results.csv'); P1 = pd.read_csv(DATA + 'p1_spectra.csv')
-BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'scripts'))
+from theory_sim import simulate
+R = pd.read_csv(A + 'atlas_results.csv'); P1 = pd.read_csv(OUTDIR + 'p1_spectra.csv')
+BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; G = G[G.Chromosome.astype(str).isin([str(i) for i in range(1, 23)])].join(BM[['gc', 'type']], how='inner'); G = G[G.type == 'protein_coding'].sort_values(['Chromosome', 'Start'])
 lags = np.arange(1, 61); ac = []
 for L_ in lags:
@@ -13,7 +14,7 @@ for L_ in lags:
         x = (g.gc.values - g.gc.mean()) / g.gc.std()
         if len(x) > L_ + 5: v.append(np.mean(x[:-L_] * x[L_:]))
     ac.append(np.mean(v))
-R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(A + 'isochore_law.csv'); P4 = pd.read_csv(DATA + 'p4_domain_scale_tests.csv'); P5 = pd.read_csv(DATA + 'p5a_liver_gc.csv'); S = pd.read_csv(DATA + 'sim_decay_recovery.csv'); P1 = pd.read_csv(DATA + 'p1_spectra.csv')
+R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(OUTDIR + 'isochore_v2.csv'); L = L.rename(columns={**{f'held_pred_L{k}': f'pred_L{k}' for k in (1, 2, 5, 10, 20, 30)}, **{f'held_obs_L{k}': f'obs_gc_component_L{k}' for k in (1, 2, 5, 10, 20, 30)}}); P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); P5 = pd.read_csv(OUTDIR + 'p5a_liver_gc.csv'); S = pd.read_csv(OUTDIR + 'sim_decay_recovery.csv'); P1 = pd.read_csv(OUTDIR + 'p1_spectra.csv')
 import schem
 fig = plt.figure(figsize=(W, W * 0.85)); gs = fig.add_gridspec(3, 3, hspace=0.55, wspace=0.5)
 # B identity in simulation
@@ -45,10 +46,10 @@ ax = fig.add_subplot(gs[2, 1])
 for lg, col in [(1, OI['blue']), (5, OI['green']), (20, OI['red'])]:
     ax.scatter(L[f'pred_L{lg}'], L[f'obs_gc_component_L{lg}'], s=9, color=col, lw=0, label=f'{lg} gene' + ('s' if lg > 1 else '') + f'  (r = {np.corrcoef(L[f"pred_L{lg}"], L[f"obs_gc_component_L{lg}"])[0, 1]:.2f})')
 m = max(L[[c for c in L.columns if c.startswith('obs')]].max().max(), L[[c for c in L.columns if c.startswith('pred')]].max().max()) * 1.05
-ax.plot([0, m], [0, m], 'k:', lw=0.7); ax.set_xlabel('Predicted GC component'); ax.set_ylabel('Observed GC component'); ax.legend(loc='upper left', fontsize=5.5)
+ax.plot([0, m], [0, m], 'k:', lw=0.7); ax.set_xlabel('Predicted, GC slope from odd chromosomes'); ax.set_ylabel('Observed, even chromosomes'); ax.legend(loc='upper left', fontsize=5.5)
 lab(ax, 'g')
 ax = fig.add_subplot(gs[2, 2]); g = S.groupby('true_lambda')[['naive', 'corrected']].median()
 ax.plot(g.index, g.naive, 'o-', color=OI['red'], ms=3, lw=1, label='naive'); ax.plot(g.index, g.corrected, 's-', color=OI['blue'], ms=3, lw=1, label='GC-corrected')
-ax.plot([0.8, 9], [0.8, 9], 'k:', lw=0.7, label='identity'); ax.set_xlabel('True cis length (genes)'); ax.set_ylabel('Estimated length (genes)'); ax.legend(loc='center left', bbox_to_anchor=(0.0, 0.52))
+ax.plot([1, 13], [1, 13], 'k:', lw=0.7, label='identity'); ax.set_xlim(0, 13.5); ax.set_ylim(0, 17); ax.set_xlabel('True cis length (genes)'); ax.set_ylabel('Estimated length (genes)'); ax.legend(loc='lower right', fontsize=5.6)
 lab(ax, 'h')
 save(fig, 'Fig1_nonpositional_layers'); print('Fig1_nonpositional_layers ok')

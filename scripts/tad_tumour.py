@@ -1,8 +1,8 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
-import numpy as np, pandas as pd, pyannotables as pa, statsmodels.api as sm, glob
-src = open('cohesin_v2.py').read(); src = src[:src.index('rows = []')].replace("    return D, g.chr.values, samp, cov", "    return D, g.chr.values, samp, cov, g.iloc[:, 0].values")
-exec(src)
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
+import sys, os, glob, numpy as np, pandas as pd, pyannotables as pa, statsmodels.api as sm
+from lib_tumour import CHR, coding, prepare, trunc
+
 B = pd.read_csv(glob.glob(DATA + 'TAD-full/*/data/boundariesByStability/100kbBookendBoundaries_mainText/100kbBookendBoundaries_byStability.bed')[0], sep='\t')
 B['chr'] = B.chr.str.replace('chr', ''); B['mid'] = (B['loc'] + B['loc2']) / 2
 G37 = pa.tables()['homo_sapiens-GRCh37-ensembl100']; G37 = G37[~G37.index.duplicated()]; mid37 = ((G37.Start + G37.End) / 2); chr37 = G37.Chromosome.astype(str)
@@ -24,7 +24,7 @@ def score(D, chrs, i, mask):
     return near - far
 rows = []
 for c, gm in [('BLCA', ['STAG2']), ('UCEC', ['CTCF'])]:
-    D, chrs, samp, cov, gids = prepare(c); i, cls = pair_classes(gids, chrs)
+    D, chrs, samp, cov, gids = prepare(c, return_gids=True); i, cls = pair_classes(gids, chrs)
     print(c, pd.Series(cls).value_counts().to_dict(), flush=True)
     S = {k: score(D, chrs, i, cls == k) for k in ('within', 'stable')}
     for mclass, srcm in [('all coding', coding), ('truncating', trunc)]:
@@ -37,4 +37,4 @@ for c, gm in [('BLCA', ['STAG2']), ('UCEC', ['CTCF'])]:
                 res[f'{k}_wt'] = base; res[f'{k}_effect_pct'] = 100 * f.params['mutant'] / abs(base); res[f'{k}_p'] = f.pvalues['mutant']
             dd = S['within'][keep] - S['stable'][keep]; f = sm.OLS(dd, Xd).fit(cov_type='HC3'); res['within_minus_stable_effect'] = f.params['mutant']; res['p_difference'] = f.pvalues['mutant']
             rows.append(res)
-R = pd.DataFrame(rows); R.to_csv('tad_tumour_results.csv', index=False); pd.set_option('display.width', 250); print(R.round(4).to_string(index=False))
+R = pd.DataFrame(rows); R.to_csv(OUTDIR + 'tad_tumour_results.csv', index=False); pd.set_option('display.width', 250); print(R.round(4).to_string(index=False))

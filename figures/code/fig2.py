@@ -1,7 +1,7 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
-import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
-R = pd.read_csv(A + 'atlas_results.csv'); O = pd.read_csv(A + 'orientation_by_tissue.csv'); F = pd.read_csv(A + 'robust_families.csv'); Lz = pd.read_csv(A + 'lorentz_results.csv')
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
+R = pd.read_csv(A + 'atlas_results.csv'); O = pd.read_csv(A + 'orientation_by_tissue.csv'); F = pd.read_csv(A + 'robust_families.csv'); Lz = pd.read_csv(OUTDIR + 'lorentz_v2.csv')
 import schem
 fig = plt.figure(figsize=(W, W * 0.55)); gs = fig.add_gridspec(2, 4, hspace=0.55, wspace=0.65)
 
@@ -19,7 +19,7 @@ ax = fig.add_subplot(gs[1, 0]); cats = [('r_same_stem', 'same gene family'), ('r
 med = [F[c].median() for c, _ in cats]; lo = [F[c].quantile(0.25) for c, _ in cats]; hi = [F[c].quantile(0.75) for c, _ in cats]
 cols = ['0.6', '0.6', '0.6', OI['blue'], OI['green']]; x = np.arange(len(cats)); ax.bar(x, med, color=cols, width=0.65); ax.errorbar(x, med, yerr=[np.subtract(med, lo), np.subtract(hi, med)], fmt='none', ecolor='k', lw=0.7, capsize=2)
 ax.set_xticks(x); ax.set_xticklabels([n for _, n in cats], rotation=30, ha='right', fontsize=6); ax.set_ylabel('Adjacent-pair correlation'); lab(ax, 'd')
-ax = fig.add_subplot(gs[1, 1]); sp = np.load(A + 'spec_thyroid.npy'); ax.loglog(sp[0], sp[1], 'o', ms=2.5, color='0.25', label='thyroid, 684 samples'); ax.loglog(sp[0], sp[2], color=OI['blue'], lw=1.2, label='two Lorentzians')
+ax = fig.add_subplot(gs[1, 1]); sp = np.load(OUTDIR + 'spec_v2_thyroid.npy'); ax.loglog(sp[0], sp[1], 'o', ms=2.5, color='0.25', label='thyroid, 684 samples'); ax.loglog(sp[0], sp[2], color=OI['blue'], lw=1.2, label='two Lorentzians')
 ax.loglog(sp[0], sp[3], color=OI['red'], lw=0.9, ls='--', label='power law'); ax.set_xlabel('Spatial frequency (cycles per gene)'); ax.set_ylabel('Covariance spectrum S(f)'); ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.3), ncol=3, fontsize=5.2, columnspacing=0.8)
 lab(ax, 'e')
 ax = fig.add_subplot(gs[1, 2:4]); xs = np.arange(len(Lz))

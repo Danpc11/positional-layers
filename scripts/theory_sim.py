@@ -1,11 +1,11 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Simulations for the positional-layer theory.
 x[s,j] = mu[j] + beta[j]*z[s] + c[s,j] + b[s]*gc[j] + e[s,j]
   mu: tissue landscape (no positional structure); c: cis co-regulation (moving average of local regulators, decay length lam);
   b*gc: per-sample technical GC bias acting on isochore-clustered GC; beta*z: stage effect, locally smoothed.
 Checks: (1) spectral decomposition identity; (2) 'universal peaks' with real vs random gene order; (3) GC creates a false
 domain scale; (4) recovery of the cis decay length by naive vs corrected estimators."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd
 rng = np.random.default_rng(42)
 def ar1(n, phi, rng): x = np.zeros(n); x[0] = rng.normal()
@@ -56,29 +56,30 @@ def deviations(X, GC=None, z=None):
     return D
 def decay_length(prof):
     m = prof > 0.01; b = np.polyfit(LAGS[m], np.log(prof[m]), 1) if m.sum() >= 3 else [np.nan]; return -1 / b[0]
-out = {}
-# (1) identity: mean periodogram = |FT(mu_hat)|^2 + FT of the lag-summed (circular) sample covariance
-X, chrs, GC, mu, z = simulate(seed=1); c0 = chrs == 0; Xc = X[:, c0]; n = Xc.shape[1]
-mbar = Xc.mean(0); Dv = Xc - mbar
-lhs = np.mean([np.abs(np.fft.fft(x)) ** 2 for x in Xc], 0)
-C = np.array([np.mean(np.sum(Dv * np.roll(Dv, -L, axis=1), 1)) for L in range(n)])
-rhs = np.abs(np.fft.fft(mbar)) ** 2 + np.real(np.fft.fft(C))
-out['identity_max_rel_error'] = float(np.max(np.abs(lhs - rhs) / lhs))
-out['landscape_share_of_power'] = float(np.sum(np.abs(np.fft.fft(mbar)) ** 2) / np.sum(lhs))
-# (2) universal peaks with real vs random order, with and without positional structure
-for name, kw in [('landscape only', dict(cis=False, gc=False, stage=False)), ('full model', {})]:
-    Xs, ch, *_ = simulate(seed=2, **kw); out[f'universal_{name}_real'] = universal(Xs, ch); out[f'universal_{name}_random'] = universal(Xs, ch, perm_seed=5)
-# (3) GC creates a false domain scale; correction recovers the cis-only truth
-Xg, ch, GCg, _, zg = simulate(seed=3, cis=True, gc=True); Xt, cht, *_ = simulate(seed=3, cis=True, gc=False)
-prof_raw = lagprof(deviations(Xg, z=zg), ch); prof_corr = lagprof(deviations(Xg, GC=GCg, z=zg), ch); prof_truth = lagprof(deviations(Xt, z=zg), cht)
-pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corrected': prof_corr, 'truth_no_GC': prof_truth}).to_csv(DATA + 'sim_lag_profiles.csv', index=False)
-# (4) recovery of the true cis decay length
-rec = []
-for lam in [1, 2, 3, 5, 8]:
-    for rep in range(3):
-        Xr, chr_, GCr, _, zr = simulate(seed=100 + 10 * lam + rep, lam=lam)
-        rec.append({'true_lambda': lam, 'rep': rep, 'naive': decay_length(lagprof(deviations(Xr, z=zr), chr_)), 'corrected': decay_length(lagprof(deviations(Xr, GC=GCr, z=zr), chr_))})
-REC = pd.DataFrame(rec); REC.to_csv(DATA + 'sim_decay_recovery.csv', index=False)
-pd.Series(out).to_csv(DATA + 'sim_summary.csv')
-print(pd.Series(out).round(4).to_string()); print(pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corr': prof_corr, 'truth': prof_truth}).round(3).to_string(index=False))
-print(REC.groupby('true_lambda')[['naive', 'corrected']].median().round(2).to_string())
+if __name__ == '__main__':
+    out = {}
+    # (1) identity: mean periodogram = |FT(mu_hat)|^2 + FT of the lag-summed (circular) sample covariance
+    X, chrs, GC, mu, z = simulate(seed=1); c0 = chrs == 0; Xc = X[:, c0]; n = Xc.shape[1]
+    mbar = Xc.mean(0); Dv = Xc - mbar
+    lhs = np.mean([np.abs(np.fft.fft(x)) ** 2 for x in Xc], 0)
+    C = np.array([np.mean(np.sum(Dv * np.roll(Dv, -L, axis=1), 1)) for L in range(n)])
+    rhs = np.abs(np.fft.fft(mbar)) ** 2 + np.real(np.fft.fft(C))
+    out['identity_max_rel_error'] = float(np.max(np.abs(lhs - rhs) / lhs))
+    out['landscape_share_of_power'] = float(np.sum(np.abs(np.fft.fft(mbar)) ** 2) / np.sum(lhs))
+    # (2) universal peaks with real vs random order, with and without positional structure
+    for name, kw in [('landscape only', dict(cis=False, gc=False, stage=False)), ('full model', {})]:
+        Xs, ch, *_ = simulate(seed=2, **kw); out[f'universal_{name}_real'] = universal(Xs, ch); out[f'universal_{name}_random'] = universal(Xs, ch, perm_seed=5)
+    # (3) GC creates a false domain scale; correction recovers the cis-only truth
+    Xg, ch, GCg, _, zg = simulate(seed=3, cis=True, gc=True); Xt, cht, *_ = simulate(seed=3, cis=True, gc=False)
+    prof_raw = lagprof(deviations(Xg, z=zg), ch); prof_corr = lagprof(deviations(Xg, GC=GCg, z=zg), ch); prof_truth = lagprof(deviations(Xt, z=zg), cht)
+    pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corrected': prof_corr, 'truth_no_GC': prof_truth}).to_csv(OUTDIR + 'sim_lag_profiles.csv', index=False)
+    # (4) recovery of the true cis decay length
+    rec = []
+    for lam in [1, 2, 3, 5, 8]:
+        for rep in range(3):
+            Xr, chr_, GCr, _, zr = simulate(seed=100 + 10 * lam + rep, lam=lam)
+            rec.append({'true_lambda': lam, 'rep': rep, 'naive': decay_length(lagprof(deviations(Xr, z=zr), chr_)), 'corrected': decay_length(lagprof(deviations(Xr, GC=GCr, z=zr), chr_))})
+    REC = pd.DataFrame(rec); REC.to_csv(OUTDIR + 'sim_decay_recovery.csv', index=False)
+    pd.Series(out).to_csv(OUTDIR + 'sim_summary.csv')
+    print(pd.Series(out).round(4).to_string()); print(pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corr': prof_corr, 'truth': prof_truth}).round(3).to_string(index=False))
+    print(REC.groupby('true_lambda')[['naive', 'corrected']].median().round(2).to_string())

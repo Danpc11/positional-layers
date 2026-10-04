@@ -49,46 +49,68 @@ def landscape_share(X: np.ndarray) -> float:
 
 
 
+def _gc_basis(gc, degree):
+    """Orthonormal basis of [1, g, ..., g^degree] with its EFFECTIVE rank.
+
+    Review point 5: with constant GC (or fewer distinct GC values than the degree), the polynomial columns are collinear.
+    A plain QR still returns `degree + 1` columns, and projecting on the spurious ones removes signal unrelated to GC.
+    We keep only directions whose singular value is non-negligible."""
+    g = np.asarray(gc, float)
+    sd = g.std()
+    g = (g - g.mean()) / sd if sd > 0 else np.zeros_like(g)
+    D = np.vstack([g ** k for k in range(degree + 1)]).T
+    U, s, _ = np.linalg.svd(D, full_matrices=False)
+    keep = s > s[0] * 1e-10 * max(D.shape)
+    return U[:, keep]
+
+
 def gc_correct(X: np.ndarray, gc: np.ndarray, degree: int = 2) -> np.ndarray:
     """Remove a per-sample polynomial trend on gene GC content (the technical isochore layer).
 
-    The basis includes the constant column, so this also removes each sample's mean across
-    genes. That is deliberate (a per-sample offset is not positional information) but it
-    means the output rows are centred. On simulated data with no GC bias at all the
-    correction costs 0.3% of the adjacent-gene correlation, so it does not eat real signal.
+    X is samples x genes. The basis includes the constant column, so each sample's mean across genes is also removed: a
+    per-sample offset is not positional information, and rows come out centred. When GC is constant the basis has rank 1
+    and only the per-sample mean is removed. On simulated data with no GC bias the correction costs 0.3% of the
+    adjacent-gene correlation; when real regulation tracks GC it can remove much more at domain scale (see
+    scripts/gc_correlated_sim.py), so it cannot separate technical bias from GC-associated biology.
     """
     X = np.asarray(X, float)
-    g = (np.asarray(gc, float) - np.mean(gc)) / (np.std(gc) + 1e-12)
-    D = np.vstack([g ** k for k in range(degree + 1)]).T
-    Q, _ = np.linalg.qr(D)
+    if X.ndim != 2 or X.shape[1] != len(gc):
+        raise ValueError(f'X must be samples x genes with {len(gc)} genes; got shape {X.shape}')
+    Q = _gc_basis(gc, degree)
     return X - (X @ Q) @ Q.T
 
 
 def gc_slopes(X: np.ndarray, gc: np.ndarray) -> np.ndarray:
-    """Per-sample GC slope b_s, whose variance drives the isochore law."""
+    """Per-sample GC slope b_s (OLS on standardised GC with an intercept), whose variance drives the isochore law.
+    Returns zeros when GC is constant, where the slope is not identifiable."""
     X = np.asarray(X, float)
-    g = (np.asarray(gc, float) - np.mean(gc)) / (np.std(gc) + 1e-12)
-    Y = X - X.mean(0)
+    g = np.asarray(gc, float)
+    if X.shape[1] != len(g):
+        raise ValueError(f'X must be samples x genes with {len(g)} genes; got shape {X.shape}')
+    if g.std() == 0:
+        return np.zeros(X.shape[0])
+    g = (g - g.mean()) / g.std()
+    Y = X - X.mean(1, keepdims=True)
     return (Y @ g) / (g @ g)
 
 
 def lag_profile_linear(Y: np.ndarray, n_genes: int, n_chrom: int, max_lag: int = 60) -> np.ndarray:
     """Non-circular lag correlation profile, averaged over chromosomes and samples.
 
-    This is the estimator used for the per-tissue coupling atlas in the paper: genes are
-    standardised across samples, and pairs are taken within a chromosome without wrapping.
+    Y is samples x genes with the genes of n_chrom chromosomes of n_genes each, concatenated. This is the estimator used for
+    the coupling atlas: genes standardised across samples, pairs taken within a chromosome without wrapping. Lags with no
+    pairs (max_lag >= n_genes) are returned as NaN instead of failing.
     """
     Y = np.asarray(Y, float)
-    Z = Y / (Y.std(0) + 1e-12)
-    out = np.zeros(max_lag + 1)
-    for L in range(max_lag + 1):
+    if Y.ndim != 2 or Y.shape[1] != n_genes * n_chrom:
+        raise ValueError(f'Y must be samples x (n_genes * n_chrom) = {n_genes * n_chrom} columns; got shape {Y.shape}')
+    Z = (Y - Y.mean(0)) / (Y.std(0) + 1e-12)
+    out = np.full(max_lag + 1, np.nan)
+    for L in range(min(max_lag, n_genes - 1) + 1):
         acc, cnt = 0.0, 0
         for c in range(n_chrom):
             s = slice(c * n_genes, (c + 1) * n_genes)
             A, B = Z[:, s][:, :n_genes - L], Z[:, s][:, L:]
-            if A.shape[1] == 0:
-                continue
-            acc += float(np.mean(A * B)) * A.shape[1]
-            cnt += A.shape[1]
-        out[L] = acc / cnt if cnt else np.nan
+            acc += float(np.mean(A * B)) * A.shape[1]; cnt += A.shape[1]
+        out[L] = acc / cnt
     return out

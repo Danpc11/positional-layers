@@ -1,5 +1,7 @@
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd, statsmodels.formula.api as smf
-D = pd.read_csv('crispri_pairs.csv.gz'); D = D[np.isfinite(D.resp) & np.isfinite(D.r)]; D['resp'] = D.resp.clip(-20, 20); D['rk'] = D.r * D.kd
+D = pd.read_csv(OUTDIR + 'crispri_pairs.csv.gz'); D = D[np.isfinite(D.resp) & np.isfinite(D.r)]; D['resp'] = D.resp.clip(-20, 20); D['rk'] = D.r * D.kd
 CI = D[D.type == 'cis'].copy(); TR = D[D.type == 'trans'].copy()
 CI['dbin'] = pd.cut(CI.dist, [-1, 1e4, 5e4, 2e5, 5e5, 1e6], labels=['a<10kb', 'b10-50kb', 'c50-200kb', 'd200-500kb', 'e0.5-1Mb']).astype(str)
 print(f'cis pairs {len(CI):,} | trans pairs {len(TR):,} | perturbations {D.pert.nunique():,}')

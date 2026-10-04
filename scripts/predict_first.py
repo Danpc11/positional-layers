@@ -1,10 +1,10 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """STEP 1 — predictions fixed from GTEx whole blood only (baseline cis coupling), blind to the edited-cell data."""
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import pandas as pd, numpy as np, pyannotables as pa
 CHR = [str(i) for i in range(1, 23)] + ['X']
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; sym = G.gene_name.astype(str)
-P = pd.read_csv(DATA + 'pairs_whole_blood.csv.gz')
+P = pd.read_csv(OUTDIR + 'pairs_whole_blood.csv.gz')
 P['s1'] = sym.reindex(P.g1).values; P['s2'] = sym.reindex(P.g2).values
 def neighbours(target, k=6):
     """genes within k positions of the target on the GTEx-blood gene order, with the coupling of the intervening pairs"""
@@ -26,6 +26,6 @@ def neighbours(target, k=6):
 pred = pd.concat([neighbours(t) for t in ['BCL11A', 'HBG1', 'HBG2', 'HBB', 'HBD']]).drop_duplicates(['target', 'neighbour'])
 pred['predicted_direction'] = np.where(pred.coupling_r > 0, 'same as target', 'opposite to target')
 pred = pred.sort_values(['target', 'coupling_r'], ascending=[True, False])
-pred.to_csv('predictions_from_GTEx_blood.csv', index=False)
+pred.to_csv(OUTDIR + 'predictions_from_GTEx_blood.csv', index=False)
 pd.set_option('display.width', 200); print(pred.round(3).to_string(index=False))
 print('\nblood-wide reference: median |r| %.3f, 90th percentile %.3f' % (P.r.abs().median(), P.r.quantile(0.9)))

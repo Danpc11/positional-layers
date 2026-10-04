@@ -1,5 +1,5 @@
-import os
-DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import os, sys
+from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys
 THR = float(sys.argv[1]) if len(sys.argv) > 1 else 10
 import glob, os, re, numpy as np, pandas as pd, pyannotables as pa
@@ -10,7 +10,7 @@ G['chr'] = G.Chromosome.astype(str); G['len'] = G.End - G.Start
 # ---- SLAM-seq: newly synthesised reads per gene (Entrez), mapped to Ensembl by 3' UTR overlap on the same strand
 def load(f):
     d = pd.read_csv(f, sep='\t'); return d.groupby('Name').agg(chr=('Chromosome', 'first'), s=('Start', 'min'), e=('End', 'max'), strand=('Strand', 'first'), tc=('TcReadCount', 'sum'), tot=('ReadCount', 'sum'))
-files = {re.search(r'Sample(\d+)', f).group(1): f for f in glob.glob('GSM*_tcount.tsv.gz')}
+files = {re.search(r'Sample(\d+)', f).group(1): f for f in glob.glob(DATA + 'slam/GSM*_tcount.tsv.gz')}
 ref = load(files['26']); ref['chr'] = ref.chr.str.replace('chr', '')
 emap = {}
 for c, d in ref.groupby('chr'):
@@ -21,8 +21,8 @@ for c, d in ref.groupby('chr'):
 TC = pd.DataFrame({k: load(f).tc for k, f in files.items()}).fillna(0); TC = TC[TC.index.isin(emap)]; TC.index = [emap[i] for i in TC.index]; TC = TC.groupby(level=0).sum()
 print('genes mapped:', len(TC))
 # ---- baseline coupling in myeloid leukaemia (BeatAML2), adjacent genes in GRCh38 order, GC-corrected
-BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
-B = pd.read_csv(DATA + 'beataml_waves1to4_counts_dbgap.txt', sep='\t'); B['gid'] = B.stable_id.str.split('.').str[0]
+BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
+B = pd.read_csv(DATA + 'beataml/beataml_waves1to4_counts_dbgap.txt', sep='\t'); B['gid'] = B.stable_id.str.split('.').str[0]
 B = B.drop_duplicates('gid').set_index('gid')[[x for x in B.columns if x.startswith('BA')]]; B = B.loc[B.index.intersection(G.index).intersection(BM.index)]; B = B[B.median(axis=1) >= 10]
 g = G.loc[B.index].sort_values(['chr', 'Start']); B = B.loc[g.index]
 Y = np.log2(B.values / B.values.sum(0) * 1e6 + 1); D = Y - Y.mean(1, keepdims=True); gc = BM.loc[g.index, 'gc'].values; gcz = (gc - gc.mean()) / gc.std()
@@ -49,6 +49,6 @@ for cell, drug, cls, ctrl, trt in COMP:
     slope, _, _, p, _ = stats.linregress(d.r, prod); q = pd.qcut(d.r, 5, labels=False)
     rows.append({'cell': cell, 'perturbation': drug, 'class': cls, 'replicates': f'{len(ctrl)}v{len(trt)}', 'pairs': len(d), 'slope_on_baseline_coupling': slope, 'p': p,
                  'concordance_low_coupling': np.corrcoef(d.t1[q == 0], d.t2[q == 0])[0, 1], 'concordance_high_coupling': np.corrcoef(d.t1[q == 4], d.t2[q == 4])[0, 1]})
-R = pd.DataFrame(rows); R.to_csv(f'drug_cis_results_thr{int(THR)}.csv', index=False); pd.set_option('display.width', 220); print(R.round(3).to_string(index=False))
+R = pd.DataFrame(rows); R.to_csv(OUTDIR + f'drug_cis_results_thr{int(THR)}.csv', index=False); pd.set_option('display.width', 220); print(R.round(3).to_string(index=False))
 print('\nmedian slope by class:'); print(R.groupby('class').slope_on_baseline_coupling.median().round(3).to_string())
 print('Mann-Whitney chromatin vs signalling P = %.3f' % stats.mannwhitneyu(R[R['class'] == 'chromatin/transcription'].slope_on_baseline_coupling, R[R['class'] == 'signalling'].slope_on_baseline_coupling).pvalue)
