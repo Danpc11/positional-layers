@@ -89,10 +89,6 @@ API (constant GC, chromosomes shorter than the lag), the decay-length estimator,
 purpose: GC correction removes GC-tracking regulation at domain scale, and comparing a power law with a fixed-size hub
 cannot identify a saturating response. CI also fails on any undefined name.
 
-## Review
-
-Version 1.1.0 answers an external review of the code and methods point by point; see `REVIEW_RESPONSE.md`.
-
 ## Citation
 
 Pérez-Calixto, D. *et al.* Shared cis-regulation drives local gene co-expression across human tissues (2026).
