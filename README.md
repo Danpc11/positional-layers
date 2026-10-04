@@ -51,7 +51,7 @@ saturation_exponent(contact=1.0, K=1.0)                   # 0.5
 | --- | --- |
 | `src/poslayers/` | Reference implementation: `decompose.py`, `laws.py`, `simulate.py` |
 | `scripts/` | Analysis scripts, one per result, and two shared libraries; see `scripts/SCRIPTS.md` |
-| `figures/code/` | One script per main and Extended Data figure |
+| `figures/code/` | One script per main and Extended Data figure; `style.py` places panel letters and keeps legends off the data |
 | `docs/` | The interactive simulator served by GitHub Pages |
 | `tests/` | Tests of the identity and of each law |
 | `data/` | `MANIFEST.md` only. Inputs are public; see below |
