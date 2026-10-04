@@ -1,11 +1,11 @@
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys, glob; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys
+import sys, glob; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
 E = pd.read_csv(A + 'eqtl_cis_test.csv'); Dz = pd.read_csv(A + 'coloc_dose_response.csv'); SP = pd.read_csv(A + 'eqtl_tissue_specificity.csv'); Cc = pd.read_csv(A + 'coloc_cis_test.csv')
 PC = pd.read_csv(OUTDIR + 'eqtl_law_v2_pairs.csv').rename(columns={'pred_r': 'pred_genetic_r', 'obs_r_int_pc15': 'obs_r'})
 import schem
 rng = np.random.default_rng(0)
-fig = plt.figure(figsize=(W, W * 0.55)); gs = fig.add_gridspec(2, 4, hspace=0.6, wspace=0.65)
+fig = plt.figure(figsize=(W, W * 0.66)); gs = fig.add_gridspec(2, 4, hspace=0.6, wspace=0.65)
 
 ax = fig.add_subplot(gs[0, 0:2]); schem.shared_variant(ax); lab(ax, 'a', -0.04)
 ax = fig.add_subplot(gs[0, 2]); cats = [('r_not_both_eGenes', 'not both\neGenes', '0.6'), ('r_eGenes_no_share', 'no shared\nvariant', OI['sky']), ('r_share_same', 'shared,\nsame sign', OI['blue'])]
@@ -24,7 +24,17 @@ ax = fig.add_subplot(gs[1, 1]); PC['bin'] = pd.qcut(PC.pred_genetic_r, 8, duplic
 ax.errorbar(b.p, b.o, yerr=1.96 * b.se, fmt='o', color=OI['blue'], ms=4, capsize=2); sl = np.polyfit(PC.pred_genetic_r, PC.obs_r, 1); xx = np.linspace(b.p.min(), b.p.max(), 10)
 ax.set_xscale('symlog', linthresh=0.01); ax.set_xlabel('Predicted genetic correlation, Σ w·2p(1−p)β₁β₂'); ax.set_ylabel('Observed coupling (normalized expr.)')
 ax.text(0.05, 0.9, f'slope {sl[0]:.2f}; r = {np.corrcoef(PC.pred_genetic_r, PC.obs_r)[0, 1]:.2f}', transform=ax.transAxes, fontsize=6); lab(ax, 'e')
-ax = fig.add_subplot(gs[1, 2:4]); ax.scatter(SP.b_other, SP.b_own, s=4, color=OI['green'], alpha=0.5, lw=0); m = max(SP.b_own.max(), SP.b_other.max()); mn = min(SP.b_own.min(), SP.b_other.min())
-ax.plot([mn, m], [mn, m], 'k:', lw=0.7); ax.set_xlabel('Effect of sharing in another tissue'); ax.set_ylabel('Effect of sharing in the same tissue')
+# f: tissue x tissue heatmap of the effect of sharing a variant; the diagonal (same tissue) dominates each row
+SP['diff'] = SP.b_own - SP.b_other
+Mx = SP.pivot_table(index='coupling_tissue', columns='eqtl_tissue', values='diff', aggfunc='mean')
+tis = Mx.mean(1).sort_values(ascending=False).index.tolist(); Mx = Mx.reindex(index=tis, columns=tis)
+v = np.nanpercentile(np.abs(Mx.values), 98)
+ax = fig.add_subplot(gs[1, 2:4]); im = ax.imshow(Mx.values, cmap='RdBu_r', vmin=-v, vmax=v, aspect='auto', interpolation='nearest')
+ax.set_xticks(range(len(tis))); ax.set_xticklabels([tissue_label(t) for t in tis], rotation=90, fontsize=3.2)
+ax.set_yticks(range(len(tis))); ax.set_yticklabels([tissue_label(t) for t in tis], fontsize=3.2)
+ax.set_xlabel('Other tissue in which the variant is shared', fontsize=6); ax.set_ylabel('Tissue in which coupling is measured', fontsize=6)
+ax.tick_params(length=1, pad=1)
+cb = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.02); cb.set_label('Own-tissue minus other-tissue effect', fontsize=5.2); cb.ax.tick_params(labelsize=5)
+ax.text(1.0, 1.02, f'red: own tissue stronger ({100 * (SP["diff"] > 0).mean():.0f}% of 1,118 tissue pairs)', transform=ax.transAxes, ha='right', va='bottom', fontsize=5)
 lab(ax, 'f')
 save(fig, 'Fig3_genetic_component'); print('Fig3_genetic_component ok')
