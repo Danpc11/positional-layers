@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+env/
+*.egg-info/
+build/
+dist/
+data/*
+!data/.gitkeep
+figures/output/
+*.npz
+*.parquet
+*.hic
+*.csv.gz
+.DS_Store
