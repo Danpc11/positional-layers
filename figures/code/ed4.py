@@ -1,5 +1,7 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Extended Data Fig. 4: heatmaps summarising the atlas, the laws and the perturbation rules."""
-import sys; sys.path.insert(0, '/home/claude/figs')
+import sys; sys.path.insert(0, os.path.dirname(__file__))
 from style import *
 import schem
 R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(A + 'isochore_law.csv'); E = pd.read_csv(A + 'eqtl_cis_test.csv')

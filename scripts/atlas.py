@@ -1,11 +1,13 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Positional-layer atlas across GTEx tissues: landscape, technical isochore (GC) and cis covariance."""
 import sys, os, glob, numpy as np, pandas as pd
 from scipy import stats
-OUT = '/home/claude/atlas/atlas_results.csv'
+OUT = DATA + 'atlas_results.csv'
 BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene start (bp)': 'start', 'Chromosome/scaffold name': 'chr'})
 CHR = [str(i) for i in range(1, 23)] + ['X']
 BM = BM[BM.chr.astype(str).isin(CHR)].drop_duplicates('gid').set_index('gid'); BM['chr'] = BM.chr.astype(str)
-SA = pd.read_csv('/home/claude/repo/data/external/GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
+SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
 lags = np.array([1, 2, 3, 4, 5, 7, 10, 15, 20, 30, 150, 200, 300])
 def prof(D, chrs, perm=False):
     out = {l: [] for l in lags}

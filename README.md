@@ -9,12 +9,12 @@ organisation. This repository contains the reference implementation of the decom
 the three quantitative laws, the analysis scripts that reproduce every figure, and an interactive
 simulator.
 
-**Interactive simulator:** https://<user>.github.io/positional-layers/
+**Interactive simulator:** https://Danpc11.github.io/positional-layers/
 
 ## Install
 
 ```bash
-git clone https://github.com/<user>/positional-layers
+git clone https://github.com/Danpc11/positional-layers
 cd positional-layers
 pip install -e .
 ```
@@ -82,12 +82,14 @@ python scripts/cont_tests.py      # STAG2 and the dosage term
 ## Reproducing the figures
 
 ```bash
-python figures/code/nn_fig1.py    # ... through nn_fig6.py
-python figures/code/nn_ed4.py     # heatmap summary
+python figures/code/fig1.py       # ... through fig6.py
+python figures/code/ed4.py        # heatmap summary
 ```
 
 Figures are written to `figures/output/`. The shared style, colour tokens and schematic
 primitives live in `figures/code/style.py` and `figures/code/schem.py`.
+
+See `scripts/SCRIPTS.md` for which script produces which figure panel.
 
 ## Tests
 

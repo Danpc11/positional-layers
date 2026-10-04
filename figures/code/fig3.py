@@ -1,4 +1,6 @@
-import sys, glob; sys.path.insert(0, '/home/claude/figs'); from style import *
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import sys, glob; sys.path.insert(0, os.path.dirname(__file__)); from style import *
 E = pd.read_csv(A + 'eqtl_cis_test.csv'); Dz = pd.read_csv(A + 'coloc_dose_response.csv'); SP = pd.read_csv(A + 'eqtl_tissue_specificity.csv'); Cc = pd.read_csv(A + 'coloc_cis_test.csv')
 PC = pd.concat([pd.read_csv(f) for f in glob.glob(A + 'predcal_*.csv.gz')])
 import schem

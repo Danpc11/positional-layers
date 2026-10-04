@@ -1,3 +1,5 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Does CRISPRi silencing of a gene propagate to its cis-coupled neighbours? (Replogle 2022 K562 genome-wide Perturb-seq)
 Response: z-normalised pseudobulk (relative to non-targeting controls), robustly rescaled per perturbation.
 Baseline coupling: correlation across 615 BeatAML2 leukaemias (GC-corrected), for target-gene pairs.
@@ -13,7 +15,7 @@ obs = obs[keep]; X = X[keep.values]; print('effective perturbations (>=50% knock
 med = np.median(X, 1, keepdims=True); mad = np.median(np.abs(X - med), 1, keepdims=True) * 1.4826 + 1e-6; R = (X - med) / mad    # robust per-perturbation scaling
 # baseline coupling from BeatAML2
 BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
-B = pd.read_csv('/home/claude/beataml/beataml_waves1to4_counts_dbgap.txt', sep='\t', low_memory=False); B['gid'] = B.stable_id.str.split('.').str[0]
+B = pd.read_csv(DATA + 'beataml_waves1to4_counts_dbgap.txt', sep='\t', low_memory=False); B['gid'] = B.stable_id.str.split('.').str[0]
 B = B.drop_duplicates('gid').set_index('gid')[[x for x in B.columns if x.startswith('BA')]]; B = B.loc[B.index.intersection(BM.index)]; B = B[B.median(axis=1) >= 5]
 Yb = np.log2(B.values / B.values.sum(0) * 1e6 + 1); Db = Yb - Yb.mean(1, keepdims=True); gcz = BM.loc[B.index, 'gc'].values; gcz = (gcz - gcz.mean()) / gcz.std()
 G1 = np.column_stack([np.ones(len(gcz)), gcz, gcz ** 2]); Db = Db - G1 @ np.linalg.lstsq(G1, Db, rcond=None)[0]; Zb = (Db - Db.mean(1, keepdims=True)) / (Db.std(1, keepdims=True) + 1e-9)

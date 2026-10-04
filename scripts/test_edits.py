@@ -1,3 +1,5 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """STEP 2 — test the fixed predictions in the edited erythroblasts (GSE264491)."""
 import pandas as pd, numpy as np, pyannotables as pa
 from scipy import stats
@@ -18,7 +20,7 @@ pred['lfc_BCL11A'] = R.lfc_BCL11A.reindex(pred.gid).values; pred['lfc_HBG'] = R.
 print('\n== predicted neighbours, observed log2 fold change')
 print(pred[['target', 'neighbour', 'steps', 'coupling_r', 'lfc_BCL11A', 'lfc_HBG']].round(3).to_string(index=False))
 # genome-wide: do neighbours of the edited locus move with their baseline coupling?
-P = pd.read_csv('/home/claude/atlas/pairs_whole_blood.csv.gz'); P = P[P.g1.isin(R.index) & P.g2.isin(R.index)]
+P = pd.read_csv(DATA + 'pairs_whole_blood.csv.gz'); P = P[P.g1.isin(R.index) & P.g2.isin(R.index)]
 for edit, tcol in [('BCL11A', 't_BCL11A'), ('HBG', 't_HBG')]:
     d = P.assign(t1=R[tcol].reindex(P.g1).values, t2=R[tcol].reindex(P.g2).values).dropna(subset=['t1', 't2'])
     d['bin'] = pd.qcut(d.r, 5)

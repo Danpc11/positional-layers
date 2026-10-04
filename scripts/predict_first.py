@@ -1,8 +1,10 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """STEP 1 — predictions fixed from GTEx whole blood only (baseline cis coupling), blind to the edited-cell data."""
 import pandas as pd, numpy as np, pyannotables as pa
 CHR = [str(i) for i in range(1, 23)] + ['X']
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; sym = G.gene_name.astype(str)
-P = pd.read_csv('/home/claude/atlas/pairs_whole_blood.csv.gz')
+P = pd.read_csv(DATA + 'pairs_whole_blood.csv.gz')
 P['s1'] = sym.reindex(P.g1).values; P['s2'] = sym.reindex(P.g2).values
 def neighbours(target, k=6):
     """genes within k positions of the target on the GTEx-blood gene order, with the coupling of the intervening pairs"""

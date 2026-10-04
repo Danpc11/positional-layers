@@ -1,7 +1,9 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 import numpy as np, pandas as pd, pyannotables as pa, statsmodels.api as sm, glob
 src = open('cohesin_v2.py').read(); src = src[:src.index('rows = []')].replace("    return D, g.chr.values, samp, cov", "    return D, g.chr.values, samp, cov, g.iloc[:, 0].values")
 exec(src)
-B = pd.read_csv(glob.glob('/home/claude/repo/data/external/TAD-full/*/data/boundariesByStability/100kbBookendBoundaries_mainText/100kbBookendBoundaries_byStability.bed')[0], sep='\t')
+B = pd.read_csv(glob.glob(DATA + 'TAD-full/*/data/boundariesByStability/100kbBookendBoundaries_mainText/100kbBookendBoundaries_byStability.bed')[0], sep='\t')
 B['chr'] = B.chr.str.replace('chr', ''); B['mid'] = (B['loc'] + B['loc2']) / 2
 G37 = pa.tables()['homo_sapiens-GRCh37-ensembl100']; G37 = G37[~G37.index.duplicated()]; mid37 = ((G37.Start + G37.End) / 2); chr37 = G37.Chromosome.astype(str)
 def pair_classes(gids, chrs):

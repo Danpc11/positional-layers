@@ -1,10 +1,12 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Distance vs 3D contact (GM12878 in situ Hi-C, KR, 25 kb) as predictors of cis coupling in GTEx EBV lymphocytes."""
 import numpy as np, pandas as pd, pyannotables as pa, statsmodels.formula.api as smf
 from scipy import stats
 CHR = [str(i) for i in range(1, 23)] + ['X']
 BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
-SA = pd.read_csv('/home/claude/repo/data/external/GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
-C = pd.read_csv('/home/claude/repo/data/external/gtex/gene_reads_adult_gtex_v11_cells_cultured_fibroblasts_gct.gz', sep='\t', skiprows=2, index_col=0).drop(columns='Description')
+SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
+C = pd.read_csv(DATA + 'gtex/gene_reads_adult_gtex_v11_cells_cultured_fibroblasts_gct.gz', sep='\t', skiprows=2, index_col=0).drop(columns='Description')
 C.index = C.index.str.split('.').str[0]; C = C[~C.index.duplicated()]; samp = [x for x in C.columns if x in SA.index and pd.notna(SA.loc[x, 'SMRIN'])]; C = C[samp]
 C = C.loc[C.index.intersection(BM.index)]; C = C[C.median(axis=1) >= 10]
 Y = np.log2(C.values / C.values.sum(0) * 1e6 + 1); D = Y - Y.mean(1, keepdims=True); gc = BM.loc[C.index, 'gc'].values; gcz = (gc - gc.mean()) / gc.std()

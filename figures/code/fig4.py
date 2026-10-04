@@ -1,6 +1,8 @@
-import sys; sys.path.insert(0, '/home/claude/figs'); from style import *
-T = pd.read_csv(A + 'tad_cis_test.csv'); TT = pd.read_csv('/home/claude/tcga/tad_tumour_results.csv'); CO = pd.read_csv('/home/claude/tcga/cohesin_continuousCN.csv')
-BA = pd.read_csv('/home/claude/beataml/beataml_cohesin_replication.csv'); AN = pd.read_csv('/home/claude/tcga/aneuploidy_continuousCN.csv')
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
+T = pd.read_csv(A + 'tad_cis_test.csv'); TT = pd.read_csv(DATA + 'tad_tumour_results.csv'); CO = pd.read_csv(DATA + 'cohesin_continuousCN.csv')
+BA = pd.read_csv(DATA + 'beataml_cohesin_replication.csv'); AN = pd.read_csv(DATA + 'aneuploidy_continuousCN.csv')
 H = {c: pd.read_csv(A + f'hic_coupling_{c}.csv.gz') for c in ['GM12878', 'IMR90']}
 import schem
 fig = plt.figure(figsize=(W, W * 0.62)); gs = fig.add_gridspec(2, 4, hspace=0.75, wspace=0.9)
@@ -26,7 +28,7 @@ ax = fig.add_subplot(gs[1, 0]); r = TT.drop_duplicates('cohort')
 x = np.arange(len(r)); ax.bar(x - 0.2, r.within_wt, 0.4, color=OI['green'], label='same TAD'); ax.bar(x + 0.2, r.stable_wt, 0.4, color='0.6', label='across stable boundary')
 ax.set_xticks(x); ax.set_xticklabels(['Bladder', 'Endometrium'], fontsize=6.3); ax.set_ylabel('Cis excess (adjacent genes)'); ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.22), fontsize=5.2, ncol=1); ax.set_ylim(0, 0.22)
 lab(ax, 'e', -0.3)
-ax = fig.add_subplot(gs[1, 1]); K = pd.read_csv('/home/claude/fric/saturation_k_by_expression.csv'); xk = np.arange(3)
+ax = fig.add_subplot(gs[1, 1]); K = pd.read_csv(DATA + 'saturation_k_by_expression.csv'); xk = np.arange(3)
 for cell, col, off in [('GM12878', OI['blue'], -0.15), ('IMR90', OI['red'], 0.15)]:
     d = K[K.cell == cell]; ax.errorbar(xk + off, d.k, yerr=1.96 * d.se, fmt='o', color=col, ms=4, capsize=2, label=cell)
 ax.set_xticks(xk); ax.set_xticklabels(['low', 'mid', 'high']); ax.set_xlabel('Expression of the pair (tertile)'); ax.set_ylabel('Exponent k in coupling ~ contact^k'); ax.set_ylim(0, 1.05); ax.legend(loc='lower left', fontsize=5.4)

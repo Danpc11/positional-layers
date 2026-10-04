@@ -1,7 +1,9 @@
-import sys; sys.path.insert(0, '/home/claude/figs'); from style import *
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
 import pyannotables as pa
-exec(open('/home/claude/nar/theory_sim.py').read().split('out = {}')[0])
-R = pd.read_csv(A + 'atlas_results.csv'); P1 = pd.read_csv('/home/claude/pilot/p1_spectra.csv')
+exec(open(DATA + 'theory_sim.py').read().split('out = {}')[0])
+R = pd.read_csv(A + 'atlas_results.csv'); P1 = pd.read_csv(DATA + 'p1_spectra.csv')
 BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; G = G[G.Chromosome.astype(str).isin([str(i) for i in range(1, 23)])].join(BM[['gc', 'type']], how='inner'); G = G[G.type == 'protein_coding'].sort_values(['Chromosome', 'Start'])
 lags = np.arange(1, 61); ac = []
@@ -11,7 +13,7 @@ for L_ in lags:
         x = (g.gc.values - g.gc.mean()) / g.gc.std()
         if len(x) > L_ + 5: v.append(np.mean(x[:-L_] * x[L_:]))
     ac.append(np.mean(v))
-R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(A + 'isochore_law.csv'); P4 = pd.read_csv('/home/claude/pilot/p4_domain_scale_tests.csv'); P5 = pd.read_csv('/home/claude/pilot/p5a_liver_gc.csv'); S = pd.read_csv('/home/claude/nar/sim_decay_recovery.csv'); P1 = pd.read_csv('/home/claude/pilot/p1_spectra.csv')
+R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(A + 'isochore_law.csv'); P4 = pd.read_csv(DATA + 'p4_domain_scale_tests.csv'); P5 = pd.read_csv(DATA + 'p5a_liver_gc.csv'); S = pd.read_csv(DATA + 'sim_decay_recovery.csv'); P1 = pd.read_csv(DATA + 'p1_spectra.csv')
 import schem
 fig = plt.figure(figsize=(W, W * 0.85)); gs = fig.add_gridspec(3, 3, hspace=0.55, wspace=0.5)
 # B identity in simulation

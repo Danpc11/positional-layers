@@ -1,3 +1,5 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 import sys
 THR = float(sys.argv[1]) if len(sys.argv) > 1 else 10
 import glob, os, re, numpy as np, pandas as pd, pyannotables as pa
@@ -20,7 +22,7 @@ TC = pd.DataFrame({k: load(f).tc for k, f in files.items()}).fillna(0); TC = TC[
 print('genes mapped:', len(TC))
 # ---- baseline coupling in myeloid leukaemia (BeatAML2), adjacent genes in GRCh38 order, GC-corrected
 BM = pd.read_csv('/mnt/user-data/uploads/mart_export__1_.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
-B = pd.read_csv('/home/claude/beataml/beataml_waves1to4_counts_dbgap.txt', sep='\t'); B['gid'] = B.stable_id.str.split('.').str[0]
+B = pd.read_csv(DATA + 'beataml_waves1to4_counts_dbgap.txt', sep='\t'); B['gid'] = B.stable_id.str.split('.').str[0]
 B = B.drop_duplicates('gid').set_index('gid')[[x for x in B.columns if x.startswith('BA')]]; B = B.loc[B.index.intersection(G.index).intersection(BM.index)]; B = B[B.median(axis=1) >= 10]
 g = G.loc[B.index].sort_values(['chr', 'Start']); B = B.loc[g.index]
 Y = np.log2(B.values / B.values.sum(0) * 1e6 + 1); D = Y - Y.mean(1, keepdims=True); gc = BM.loc[g.index, 'gc'].values; gcz = (gc - gc.mean()) / gc.std()

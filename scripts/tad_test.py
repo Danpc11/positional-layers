@@ -1,7 +1,9 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Does the cis layer respect TAD boundaries? Adjacent gene pairs within one TAD vs across a boundary, at matched distance,
 using the tissue's own TAD partition (McArthur & Capra 20-bin landscape, hg19; genes placed with GRCh37 coordinates)."""
 import glob, os, numpy as np, pandas as pd, pyannotables as pa, statsmodels.formula.api as smf
-TD = glob.glob('/home/claude/repo/data/external/TAD-full/*/data/20binsTADlandscape')[0]; CHR = [str(i) for i in range(1, 23)] + ['X']
+TD = glob.glob(DATA + 'TAD-full/*/data/20binsTADlandscape')[0]; CHR = [str(i) for i in range(1, 23)] + ['X']
 def tads(name):
     d = f'{TD}/{name}/'
     b6 = pd.read_csv(d + f'bin_6_{name}.bed', sep='\t', header=None, names=['chr', 's', 'e']); b15 = pd.read_csv(d + f'bin_15_{name}.bed', sep='\t', header=None, names=['chr', 's', 'e'])
@@ -21,8 +23,8 @@ MATCH = {'liver': 'Liver_leung2015', 'adrenal_gland': 'adrenal_schmitt2016', 'ar
          'cells_ebv_transformed_lymphocytes': 'GM12878_lymphoblastoid_Lieberman', 'cells_cultured_fibroblasts': 'IMR90_fetalLungFibroblast_Lieberman'}
 TADA = {n: assign(tads(n)) for n in sorted(set(MATCH.values()))}
 norm = lambda s: s.lower().replace('-', '_'); BINS = [0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]
-P = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob('/home/claude/atlas/pairs_*.csv.gz')}
-S = {norm(os.path.basename(f)[7:-7]): pd.read_csv(f) for f in glob.glob('/home/claude/atlas/shares_*.csv.gz')}
+P = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(DATA + 'pairs_*.csv.gz')}
+S = {norm(os.path.basename(f)[7:-7]): pd.read_csv(f) for f in glob.glob(DATA + 'shares_*.csv.gz')}
 rows, spec = [], []
 for t, tn in MATCH.items():
     d = P[t].merge(S[t][['g1', 'g2', 'egene1', 'egene2', 'share_any', 'share_same']], on=['g1', 'g2']); d = d[d.dist > 0].copy(); d['bin'] = pd.cut(d.dist, BINS).astype(str)
@@ -36,5 +38,5 @@ for t, tn in MATCH.items():
     others = [fit(o)[0] for o in TADA if o != tn]
     rows.append({'tissue': t, 'tad_map': tn, 'pairs': n_all, 'frac_same_tad': f_same, 'b_same_tad': b_all, 'p': p_all, 'b_same_tad_no_shared_eQTL': b_ng, 'p_no_shared_eQTL': p_ng,
                  'b_same_tad_other_maps_median': np.median(others), 'own_map_rank_among_maps': 1 + sum(o > b_all for o in others), 'n_maps': 1 + len(others)})
-R = pd.DataFrame(rows); R.to_csv('/home/claude/atlas/tad_cis_test.csv', index=False); pd.set_option('display.width', 250); print(R.round(4).to_string(index=False))
+R = pd.DataFrame(rows); R.to_csv(DATA + 'tad_cis_test.csv', index=False); pd.set_option('display.width', 250); print(R.round(4).to_string(index=False))
 print(f"\nsame-TAD effect > 0 in {(R.b_same_tad > 0).sum()}/{len(R)} (P<0.05 in {(R.p < 0.05).sum()}); median {R.b_same_tad.median():.3f}; without shared eQTL median {R.b_same_tad_no_shared_eQTL.median():.3f}; own map > median of other maps in {(R.b_same_tad > R.b_same_tad_other_maps_median).sum()}/{len(R)}")

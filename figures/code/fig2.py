@@ -1,4 +1,6 @@
-import sys; sys.path.insert(0, '/home/claude/figs'); from style import *
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
 R = pd.read_csv(A + 'atlas_results.csv'); O = pd.read_csv(A + 'orientation_by_tissue.csv'); F = pd.read_csv(A + 'robust_families.csv'); Lz = pd.read_csv(A + 'lorentz_results.csv')
 import schem
 fig = plt.figure(figsize=(W, W * 0.55)); gs = fig.add_gridspec(2, 4, hspace=0.55, wspace=0.65)

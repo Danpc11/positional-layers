@@ -1,9 +1,11 @@
-import sys; sys.path.insert(0, '/home/claude/figs'); from style import *
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
+import sys; sys.path.insert(0, os.path.dirname(__file__)); from style import *
 import pyannotables as pa
 from scipy import stats
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]
-BY = pd.read_csv('/mnt/user-data/outputs/NAR_piloto/bystander_liver_t_stage.csv'); ED = pd.read_csv('/home/claude/edit/edit_effects.csv', index_col=0)
-WB = pd.read_csv(A + 'pairs_whole_blood.csv.gz'); DR = pd.read_csv('/home/claude/slam/drug_cis_results_thr3.csv'); CR = pd.read_csv('/home/claude/perturb/crispri_pairs.csv.gz')
+BY = pd.read_csv('/mnt/user-data/outputs/NAR_piloto/bystander_liver_t_stage.csv'); ED = pd.read_csv(DATA + 'edit_effects.csv', index_col=0)
+WB = pd.read_csv(A + 'pairs_whole_blood.csv.gz'); DR = pd.read_csv(DATA + 'drug_cis_results_thr3.csv'); CR = pd.read_csv(DATA + 'crispri_pairs.csv.gz')
 import schem
 fig = plt.figure(figsize=(W, W * 0.9)); gs = fig.add_gridspec(3, 6, hspace=0.6, wspace=1.4)
 def quint(d, a, b):

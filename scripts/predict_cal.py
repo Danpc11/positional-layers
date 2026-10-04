@@ -1,12 +1,14 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Calibrated eQTL law: lead shared fine-mapped variant -> its GTEx slopes (inverse-normal expression, variance ~1) for both genes
 -> predicted genetic correlation 2p(1-p)*b1*b2 (times P(same variant)). Compared with the observed coupling."""
 import sys, os, glob, numpy as np, pandas as pd, pyarrow.parquet as pq
 norm = lambda s: s.lower().replace('-', '_')
 for t in sys.argv[1:]:
-    out = f'/home/claude/atlas/predcal_{t}.csv.gz'
+    out = fDATA + 'predcal_{t}.csv.gz'
     if os.path.exists(out): continue
-    P = pd.read_csv(f'/home/claude/atlas/pred_pairs_{t}.csv.gz'); P = P[P.dist > 0]; genes = set(P.g1) | set(P.g2)
-    sf = [f for f in glob.glob('/home/claude/atlas/susie/*.parquet') if norm(os.path.basename(f).replace('_v11_eQTLs_SuSiE_summary.parquet', '')) == t][0]
+    P = pd.read_csv(fDATA + 'pred_pairs_{t}.csv.gz'); P = P[P.dist > 0]; genes = set(P.g1) | set(P.g2)
+    sf = [f for f in glob.glob(DATA + 'susie/*.parquet') if norm(os.path.basename(f).replace('_v11_eQTLs_SuSiE_summary.parquet', '')) == t][0]
     E = pq.read_table(sf, columns=['phenotype_id', 'variant_id', 'pip', 'cs_id']).to_pandas(); E['gid'] = E.phenotype_id.str.split('.').str[0]; E = E[E.gid.isin(genes)]
     CS = {g: [dict(zip(c.variant_id, c.pip)) for _, c in d.groupby('cs_id')] for g, d in E.groupby('gid')}
     lead = {}
@@ -20,7 +22,7 @@ for t in sys.argv[1:]:
                     if ps > best[0]: best = (ps, v)
         lead[(g1, g2)] = best
     need = {v for _, v in lead.values() if v}
-    qf = [f for f in glob.glob('/home/claude/atlas/eqtl/*.parquet') if norm(os.path.basename(f).replace('_v11_eQTLs_signif_pairs.parquet', '')) == t][0]
+    qf = [f for f in glob.glob(DATA + 'eqtl/*.parquet') if norm(os.path.basename(f).replace('_v11_eQTLs_signif_pairs.parquet', '')) == t][0]
     pf = pq.ParquetFile(qf); slope = {}; af = {}
     for rg in range(pf.num_row_groups):
         S = pf.read_row_group(rg, columns=['phenotype_id', 'variant_id', 'slope', 'af']).to_pandas(); S = S[S.variant_id.isin(need)]

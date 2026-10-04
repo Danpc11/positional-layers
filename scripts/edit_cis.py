@@ -1,3 +1,5 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Do therapeutic CRISPR edits perturb the cis neighbours of the edited locus, in proportion to their baseline coupling?
 Baseline coupling: GTEx whole blood (GC- and technically corrected), computed earlier. Edits: BCL11A erythroid enhancer
 (chr2) and HBG1/2 promoters (chr11, beta-globin locus). Predictions are made from genomic position alone, before looking
@@ -15,7 +17,7 @@ def lfc(g): return cpm[[c for c, x in zip(C.columns, grp) if x == g]].mean(1) - 
 L = pd.DataFrame({'BCL11A_enhancer': lfc('BCL11A_enhancer'), 'HBG1_2_promoter': lfc('HBG1_2_promoter')})
 sd = cpm[[c for c, x in zip(C.columns, grp) if x == 'unedited']].std(1)
 # baseline coupling from GTEx whole blood
-P = pd.read_csv('/home/claude/atlas/pairs_whole_blood.csv.gz'); nb = {}
+P = pd.read_csv(DATA + 'pairs_whole_blood.csv.gz'); nb = {}
 for a, b, r in zip(P.g1, P.g2, P.r): nb.setdefault(a, []).append((b, r)); nb.setdefault(b, []).append((a, r))
 def neighbours(target_sym, k=12):
     tid = ann.index[ann.sym == target_sym]

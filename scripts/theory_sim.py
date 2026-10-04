@@ -1,3 +1,5 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Simulations for the positional-layer theory.
 x[s,j] = mu[j] + beta[j]*z[s] + c[s,j] + b[s]*gc[j] + e[s,j]
   mu: tissue landscape (no positional structure); c: cis co-regulation (moving average of local regulators, decay length lam);
@@ -69,14 +71,14 @@ for name, kw in [('landscape only', dict(cis=False, gc=False, stage=False)), ('f
 # (3) GC creates a false domain scale; correction recovers the cis-only truth
 Xg, ch, GCg, _, zg = simulate(seed=3, cis=True, gc=True); Xt, cht, *_ = simulate(seed=3, cis=True, gc=False)
 prof_raw = lagprof(deviations(Xg, z=zg), ch); prof_corr = lagprof(deviations(Xg, GC=GCg, z=zg), ch); prof_truth = lagprof(deviations(Xt, z=zg), cht)
-pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corrected': prof_corr, 'truth_no_GC': prof_truth}).to_csv('/home/claude/nar/sim_lag_profiles.csv', index=False)
+pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corrected': prof_corr, 'truth_no_GC': prof_truth}).to_csv(DATA + 'sim_lag_profiles.csv', index=False)
 # (4) recovery of the true cis decay length
 rec = []
 for lam in [1, 2, 3, 5, 8]:
     for rep in range(3):
         Xr, chr_, GCr, _, zr = simulate(seed=100 + 10 * lam + rep, lam=lam)
         rec.append({'true_lambda': lam, 'rep': rep, 'naive': decay_length(lagprof(deviations(Xr, z=zr), chr_)), 'corrected': decay_length(lagprof(deviations(Xr, GC=GCr, z=zr), chr_))})
-REC = pd.DataFrame(rec); REC.to_csv('/home/claude/nar/sim_decay_recovery.csv', index=False)
-pd.Series(out).to_csv('/home/claude/nar/sim_summary.csv')
+REC = pd.DataFrame(rec); REC.to_csv(DATA + 'sim_decay_recovery.csv', index=False)
+pd.Series(out).to_csv(DATA + 'sim_summary.csv')
 print(pd.Series(out).round(4).to_string()); print(pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corr': prof_corr, 'truth': prof_truth}).round(3).to_string(index=False))
 print(REC.groupby('true_lambda')[['naive', 'corrected']].median().round(2).to_string())

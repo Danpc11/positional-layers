@@ -1,11 +1,13 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Approximate colocalisation of adjacent genes with SuSiE credible sets: P(same causal variant) = max over credible-set
 pairs of sum_v pip1(v)*pip2(v); direction from the shared variant with the highest pip product (afc sign)."""
 import sys, os, glob, numpy as np, pandas as pd, pyarrow.parquet as pq
 norm = lambda s: s.lower().replace('-', '_')
-PAIRS = pd.concat([pd.read_csv(f, usecols=['g1', 'g2']) for f in glob.glob('/home/claude/atlas/pairs_*.csv.gz')]).drop_duplicates(); genes = set(PAIRS.g1) | set(PAIRS.g2)
-atlas = {norm(os.path.basename(f)[6:-7]) for f in glob.glob('/home/claude/atlas/pairs_*.csv.gz')}
+PAIRS = pd.concat([pd.read_csv(f, usecols=['g1', 'g2']) for f in glob.glob(DATA + 'pairs_*.csv.gz')]).drop_duplicates(); genes = set(PAIRS.g1) | set(PAIRS.g2)
+atlas = {norm(os.path.basename(f)[6:-7]) for f in glob.glob(DATA + 'pairs_*.csv.gz')}
 for f in sys.argv[1:]:
-    t = norm(os.path.basename(f).replace('_v11_eQTLs_SuSiE_summary.parquet', '')); out = f'/home/claude/atlas/coloc_{t}.csv.gz'
+    t = norm(os.path.basename(f).replace('_v11_eQTLs_SuSiE_summary.parquet', '')); out = fDATA + 'coloc_{t}.csv.gz'
     if t not in atlas or os.path.exists(out): continue
     E = pq.read_table(f, columns=['phenotype_id', 'variant_id', 'pip', 'cs_id', 'afc']).to_pandas(); E['g'] = E.phenotype_id.str.split('.').str[0]; E = E[E.g.isin(genes)]
     CS = {g: [(dict(zip(c.variant_id, c.pip)), dict(zip(c.variant_id, np.sign(c.afc)))) for _, c in d.groupby('cs_id')] for g, d in E.groupby('g')}

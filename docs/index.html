@@ -168,7 +168,8 @@ function fftMag2(x){ // O(n^2) DFT power; n is small enough here
 function simulate(p){
   const r=rng(12345), nG=p.nGenes, nC=p.nChrom, n=nG*nC, S=p.nSamples;
   const landscape=new Float64Array(n);
-  for(let j=0;j<n;j++){let g=0;for(let k=0;k<3;k++)g+=-Math.log(1-r());landscape[j]=g;}
+  // Gamma(1.3, 1) * 3, matching poslayers.simulate.simulate_genome
+  for(let j=0;j<n;j++){let g=0;for(let k=0;k<3;k++)g+=-Math.log(1-r());landscape[j]=g*1.3;}
   const gc=new Float64Array(n);
   for(let c=0;c<nC;c++){let x=0;const tmp=new Float64Array(nG);
     for(let i=0;i<nG;i++){x=p.phi*x+gauss(r);tmp[i]=x;}
@@ -199,14 +200,21 @@ function deviations(X){const S=X.length,n=X[0].length,xbar=new Float64Array(n);
   return {Y,xbar};}
 
 function gcCorrect(Y,gc){ // remove per-sample quadratic trend on standardised GC
-  const n=gc.length,g=Array.from(gc),g2=g.map(v=>v*v);
-  const m2=mean(g2),g2c=g2.map(v=>v-m2);
-  const d1=g.reduce((a,v)=>a+v*v,0),d2=g2c.reduce((a,v)=>a+v*v,0);
-  return Y.map(y=>{let c1=0,c2=0,c0=0;
-    for(let j=0;j<n;j++){c0+=y[j];c1+=y[j]*g[j];c2+=y[j]*g2c[j];}
-    const a0=c0/n,a1=c1/(d1||1),a2=c2/(d2||1);
-    const out=new Float64Array(n);
-    for(let j=0;j<n;j++)out[j]=y[j]-a0-a1*g[j]-a2*g2c[j];
+  // Gram-Schmidt on [1, g, g^2] so the projection matches poslayers.decompose.gc_correct,
+  // which uses a QR basis. Projecting on g and g^2 one after the other is NOT the same
+  // thing unless the two are orthogonal, which they are not in a finite sample.
+  const n=gc.length,cols=[new Float64Array(n).fill(1),Float64Array.from(gc),
+                          Float64Array.from(gc,v=>v*v)],B=[];
+  for(const col of cols){
+    const v=Float64Array.from(col);
+    for(const b of B){let d=0;for(let j=0;j<n;j++)d+=v[j]*b[j];
+      for(let j=0;j<n;j++)v[j]-=d*b[j];}
+    let nn=0;for(let j=0;j<n;j++)nn+=v[j]*v[j];nn=Math.sqrt(nn);
+    if(nn>1e-9){for(let j=0;j<n;j++)v[j]/=nn;B.push(v);}
+  }
+  return Y.map(y=>{const out=Float64Array.from(y);
+    for(const b of B){let d=0;for(let j=0;j<n;j++)d+=out[j]*b[j];
+      for(let j=0;j<n;j++)out[j]-=d*b[j];}
     return out;});}
 
 function lagProfile(Y,nG,nC,maxLag){
@@ -221,9 +229,9 @@ function lagProfile(Y,nG,nC,maxLag){
     out[L]=acc/cnt;}
   return out;}
 
-function fitDecay(prof){ // exponential fit over lags 1..30 on the positive part
-  const xs=[],ys=[];
-  for(let L=1;L<Math.min(31,prof.length);L++){if(prof[L]>1e-4){xs.push(L);ys.push(Math.log(prof[L]));}}
+function fitDecay(prof){ // exponential fit over the lags where the profile is still above 5% of lag 1
+  const xs=[],ys=[],ref=prof[1];
+  for(let L=1;L<prof.length;L++){if(prof[L]>0.05*ref&&prof[L]>1e-4){xs.push(L);ys.push(Math.log(prof[L]));}}
   if(xs.length<4)return NaN;
   const mx=mean(xs),my=mean(ys);let num=0,den=0;
   for(let i=0;i<xs.length;i++){num+=(xs[i]-mx)*(ys[i]-my);den+=(xs[i]-mx)*(xs[i]-mx);}
@@ -362,7 +370,7 @@ function run(){
   const corr=lagProfile(Ycorr,sim.nG,sim.nChrom,60);
   drawLag(naive,corr,p.decay);
 
-  const CAL=1.56; // kernel calibration between fitted decay and lambda
+  const CAL=1.0; // kernel autocorrelation decays with length lambda; no calibration needed
   const dn=fitDecay(naive)/CAL,dc=fitDecay(corr)/CAL;
   const fmt=v=>isFinite(v)?v.toFixed(1):'—';
   const est=document.getElementById('esttab');

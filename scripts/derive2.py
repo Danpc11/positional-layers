@@ -1,11 +1,13 @@
+import os
+DATA = os.environ.get('POSLAYERS_DATA', 'data').rstrip('/') + '/'
 """Saturating-response prediction: the contact exponent k should be lower for highly expressed (closer to saturation) pairs."""
 import numpy as np, pandas as pd
 from scipy.optimize import curve_fit
 pw = lambda c, r0, A, k: r0 + A * c ** k
 for cell, tissue in [('GM12878', 'cells_ebv-transformed_lymphocytes'), ('IMR90', 'cells_cultured_fibroblasts')]:
-    C = pd.read_csv(f'/home/claude/repo/data/external/gtex/gene_reads_adult_gtex_v11_{tissue}_gct.gz', sep='\t', skiprows=2, index_col=0).drop(columns='Description')
+    C = pd.read_csv(fDATA + 'gtex/gene_reads_adult_gtex_v11_{tissue}_gct.gz', sep='\t', skiprows=2, index_col=0).drop(columns='Description')
     C.index = C.index.str.split('.').str[0]; C = C[~C.index.duplicated()]; lv = np.log2(C / C.sum() * 1e6 + 1).mean(1)
-    H = pd.read_csv(f'/home/claude/atlas/hic_coupling_{cell}.csv.gz'); H = H[H.contact_KR > 0].copy()
+    H = pd.read_csv(fDATA + 'hic_coupling_{cell}.csv.gz'); H = H[H.contact_KR > 0].copy()
     H['expr'] = np.minimum(lv.reindex(H.g1).values, lv.reindex(H.g2).values); H = H.dropna(subset=['expr'])
     H['et'] = pd.qcut(H.expr, 3, labels=['low', 'mid', 'high'])
     for t, d in H.groupby('et', observed=True):

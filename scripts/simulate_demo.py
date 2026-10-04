@@ -8,7 +8,9 @@ from poslayers import simulate_genome, periodogram_identity
 from poslayers.decompose import gc_correct, gc_slopes
 from poslayers.laws import isochore_law
 
-CAL = 1.56  # calibration between the fitted decay and the kernel length lambda
+# The cis kernel is exp(-i/lambda), whose normalised autocorrelation is exp(-L/lambda).
+# The decay length of that autocorrelation is lambda itself, so no calibration is needed.
+CAL = 1.0
 
 
 def lag_profile(Y, n_genes, n_chrom, max_lag=60):
@@ -26,11 +28,11 @@ def lag_profile(Y, n_genes, n_chrom, max_lag=60):
 
 
 def fit_decay(prof):
-    lags = np.arange(1, min(31, len(prof)))
+    lags = np.arange(1, len(prof))
     v = prof[lags]
-    ok = v > 1e-4
+    ok = (v > 0.05 * v[0]) & (v > 1e-4)   # relative window: see fix_repo.sh, FIX 1
     if ok.sum() < 4:
-        return np.nan
+        return np.nan                      # a decay of ~1 gene cannot be fitted this way
     slope = np.polyfit(lags[ok], np.log(v[ok]), 1)[0]
     return -1 / slope / CAL if slope < 0 else np.nan
 
