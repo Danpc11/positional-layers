@@ -72,7 +72,7 @@ def layers_diagram(ax):
     """Fig 6a: the four layers, what each is, and the operation that removes it."""
     _clean(ax)
     rows = [('landscape  μ_j', 'mean level of each gene', 'subtract the gene mean', '0.45', 'no'),
-            ('technical  b_s·g_j', 'GC bias × isochores', 'regress out GC within sample', OI['red'], 'no'),
+            ('GC-associated  b_s·g_j', 'GC bias × isochores\n(may include biology)', 'regress out GC within sample', OI['red'], 'mostly no'),
             ('dosage  d(s,j)', 'copy-number segments', 'regress out continuous CN', OI['orange'], 'no'),
             ('cis  c(s,j)', 'local covariance; consistent with\nshared regulation', '— retained for analysis', OI['blue'], 'in part')]
     ax.text(0, 4.6, 'layer', fontsize=5.8, fontweight='bold'); ax.text(27, 4.6, 'what it is', fontsize=5.8, fontweight='bold')
