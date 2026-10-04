@@ -1,0 +1,60 @@
+{
+  "upload_type": "software",
+  "title": "positional-layers: code for 'Common cis-regulatory inputs shape local gene co-expression across human tissues'",
+  "version": "1.2.0",
+  "creators": [
+    {
+      "name": "Pérez-Calixto, Daniel",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico; Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Torres-Pantoja, Sandra Michelle",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico; Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Mejía-Arratia, Yalith",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
+    },
+    {
+      "name": "Pérez-Calixto, Mitzi",
+      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Escutia-Guadarrama, Lidia",
+      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico; Facultad de Química, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Vázquez-Victorio, Genaro",
+      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Cervera, Alejandra",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
+    },
+    {
+      "name": "Tovar, Hugo",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico; Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    }
+  ],
+  "description": "<p>Reference implementation (Python package <code>poslayers</code>) of the decomposition of positional expression signals into a tissue mean profile, GC-associated variation, copy-number dosage and residual local covariance, with the analysis scripts that produce every result, table and figure of the article <em>Common cis-regulatory inputs shape local gene co-expression across human tissues</em>, and an interactive simulator.</p><p>All inputs are public and are not redistributed; <code>data/MANIFEST.md</code> lists each one and its source. The tables needed to rebuild every figure without the raw data are deposited separately as source data.</p>",
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "gene co-expression",
+    "cis-regulation",
+    "chromatin architecture",
+    "eQTL",
+    "GTEx",
+    "Hi-C",
+    "spectral analysis",
+    "RNA-seq GC bias"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://danpc11.github.io/positional-layers",
+      "relation": "isDocumentedBy",
+      "resource_type": "other"
+    }
+  ],
+  "notes": "Version 1.2.0 answers an external code and methods review (REVIEW_RESPONSE.md) and contains the figure code for the revised manuscript. Add the article DOI as a related identifier (relation: isSupplementTo) on publication."
+}

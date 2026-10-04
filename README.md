@@ -1,13 +1,13 @@
-# Positional layers
+# positional-layers
 
 Code for **"Common cis-regulatory inputs shape local gene co-expression across human tissues"**.
 
-Any positional measurement of gene expression separates exactly into a tissue landscape, one or
-more technical layers that inherit their positional structure from clustered attributes of the
-genome, and a residual covariance between nearby genes. Two of those layers are not genome
-organisation. This repository contains the reference implementation of the decomposition and of
-the three quantitative laws, the analysis scripts that reproduce every figure, and an interactive
-simulator.
+The mean single-sample periodogram of expression along a chromosome separates exactly into the spectrum of the
+tissue mean profile and the spectrum of the covariance between genes. We model that covariance as GC-associated
+variation (per-sample GC bias acting on clustered GC content), copy-number dosage in tumours, and residual local
+covariance, and test how far each component can be attributed to technical effects or to shared regulation. This
+repository contains the reference implementation of the decomposition and of the model equations, the analysis scripts
+that produce every result, table and figure, and an interactive simulator.
 
 **Interactive simulator:** https://Danpc11.github.io/positional-layers/
 
@@ -22,18 +22,19 @@ pip install -e ".[analysis,dev]"     # the library alone: pip install -e .
 Python 3.10 or newer. The library needs numpy, scipy, pandas, statsmodels and matplotlib; the `analysis` extra adds what the
 scripts import (pyannotables, pyarrow, anndata, patsy, openpyxl, hic-straw).
 
-## The laws in thirty seconds
+## The model equations in thirty seconds
 
 ```python
 from poslayers import simulate_genome, periodogram_identity, isochore_law, eqtl_law, saturation_exponent
 
 sim = simulate_genome(decay_len=5, gc_bias_sd=0.25, seed=1)
 
-# 1. The decomposition is an identity, not an approximation
+# 1. The spectral decomposition is an exact identity
 periodogram_identity(sim["X"])["max_relative_error"]      # ~1e-15
 
 # 2. Isochore law: the covariance a per-sample GC bias creates between two genes, from one number per sample.
-#    Tested out of sample in 36 tissues (slope from odd chromosomes, covariance on even ones).
+#    Tested out of sample in 36 tissues (slope from odd chromosomes, covariance on even ones). It cannot tell
+#    technical bias from regulation that also tracks GC.
 isochore_law(var_b=0.06, gc_i=1.2, gc_j=0.9, sd_i=1.0, sd_j=1.0)
 
 # 3. eQTL law: the correlation a shared variant induces, sign included. In GTEx it predicts the sign and rank of
@@ -89,9 +90,28 @@ API (constant GC, chromosomes shorter than the lag), the decay-length estimator,
 purpose: GC correction removes GC-tracking regulation at domain scale, and comparing a power law with a fixed-size hub
 cannot identify a saturating response. CI also fails on any undefined name.
 
-## Citation
+## Review
 
-Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
+Version 1.1.0 answers an external review of the code and methods point by point; see `REVIEW_RESPONSE.md`.
+
+## How to cite
+
+Cite the archived release of this code and the article:
+
+- Pérez-Calixto, D. *et al.* positional-layers, version 1.2.0. Zenodo https://doi.org/10.5281/zenodo.XXXXXXX (2026).
+- Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
+
+`CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").
+
+## Rebuilding the figures without the raw data
+
+The 34 tables the figure scripts read (55 MB) are archived with the release as source data. Unpack them and run only the
+figure stage:
+
+```bash
+export POSLAYERS_RESULTS=/path/to/source_data
+bash run_pipeline.sh figures
+```
 
 ## Licence
 

@@ -20,6 +20,7 @@ if stage atlas; then
   run $S/isochore_law.py
   run $S/spectral_form.py thyroid nerve_tibial skin_sun_exposed_lower_leg cells_cultured_fibroblasts cells_ebv-transformed_lymphocytes muscle_skeletal
   run $S/robust_families.py
+  run $S/gc_autocorrelation.py
 fi
 if stage eqtl; then
   run $S/eqtl_share.py "$D"/gtex_eqtl/*_v11_eQTLs_signif_pairs.parquet
@@ -64,6 +65,7 @@ if stage perturbations; then
 fi
 if stage simulations; then
   run $S/theory_sim.py
+  run $S/decay_recovery.py
   run $S/gc_correlated_sim.py
 fi
 if stage liver; then                                     # needs LIVER_SPECTRA (see data/MANIFEST.md)
