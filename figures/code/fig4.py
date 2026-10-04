@@ -31,7 +31,7 @@ lab(ax, 'e', -0.3)
 ax = fig.add_subplot(gs[1, 1]); BS = pd.read_csv(OUTDIR + 'boot_hic_summary.csv').set_index(['cell', 'stat']); xk = np.arange(3)
 for cell, col, off in [('GM12878', OI['blue'], -0.15), ('IMR90', OI['red'], 0.15)]:
     d = BS.loc[cell].loc[['k_t1', 'k_t2', 'k_t3']]; ax.errorbar(xk + off, d.estimate, yerr=[d.estimate - d.ci_low, d.ci_high - d.estimate], fmt='o', color=col, ms=4, capsize=2, label=cell)
-ax.set_xticks(xk); ax.set_xticklabels(['low', 'mid', 'high']); ax.set_xlabel('Expression of the pair (tertile)'); ax.set_ylabel('Exponent k in coupling ~ contact^k'); ax.set_ylim(0, 1.05); ax.legend(loc='lower left', fontsize=5.4)
+ax.set_xticks(xk); ax.set_xticklabels(['low', 'mid', 'high']); ax.set_xlabel('Expression of the pair (tertile)'); ax.set_ylabel('Contact exponent k'); ax.set_ylim(0, 1.05); ax.legend(loc='lower left', fontsize=5.4)
 lab(ax, 'f')
 ax = fig.add_subplot(gs[1, 2:4]); rows = []
 for _, q in CO.iterrows(): rows.append((f"{'STAG2' if q.gene == 'STAG2' else 'CTCF'} {'BLCA' if q.cohort == 'BLCA' else 'UCEC'} {'trunc' if q['class'] == 'truncating' else 'any'}{', strict' if q.tmb_q == 0.7 else ''}", q.adj_pct, q.ci_low, q.ci_high, OI['red'] if q.gene == 'STAG2' else '0.5'))
