@@ -4,11 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "poslayers"
-version = "1.1.0"
-description = "Decomposition of positional signals in transcriptomic data"
+version = "1.2.0"
+description = "Decomposition of positional signals in transcriptomic data, and the analyses of 'Common cis-regulatory inputs shape local gene co-expression across human tissues'"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
+authors = [
+  { name = "Daniel Pérez-Calixto" }, { name = "Sandra Michelle Torres-Pantoja" }, { name = "Yalith Mejía-Arratia" },
+  { name = "Mitzi Pérez-Calixto" }, { name = "Lidia Escutia-Guadarrama" }, { name = "Genaro Vázquez-Victorio" },
+  { name = "Alejandra Cervera" }, { name = "Hugo Tovar" },
+]
+keywords = ["gene co-expression", "cis-regulation", "chromatin architecture", "eQTL", "GTEx", "Hi-C", "spectral analysis", "RNA-seq GC bias"]
+classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Topic :: Scientific/Engineering :: Bio-Informatics"]
 # the library itself (src/poslayers)
 dependencies = ["numpy>=1.26", "scipy>=1.13", "pandas>=2.2", "statsmodels>=0.14", "matplotlib>=3.8"]
 
@@ -16,6 +23,11 @@ dependencies = ["numpy>=1.26", "scipy>=1.13", "pandas>=2.2", "statsmodels>=0.14"
 # everything the analysis scripts in scripts/ and the figure code in figures/code/ import
 analysis = ["pyannotables>=0.5", "pyarrow>=14", "anndata>=0.10", "patsy>=0.5", "openpyxl>=3.1", "hic-straw>=1.3"]
 dev = ["pytest>=7.4", "pyflakes>=3.1"]
+
+[project.urls]
+Homepage = "https://github.com/Danpc11/positional-layers"
+Documentation = "https://danpc11.github.io/positional-layers"
+Changelog = "https://github.com/Danpc11/positional-layers/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
