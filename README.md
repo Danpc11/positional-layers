@@ -1,4 +1,4 @@
-# positional-layers
+# Positional layers
 
 Code for **"Shared cis-regulation drives local gene co-expression across human tissues"**.
 
