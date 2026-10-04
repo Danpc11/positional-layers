@@ -91,7 +91,7 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 ## Citation
 
-Pérez-Calixto, D. *et al.* Shared cis-regulation drives local gene co-expression across human tissues (2026).
+Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 ## Licence
 
