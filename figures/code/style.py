@@ -7,8 +7,103 @@ plt.rcParams.update({'font.family': 'sans-serif', 'font.sans-serif': ['Liberatio
 OI = {'blue': '#0072B2', 'orange': '#E69F00', 'green': '#009E73', 'red': '#D55E00', 'purple': '#CC79A7', 'sky': '#56B4E9', 'yellow': '#F0E442', 'grey': '#7F7F7F', 'black': '#000000'}
 W = 180 / 25.4
 OUT = FIGDIR
-def lab(ax, s, dx=-0.16, dy=1.24): ax.text(dx, dy, s, transform=ax.transAxes, fontsize=9, fontweight='bold', va='top', ha='left') if False else ax.text(dx, dy, s.lower(), transform=ax.transAxes, fontsize=9, fontweight='bold', va='top', ha='left')
-def save(fig, name): fig.savefig(OUT + name + '.pdf', bbox_inches='tight'); fig.savefig(OUT + name + '.png', dpi=220, bbox_inches='tight'); plt.close(fig)
+_PANELS = {}
+
+
+def lab(ax, s, *_, **__):
+    """Register a panel letter. Its position is set in save(), after layout, at the OUTER left edge of the panel
+    (tick labels and axis labels included) and on the panel's top edge, aligned across panels of the same row."""
+    _PANELS.setdefault(id(ax.figure), []).append((ax, s.lower()))
+
+
+def _data_boxes(ax, r):
+    """Display-space points and boxes occupied by data in ax: line vertices (densified), scatter offsets, bars, error bars."""
+    import numpy as _np
+    from matplotlib.collections import LineCollection, PathCollection, PolyCollection
+    pts, boxes = [], []
+    for ln in ax.get_lines():
+        if not ln.get_visible(): continue
+        xy = _np.column_stack([ln.get_xdata(orig=False), ln.get_ydata(orig=False)]).astype(float)
+        if len(xy) == 0: continue
+        if len(xy) > 1 and ln.get_linestyle() not in ('None', '', ' '):
+            t = _np.linspace(0, 1, 12)[:, None]
+            xy = _np.vstack([a + t * (b - a) for a, b in zip(xy[:-1], xy[1:])] + [xy[-1:]])
+        pts.append(ln.get_transform().transform(xy))
+    for c in ax.collections:
+        if not c.get_visible(): continue
+        if isinstance(c, LineCollection):
+            for seg in c.get_segments():
+                if len(seg) > 1:
+                    t = _np.linspace(0, 1, 12)[:, None]; seg = _np.vstack([a + t * (b - a) for a, b in zip(seg[:-1], seg[1:])])
+                pts.append(c.get_transform().transform(seg))
+        elif isinstance(c, PathCollection) and len(c.get_offsets()):
+            pts.append(c.get_offset_transform().transform(_np.asarray(c.get_offsets(), float)))
+        elif isinstance(c, PolyCollection):
+            try: boxes.append(c.get_window_extent(r))
+            except Exception: pass
+    for p in ax.patches:
+        if p.get_visible() and p.get_width() if hasattr(p, 'get_width') else False:
+            boxes.append(p.get_window_extent(r))
+    return (_np.vstack(pts) if pts else _np.empty((0, 2))), boxes
+
+
+def _overlaps(bb, pts, boxes):
+    import numpy as _np
+    if len(pts) and _np.any((pts[:, 0] >= bb.x0) & (pts[:, 0] <= bb.x1) & (pts[:, 1] >= bb.y0) & (pts[:, 1] <= bb.y1)): return True
+    return any(bb.overlaps(b) for b in boxes)
+
+
+def _fix_legends(fig):
+    """Move any legend that covers data to the first free corner of its axes, or above the axes if none is free."""
+    r = fig.canvas.get_renderer()
+    for ax in fig.axes:
+        leg = ax.get_legend()
+        if leg is None or not leg.get_visible(): continue
+        if not leg.get_window_extent(r).overlaps(ax.get_window_extent(r)): continue      # already outside the axes
+        pts, boxes = _data_boxes(ax, r)
+        if not _overlaps(leg.get_window_extent(r), pts, boxes): continue
+        if getattr(ax, 'name', '') == 'polar': continue
+        handles = list(getattr(leg, 'legend_handles', None) or getattr(leg, 'legendHandles', []))
+        labels = [t.get_text() for t in leg.get_texts()]
+        if not handles or len(handles) != len(labels): continue
+        fs = leg.get_texts()[0].get_fontsize() if leg.get_texts() else 5.5
+        for loc in ('upper left', 'upper right', 'lower left', 'lower right', 'center left', 'center right', 'upper center', 'lower center'):
+            new = ax.legend(handles, labels, loc=loc, fontsize=fs, frameon=False, handlelength=1.4, borderaxespad=0.3)
+            fig.canvas.draw()
+            if not _overlaps(new.get_window_extent(r), pts, boxes): break
+        else:
+            ax.legend(handles, labels, loc='lower left', bbox_to_anchor=(0.0, 1.01), fontsize=fs, frameon=False, handlelength=1.4,
+                      ncol=1, borderaxespad=0.0)
+            fig.canvas.draw()
+
+
+def _place_letters(fig):
+    items = _PANELS.pop(id(fig), [])
+    if not items: return
+    fig.canvas.draw(); r = fig.canvas.get_renderer(); inv = fig.transFigure.inverted()
+    boxes = []
+    for ax, s in items:
+        tb = ax.get_tightbbox(r); ext = [tb] + [a.get_window_extent(r) for a in (ax.yaxis.label, ax.xaxis.label, ax.title) if a.get_text()]
+        X0 = min(e.x0 for e in ext); Y1 = max(e.y1 for e in ext)
+        leg = ax.get_legend()
+        if leg is not None and leg.get_visible(): Y1 = max(Y1, leg.get_window_extent(r).y1)
+        (x0, _), (_, y1) = inv.transform([[X0, 0], [0, Y1]])
+        boxes.append([ax, s, x0, y1, ax.get_position().y1])
+    # panels whose AXES tops are within 3% of the figure height form a row; every letter in a row sits above the highest
+    # element of that row (tick labels, titles and legends placed above the axes included)
+    boxes.sort(key=lambda b: -b[4]); rows = []
+    for b in boxes:
+        if rows and abs(rows[-1][0][4] - b[4]) < 0.03: rows[-1].append(b)
+        else: rows.append([b])
+    for row in rows:
+        top = max(b[3] for b in row)
+        for ax, s, x0, _, _ in row:
+            fig.text(x0, top + 0.004, s, fontsize=9, fontweight='bold', ha='left', va='bottom')
+
+
+def save(fig, name):
+    fig.canvas.draw(); _fix_legends(fig); _place_letters(fig)
+    fig.savefig(OUT + name + '.pdf', bbox_inches='tight'); fig.savefig(OUT + name + '.png', dpi=220, bbox_inches='tight'); plt.close(fig)
 A = OUTDIR
 NAMES = {'cells_ebv-transformed_lymphocytes': 'EBV lymphocytes', 'cells_ebv_transformed_lymphocytes': 'EBV lymphocytes', 'cells_cultured_fibroblasts': 'Fibroblasts', 'esophagus_gastroesophageal_junction': 'Oesophagus, GEJ',
          'esophagus_mucosa': 'Oesophagus, mucosa', 'esophagus_muscularis': 'Oesophagus, muscularis', 'skin_sun_exposed_lower_leg': 'Skin', 'brain_frontal_cortex_ba9': 'Brain, frontal cortex',
