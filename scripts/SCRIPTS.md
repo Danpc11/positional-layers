@@ -14,7 +14,7 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | atlas | `orient.py` | GTEx count files | as above | `pairs_<tissue>.csv.gz`, `orientation_by_tissue.csv` | Fig. 2c; input to most pair analyses |
 | atlas | `isochore_law.py` | — | `gtex/` | `isochore_v2.csv` | Fig. 1g; ED 4b; ST9A |
 | atlas | `spectral_form.py` | tissues | `gtex/` | `lorentz_v2.csv`, `spec_v2_<tissue>.npy` | Fig. 2e,f; ED 1b; ST9B |
-| atlas | `robust_families.py` | — | `pairs_*.csv.gz` | `robust_families.csv` | Fig. 2d |
+| atlas | `robust_families.py` | — | `pairs_*.csv.gz` | `robust_families.csv` | text (family exclusion) |
 | eqtl | `eqtl_share.py` | signif-pairs parquet files | `gtex_eqtl/` | `shares_<tissue>.csv.gz` | |
 | eqtl | `eqtl_test.py` | — | `pairs_*`, `shares_*` | `eqtl_cis_test.csv`, `eqtl_tissue_specificity.csv` | Fig. 3b,c,f; ED 1c |
 | eqtl | `coloc.py` | SuSiE parquet files | `gtex_eqtl/` | `coloc_<tissue>.csv.gz` | |
@@ -23,7 +23,8 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | eqtl | `eqtl_law.py` | — | `pred_pairs_*`, `gtex_eqtl/` | `eqtl_law_v2_pairs.csv` | Fig. 3e; ST4B |
 | eqtl | `eqtl_law_summary.py` | — | `eqtl_law_v2_pairs.csv` | `eqtl_law_v2_summary.csv` | ST4A |
 | architecture | `tad_test.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `tad_cis_test.csv` | Fig. 4b; ST5 |
-| architecture | `tad_bootstrap.py` | — | `pairs_*`, `TAD-full/` | `tad_block_bootstrap.csv` | Fig. 4b; ST5 |
+| architecture | `tad_bootstrap.py` | — | `pairs_*`, `TAD-full/` | `tad_block_bootstrap.csv` | Fig. 2b; 4b; ST5 |
+| architecture | `pair_attributes.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `upset_pair_attributes.csv` | Fig. 2d |
 | architecture | `hic_test.py`, `hic_test_imr90.py` | — | `hic/`, `gtex/` | `hic_coupling_<cell>.csv.gz` | Fig. 4c,d |
 | architecture | `boot_hic.py` | cell, tissue, replicates | `hic_coupling_*`, `gtex/` | `boot_hic_<cell>.csv` | |
 | architecture | `boot_hic_summary.py` | — | `boot_hic_*.csv` | `boot_hic_summary.csv` | Fig. 4d,f; ST8D |
