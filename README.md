@@ -1,6 +1,6 @@
 # Positional layers
 
-Code for **"Shared cis-regulation drives local gene co-expression across human tissues"**.
+Code for **"Common cis-regulatory inputs shape local gene co-expression across human tissues"**.
 
 Any positional measurement of gene expression separates exactly into a tissue landscape, one or
 more technical layers that inherit their positional structure from clustered attributes of the
