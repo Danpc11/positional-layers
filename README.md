@@ -10,8 +10,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 -->
 
-Code for the article above.
-
 The mean single-sample periodogram of expression along a chromosome separates exactly into the spectrum of the
 tissue mean profile and the spectrum of the covariance between genes. We model that covariance as GC-associated
 variation (per-sample GC bias acting on clustered GC content), copy-number dosage in tumours, and residual local
