@@ -3,7 +3,7 @@ Route A: autocorrelation rho(L) across samples -> fit exponential(s) -> lambda_a
 Route B: mean periodogram of the residual profiles along gene order -> fit discrete Lorentzian(s) + floor -> lambda_spec;
 compare with a power law + floor. Theory: exponential ACF <=> Lorentzian spectrum with the same lambda, no discrete peaks."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
 from scipy.optimize import curve_fit
 CHR = [str(i) for i in range(1, 23)] + ['X']; norm = lambda s: s.lower().replace('-', '_')
@@ -55,6 +55,6 @@ for t in sys.argv[1:]:
     resid = S / lor2(fx, *pL2); row = {'tissue': t, 'samples': Z.shape[1], 'lam_acf_1exp': e1[1], 'lam_acf_short': e2[1], 'lam_acf_long': e2[3], 'acf_rss_1exp': rss1, 'acf_rss_2exp': rss2,
         'lam_spec_1lor': pL1[1], 'lam_spec_short': pL2[1], 'lam_spec_long': pL2[3], 'AIC_lor1': aic(rL1, 3), 'AIC_lor2': aic(rL2, 5), 'AIC_powerlaw': aic(rP, 3), 'powerlaw_alpha': pP[1],
         'max_peak_over_fit': resid.max(), 'n_bins_over_1.5x_fit': int((resid > 1.5).sum())}
-    pd.DataFrame([row]).to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False)
+    upsert_csv(pd.DataFrame([row]), OUT, ['tissue'])
     np.save(OUTDIR + f'spec_v2_{t}.npy', np.vstack([fx, S, lor2(fx, *pL2), plaw(fx, *pP)]))
     print(t, {k: round(v, 3) if isinstance(v, float) else v for k, v in row.items() if k != 'tissue'}, flush=True)
