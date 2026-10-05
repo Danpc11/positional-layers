@@ -65,8 +65,7 @@ a{color:var(--blue)}
 <p class="sub">An interactive version of the simulation behind
 <em>Common cis-regulatory inputs shape local gene co-expression across human tissues</em>.
 Build a genome whose cis structure you choose, add a technical GC bias, then watch what each
-estimator reports. The point of the paper is that two of the three positional layers are not
-genome organisation at all — here you can switch them on and off.</p>
+estimator reports. Here you control every component, so you can see how the tissue mean profile and a GC-associated term create positional patterns without any cis structure, and switch each on and off.</p>
 
 <div class="grid">
   <div class="panel">
@@ -101,8 +100,7 @@ genome organisation at all — here you can switch them on and off.</p>
     <figure>
       <div class="canvaswrap"><canvas id="layers" width="1500" height="560"></canvas></div>
       <figcaption><strong>The decomposition.</strong> One sample's profile along a chromosome and the
-      three terms that build it. Only the cis term carries information about gene order: permuting
-      the genes leaves the landscape spectrum statistically unchanged.</figcaption>
+      three terms that build it. Permuting the genes leaves the distribution of the landscape spectrum unchanged. The GC and cis terms both depend on gene order, the GC term because GC content is clustered along the genome, which is why it can imitate local co-expression.</figcaption>
     </figure>
 
     <h2>Does the identity hold?</h2>
@@ -118,8 +116,7 @@ genome organisation at all — here you can switch them on and off.</p>
       <div class="canvaswrap"><canvas id="lagplot" width="1500" height="420"></canvas></div>
       <figcaption><strong>Lag correlation, naive versus GC-corrected.</strong> Raise the GC bias and the
       naive profile grows a long tail at the scale of the isochores, which is easy to read as a
-      coordinated expression domain. Correcting the per-sample GC trend removes it and leaves the
-      true cis kernel.</figcaption>
+      coordinated expression domain. Correcting the per-sample GC trend removes it and recovers the simulated cis kernel when, as here, the cis term is independent of GC. If real regulation also tracks GC, the correction removes part of it too.</figcaption>
     </figure>
 
     <table id="esttab">
@@ -130,15 +127,14 @@ genome organisation at all — here you can switch them on and off.</p>
     <figure>
       <div class="canvaswrap"><canvas id="lawplot" width="1500" height="420"></canvas></div>
       <figcaption><strong>Predicted versus observed GC component.</strong> The law
-      <code>ρ = Var(b)·g_i·g_j / (σ_i σ_j)</code> has no fitted parameter: Var(b) is measured from the
-      per-sample GC slopes. Points should fall on the identity line at every distance.</figcaption>
+      <code>ρ = Var(b)·g_i·g_j / (σ_i σ_j)</code> uses only Var(b), measured from the per-sample GC slopes. Here the slopes come from the same genes, so agreement mainly checks the model; the paper tests the law out of sample, estimating the slopes on odd chromosomes and predicting the covariance on even ones (Fig. 1g).</figcaption>
     </figure>
   </div>
 </div>
 
 <h2>What this shows</h2>
 <p class="note">Three things worth trying. Set the cis amplitude to zero and raise the GC bias: the
-naive estimator still reports a decay length of 10–20 genes, out of nothing. Set the GC bias to
+naive estimator still reports a decay length of about 10–15 genes, out of nothing. Set the GC bias to
 zero: the naive and corrected estimators agree, and both recover the truth. Lower the GC
 autocorrelation φ towards zero: the bias is still there but stops being positional, because the
 artefact inherits its range from the clustering of GC content, not from the bias itself.</p>
