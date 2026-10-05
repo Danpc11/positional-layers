@@ -25,49 +25,59 @@ keywords:
   - Hi-C
   - RNA-seq GC bias
 authors:
-  - given-names: Daniel
-    family-names: Pérez-Calixto
-    affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN); Facultad de Ciencias, Universidad Nacional Autónoma de México"
   - given-names: Sandra Michelle
     family-names: Torres-Pantoja
     affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN); Facultad de Ciencias, Universidad Nacional Autónoma de México"
-  - given-names: Yalith
+  - given-names: Yalith Estefania
     family-names: Mejía-Arratia
     affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN)"
-  - given-names: Mitzi
-    family-names: Pérez-Calixto
-    affiliation: "Facultad de Ciencias, Universidad Nacional Autónoma de México"
-  - given-names: Lidia
-    family-names: Escutia-Guadarrama
-    affiliation: "Facultad de Ciencias, Universidad Nacional Autónoma de México; Facultad de Química, Universidad Nacional Autónoma de México"
-  - given-names: Genaro
-    family-names: Vázquez-Victorio
-    affiliation: "Facultad de Ciencias, Universidad Nacional Autónoma de México"
+  - given-names: Laura
+    family-names: Gómez-Romero
+    affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN)"
   - given-names: Alejandra
     family-names: Cervera
     affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN)"
+  - given-names: Enrique
+    family-names: Hernández-Lemus
+    affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN)"
+  - given-names: Lidia
+    family-names: Escutia-Guadarrama
+    affiliation: "Facultad de Ciencias, Universidad Nacional Autónoma de México; Facultad de Química, Universidad Nacional Autónoma de México"
+  - given-names: Mitzi
+    family-names: Pérez-Calixto
+    affiliation: "Facultad de Ciencias, Universidad Nacional Autónoma de México"
+  - given-names: Genaro
+    family-names: Vázquez-Victorio
+    affiliation: "Facultad de Ciencias, Universidad Nacional Autónoma de México"
   - given-names: Hugo
     family-names: Tovar
-    affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN); Facultad de Ciencias, Universidad Nacional Autónoma de México"
+    affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN)"
+  - given-names: Daniel
+    family-names: Pérez-Calixto
+    affiliation: "Instituto Nacional de Medicina Genómica (INMEGEN)"
 preferred-citation:
   type: article
   title: "Common cis-regulatory inputs shape local gene co-expression across human tissues"
   year: 2026
   notes: "Manuscript submitted. Replace with the journal, volume and DOI on publication."
   authors:
-    - given-names: Daniel
-      family-names: Pérez-Calixto
     - given-names: Sandra Michelle
       family-names: Torres-Pantoja
-    - given-names: Yalith
+    - given-names: Yalith Estefania
       family-names: Mejía-Arratia
-    - given-names: Mitzi
-      family-names: Pérez-Calixto
-    - given-names: Lidia
-      family-names: Escutia-Guadarrama
-    - given-names: Genaro
-      family-names: Vázquez-Victorio
+    - given-names: Laura
+      family-names: Gómez-Romero
     - given-names: Alejandra
       family-names: Cervera
+    - given-names: Enrique
+      family-names: Hernández-Lemus
+    - given-names: Lidia
+      family-names: Escutia-Guadarrama
+    - given-names: Mitzi
+      family-names: Pérez-Calixto
+    - given-names: Genaro
+      family-names: Vázquez-Victorio
     - given-names: Hugo
       family-names: Tovar
+    - given-names: Daniel
+      family-names: Pérez-Calixto

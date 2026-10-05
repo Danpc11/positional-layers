@@ -109,8 +109,8 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 Cite the archived release of this code and the article:
 
-- Pérez-Calixto, D. *et al.* positional-layers, version 0.1.0. Zenodo https://doi.org/10.5281/zenodo.23165504 (2026).
-- Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
+- Torres-Pantoja, S. M. *et al.* positional-layers, version 0.1.0. Zenodo https://doi.org/10.5281/zenodo.23165504 (2026).
+- Torres-Pantoja, S. M. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 `CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").
 

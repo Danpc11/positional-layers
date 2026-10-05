@@ -4,36 +4,44 @@
   "version": "0.1.0",
   "creators": [
     {
-      "name": "Pérez-Calixto, Daniel",
-      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico; Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
-    },
-    {
       "name": "Torres-Pantoja, Sandra Michelle",
       "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico; Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
     },
     {
-      "name": "Mejía-Arratia, Yalith",
+      "name": "Mejía-Arratia, Yalith Estefania",
       "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
     },
     {
-      "name": "Pérez-Calixto, Mitzi",
-      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
-    },
-    {
-      "name": "Escutia-Guadarrama, Lidia",
-      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico; Facultad de Química, Universidad Nacional Autónoma de México, Mexico City, Mexico"
-    },
-    {
-      "name": "Vázquez-Victorio, Genaro",
-      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+      "name": "Gómez-Romero, Laura",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
     },
     {
       "name": "Cervera, Alejandra",
       "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
     },
     {
+      "name": "Hernández-Lemus, Enrique",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
+    },
+    {
+      "name": "Escutia-Guadarrama, Lidia",
+      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico; Facultad de Química, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Pérez-Calixto, Mitzi",
+      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
+      "name": "Vázquez-Victorio, Genaro",
+      "affiliation": "Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+    },
+    {
       "name": "Tovar, Hugo",
-      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico; Facultad de Ciencias, Universidad Nacional Autónoma de México, Mexico City, Mexico"
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
+    },
+    {
+      "name": "Pérez-Calixto, Daniel",
+      "affiliation": "Instituto Nacional de Medicina Genómica (INMEGEN), Mexico City, Mexico"
     }
   ],
   "description": "<p>Reference implementation (Python package <code>poslayers</code>) of the decomposition of positional expression signals into a tissue mean profile, GC-associated variation, copy-number dosage and residual local covariance, with the analysis scripts that produce every result, table and figure of the article <em>Common cis-regulatory inputs shape local gene co-expression across human tissues</em>, and an interactive simulator.</p><p>All inputs are public and are not redistributed; <code>data/MANIFEST.md</code> lists each one and its source. The tables needed to rebuild every figure without the raw data are deposited separately as source data.</p>",
