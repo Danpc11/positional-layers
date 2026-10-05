@@ -14,6 +14,7 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | atlas | `orient.py` | GTEx count files | as above | `pairs_<tissue>.csv.gz`, `orientation_by_tissue.csv` | Fig. 2c; input to most pair analyses |
 | atlas | `isochore_law.py` | — | `gtex/` | `isochore_v2.csv` | Fig. 1g; ED 4b; ST9A |
 | atlas | `spectral_form.py` | tissues | `gtex/` | `lorentz_v2.csv`, `spec_v2_<tissue>.npy` | Fig. 2e,f; ED 1b; ST9B |
+| atlas | `gc_autocorrelation.py` | — | `biomart_GRCh38_gene_gc.txt` | `gc_autocorrelation.csv` | ED 1d |
 | atlas | `robust_families.py` | — | `pairs_*.csv.gz` | `robust_families.csv` | text (family exclusion) |
 | eqtl | `eqtl_share.py` | signif-pairs parquet files | `gtex_eqtl/` | `shares_<tissue>.csv.gz` | |
 | eqtl | `eqtl_test.py` | — | `pairs_*`, `shares_*` | `eqtl_cis_test.csv`, `eqtl_tissue_specificity.csv` | Fig. 3b,c,f; ED 1c |
@@ -40,7 +41,8 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | perturbations | `predict_first.py` → `test_edits.py` → `edit_cis.py` | — | `pairs_whole_blood`, `edit/` | `predictions_*.csv`, `edit_*.csv` | Fig. 5c,d |
 | perturbations | `drug_test.py` | read threshold | `slam/`, `beataml/` | `drug_cis_results_thr<k>.csv` | Fig. 5f; ST7 |
 | perturbations | `crispri_test.py` → `crispri_analyse.py` | — | `perturb/`, `beataml/` | `crispri_pairs.csv.gz` | Fig. 5e |
-| simulations | `theory_sim.py` | — | — | `sim_*.csv` | Fig. 1b,h |
+| simulations | `theory_sim.py` | — | — | `sim_summary.csv`, `sim_lag_profiles.csv` | Fig. 1b |
+| simulations | `decay_recovery.py` | — | — | `sim_decay_recovery.csv` | Fig. 1h |
 | simulations | `gc_correlated_sim.py` | — | — | `gc_correlated_cis_sim.csv` | ST9C |
 | liver | `pilot_spectra.py`, `pilot_domain_tests.py`, `pilot_liver_gc.py` | — | Liver_Spectra outputs (`LIVER_SPECTRA`) | `p1_spectra.csv`, `p4_domain_scale_tests.csv`, `p5a_liver_gc.csv` | Fig. 1c-e; ED 1a |
 | — | `simulate_demo.py` | `--decay`, `--gc-bias` | — | prints | web simulator |
