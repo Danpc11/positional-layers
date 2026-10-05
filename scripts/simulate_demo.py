@@ -30,7 +30,7 @@ def lag_profile(Y, n_genes, n_chrom, max_lag=60):
 def fit_decay(prof):
     lags = np.arange(1, len(prof))
     v = prof[lags]
-    ok = (v > 0.05 * v[0]) & (v > 1e-4)   # relative window: see fix_repo.sh, FIX 1
+    ok = (v > 0.05 * v[0]) & (v > 1e-4)   # relative window: a fixed window lets the noisy tail dominate short decays
     if ok.sum() < 4:
         return np.nan                      # a decay of ~1 gene cannot be fitted this way
     slope = np.polyfit(lags[ok], np.log(v[ok]), 1)[0]
