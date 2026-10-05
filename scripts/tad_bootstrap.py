@@ -2,7 +2,7 @@
 r ~ same_tad + distance bin + orientation, on adjacent pairs with both genes in a TAD."""
 import os
 from poslayers.config import OUTDIR
-import os, glob, numpy as np, pandas as pd, pyannotables as pa
+import glob, numpy as np, pandas as pd, pyannotables as pa
 from lib_tad import MATCH, tads, assign
 TADA = {n: assign(tads(n)) for n in sorted(set(MATCH.values()))}
 BINS = [0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]; G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]

@@ -1,6 +1,6 @@
 import os
 from poslayers.config import OUTDIR
-import glob, os, numpy as np, pandas as pd, statsmodels.formula.api as smf
+import glob, numpy as np, pandas as pd, statsmodels.formula.api as smf
 from lib_boot import block_bootstrap
 norm = lambda s: s.lower().replace('-', '_')
 BINS = [-np.inf, 0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]

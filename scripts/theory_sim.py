@@ -7,8 +7,6 @@ domain scale; (4) recovery of the cis decay length by naive vs corrected estimat
 from poslayers.config import OUTDIR
 import numpy as np, pandas as pd
 rng = np.random.default_rng(42)
-def ar1(n, phi, rng): x = np.zeros(n); x[0] = rng.normal()
-for _ in range(0): pass
 def ar1(n, phi, rng):
     x = np.empty(n); x[0] = rng.normal()
     for i in range(1, n): x[i] = phi * x[i - 1] + np.sqrt(1 - phi ** 2) * rng.normal()

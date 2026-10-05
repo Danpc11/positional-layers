@@ -39,3 +39,27 @@ def upsert_csv(df, path, key):
 # Re-running a script recomputes everything by default. Set POSLAYERS_RESUME=1 to reuse units (tissues, replicates) that a
 # previous run already wrote; only do this when data, filters and code are unchanged since that run.
 RESUME = os.environ.get('POSLAYERS_RESUME', '0') == '1'
+
+
+def replace_groups_csv(df, path, by, groups, key=None):
+    """Write the rows of the units recomputed in this run, replacing ALL earlier rows of those units.
+
+    by     : column(s) that identify a unit, e.g. ['tissue'] or ['cohort'];
+    groups : the units recomputed in this run, as values (one column) or tuples (several columns). A unit listed here
+             loses every earlier row even if df has no rows for it (for example a tissue left without pairs).
+    key    : optional columns that must be unique in the result.
+    Use upsert_csv only for incremental writes whose intention is to keep earlier rows of the same unit.
+    """
+    import pandas as pd
+    by = [by] if isinstance(by, str) else list(by)
+    groups = {g if isinstance(g, tuple) else (g,) for g in groups}
+    out = df
+    if os.path.exists(path) and os.path.getsize(path) > 0:
+        prev = pd.read_csv(path)
+        if len(prev):
+            keep = ~pd.Series([tuple(r) in groups for r in prev[by].astype(object).itertuples(index=False, name=None)], index=prev.index)
+            out = pd.concat([prev[keep.values], df], ignore_index=True)
+    if key is not None and len(out) and out.duplicated(key).any():
+        raise ValueError(f'{path}: more than one row per {key}')
+    out.to_csv(path, index=False)
+    return out

@@ -2,7 +2,7 @@
 (any direction; same direction of effect)? Reads only the needed parquet columns."""
 import os, sys
 from poslayers.config import OUTDIR
-import sys, os, glob, numpy as np, pandas as pd, pyarrow.parquet as pq
+import glob, numpy as np, pandas as pd, pyarrow.parquet as pq
 PAIRS = pd.concat([pd.read_csv(f, usecols=['g1', 'g2']) for f in glob.glob(OUTDIR + 'pairs_*.csv.gz')]).drop_duplicates()
 genes = set(PAIRS.g1) | set(PAIRS.g2)
 norm = lambda s: s.lower().replace('-', '_')

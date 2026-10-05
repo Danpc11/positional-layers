@@ -55,7 +55,6 @@ def test_lag_covariance_is_circular_as_documented():
     """lag_covariance wraps; lag_profile_linear does not. Both are intended."""
     rng = np.random.default_rng(0)
     Y = rng.normal(size=(40, 120))
-    n = Y.shape[1]
     circ = [float(np.mean([np.sum(Y[s] * np.roll(Y[s], -L)) for s in range(40)])) for L in range(4)]
     assert np.allclose(lag_covariance(Y, max_lag=4), circ)
 

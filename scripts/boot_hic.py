@@ -8,11 +8,12 @@ resamples 10-Mb genomic blocks with replacement (blocks defined on the first gen
 Resumable: appends one row per replicate to boot_hic_<cell>.csv."""
 import os, sys
 from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
-import sys, os, numpy as np, pandas as pd, pyannotables as pa
+import numpy as np, pandas as pd, pyannotables as pa
 from scipy.optimize import curve_fit
 from patsy import dmatrix
 cell, tissue, B = sys.argv[1], sys.argv[2], int(sys.argv[3])
 OUT = OUTDIR + f'boot_hic_{cell}.csv'; done = len(pd.read_csv(OUT)) if (RESUME and os.path.exists(OUT)) else 0
+if not RESUME and os.path.exists(OUT): os.remove(OUT)          # a fresh run must not keep replicates beyond the number requested now
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
 SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN', 'SMTSISCH', 'SMNABTCH', 'SMGEBTCH']).set_index('SAMPID')
 C = pd.read_csv(DATA + f'gtex/gene_reads_adult_gtex_v11_{tissue}_gct.gz', sep='\t', skiprows=2, index_col=0).drop(columns='Description')

@@ -11,7 +11,6 @@ Also: corr(b_odd, b_even) across samples, and the share of the quadratic correct
 """
 import os
 from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
-import os
 import glob
 import numpy as np
 import pandas as pd

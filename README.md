@@ -71,7 +71,8 @@ export POSLAYERS_FIGS=/path/to/figures       # default figures/output/
 
 ## Reproducing the analyses and figures
 
-Re-running a script recomputes every tissue or replicate. To reuse units already written by an earlier run with the same
+Re-running a script recomputes every tissue or replicate and replaces all earlier rows of each recomputed unit, so pairs
+that no longer pass a filter are removed. To reuse units already written by an earlier run with the same
 data, filters and code, set `POSLAYERS_RESUME=1`. Genomic-block intervals use 10-Mb blocks; set `POSLAYERS_BLOCK_MB` to
 change the block size for a sensitivity analysis. Run `dosage_prediction.py` with all cohorts at once
 (`BLCA,UCEC`), or one at a time: rows are replaced by cohort, split and lag.
@@ -102,7 +103,7 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 Cite the archived release of this code and the article:
 
-- Pérez-Calixto, D. *et al.* positional-layers, version 1.3.2 (2026). Zenodo DOI to be added when the release is archived.
+- Pérez-Calixto, D. *et al.* positional-layers, version 1.3.3 (2026). Zenodo DOI to be added when the release is archived.
 - Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 `CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").

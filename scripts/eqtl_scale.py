@@ -13,7 +13,7 @@ Input : OUTDIR/eqtl_law_v2_pairs.csv (eqtl_law.py), DATA/gtex_eqtl/<Tissue>_v11_
 Output: OUTDIR/eqtl_scale_pairs.csv (per pair and K), OUTDIR/eqtl_scale_sensitivity.csv (summary)
 """
 import os, numpy as np, pandas as pd
-from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
+from poslayers.config import DATA, OUTDIR, RESUME, replace_groups_csv
 
 NAME = {'nerve_tibial': 'Nerve_Tibial', 'thyroid': 'Thyroid', 'cells_cultured_fibroblasts': 'Cells_Cultured_fibroblasts', 'artery_tibial': 'Artery_Tibial',
         'whole_blood': 'Whole_Blood', 'testis': 'Testis', 'skin_sun_exposed_lower_leg': 'Skin_Sun_Exposed_Lower_leg', 'esophagus_mucosa': 'Esophagus_Mucosa',
@@ -33,7 +33,7 @@ for t, N in NAME.items():
         cov = np.mean((R[i1] - R[i1].mean(1, keepdims=True)) * (R[i2] - R[i2].mean(1, keepdims=True)), 1); sd = R.std(1)
         rows.append(pd.DataFrame({'tissue': t, 'g1': pr.g1.values, 'g2': pr.g2.values, 'K': K, 'pred_r': pr.pred_r.values, 'coloc_score': pr.coloc_score.values,
                                   'corr': cov / (sd[i1] * sd[i2]), 'cov_sd0': cov / (sd0[i1] * sd0[i2])}))
-    upsert_csv(pd.concat(rows), OUT, ['tissue', 'g1', 'g2', 'K']); print(t, len(pr), 'pairs', flush=True)
+    replace_groups_csv(pd.concat(rows) if rows else pd.DataFrame(), OUT, ['tissue'], [t], key=['tissue', 'g1', 'g2', 'K']); print(t, len(pr), 'pairs', flush=True)
     del bed, X, Xc, U, Vt
 
 D = pd.read_csv(OUT)

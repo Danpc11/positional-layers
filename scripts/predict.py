@@ -4,7 +4,7 @@
     P(same variant) * 2p(1-p) * (afc_1/2) * (afc_2/2) / (sd_1 * sd_2)   [afc: log2 allelic fold change; afc/2 = per-allele log2 effect]."""
 import os, sys
 from poslayers.config import DATA, OUTDIR, upsert_csv
-import sys, os, glob, numpy as np, pandas as pd, pyannotables as pa, pyarrow.parquet as pq
+import glob, numpy as np, pandas as pd, pyannotables as pa, pyarrow.parquet as pq
 CHR = [str(i) for i in range(1, 23)] + ['X']; norm = lambda s: s.lower().replace('-', '_')
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
 G38 = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G38 = G38[~G38.index.duplicated()][['Chromosome', 'Start', 'End']]; G38.columns = ['chr', 'start', 'end']; G38['chr'] = G38.chr.astype(str); G38 = G38[G38.chr.isin(CHR)].join(BM[['gc']], how='inner')

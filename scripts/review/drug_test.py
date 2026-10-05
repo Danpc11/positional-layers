@@ -3,9 +3,8 @@ import os, sys
 from statsmodels.stats.multitest import multipletests
 from lib_boot import blocks_for
 from poslayers.config import DATA, OUTDIR
-import sys
 THR = float(sys.argv[1]) if len(sys.argv) > 1 else 10
-import glob, os, re, numpy as np, pandas as pd, pyannotables as pa
+import glob, re, numpy as np, pandas as pd, pyannotables as pa
 from scipy import stats
 CHR = [str(i) for i in range(1, 23)] + ['X']
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; G = G[G.Chromosome.astype(str).isin(CHR)]

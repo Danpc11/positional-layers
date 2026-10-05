@@ -39,3 +39,31 @@ def test_crispri_analysis_runs_end_to_end(tmp_path):
     assert res.returncode == 0, res.stderr[-2000:]
     assert 'coupling x knockdown' in res.stdout
     assert (tmp_path / 'crispri_coupling_distribution_cis_vs_trans.csv').exists()
+
+
+def test_replace_groups_drops_rows_that_no_longer_pass_a_filter(tmp_path):
+    from poslayers.config import replace_groups_csv
+    p = str(tmp_path / 'pairs.csv')
+    pd.DataFrame({'tissue': ['t1', 't1', 't2'], 'pair': ['kept', 'removed', 'other'], 'v': [1, 2, 3]}).to_csv(p, index=False)
+    replace_groups_csv(pd.DataFrame({'tissue': ['t1'], 'pair': ['kept'], 'v': [10]}), p, ['tissue'], ['t1'], key=['tissue', 'pair'])
+    out = pd.read_csv(p)
+    assert set(map(tuple, out[['tissue', 'pair']].values)) == {('t1', 'kept'), ('t2', 'other')}      # 'removed' is gone, t2 untouched
+    assert out.set_index('pair').v['kept'] == 10
+
+
+def test_replace_groups_clears_a_unit_left_without_rows(tmp_path):
+    from poslayers.config import replace_groups_csv
+    p = str(tmp_path / 'pairs.csv')
+    pd.DataFrame({'tissue': ['t1', 't2'], 'pair': ['a', 'b'], 'v': [1, 2]}).to_csv(p, index=False)
+    replace_groups_csv(pd.DataFrame(columns=['tissue', 'pair', 'v']), p, ['tissue'], ['t1'])
+    out = pd.read_csv(p)
+    assert list(out.tissue) == ['t2']
+
+
+def test_upsert_keeps_rows_absent_from_new_output(tmp_path):
+    """Documents why upsert_csv is reserved for incremental writes: it keeps rows whose key is not rewritten."""
+    from poslayers.config import upsert_csv
+    p = str(tmp_path / 'pairs.csv')
+    pd.DataFrame({'tissue': ['t1', 't1'], 'pair': ['kept', 'removed']}).to_csv(p, index=False)
+    upsert_csv(pd.DataFrame({'tissue': ['t1'], 'pair': ['kept']}), p, ['tissue', 'pair'])
+    assert 'removed' in set(pd.read_csv(p).pair)

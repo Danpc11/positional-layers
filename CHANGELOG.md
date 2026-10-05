@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.3
+
+- Re-running a unit (tissue or cohort) now replaces ALL its earlier rows, also when the new output has fewer rows or none:
+  `poslayers.config.replace_groups_csv`, used by `eqtl_law.py`, `eqtl_scale.py`, `orient.py`, `cont_tests.py`,
+  `fric2.py` and `dosage_prediction.py`. Before, `upsert_csv` with pair-level keys kept rows that a new filter had
+  removed, and `cont_tests.py` skipped the write when a cohort had no rows. `upsert_csv` is kept for incremental writes.
+- `boot_hic.py` starts a fresh replicate file unless `POSLAYERS_RESUME=1`, so a run with fewer replicates does not keep
+  earlier ones.
+- Tests for a filter that removes a pair, a tissue left without pairs, and the documented behaviour of `upsert_csv`.
+- Removed a dead first definition of `ar1` in `theory_sim.py` and duplicate imports.
+
 ## 1.3.2
 
 - `dosage_prediction.py`: the dosage model (intercept, linear and quadratic terms) is fitted in the training half only

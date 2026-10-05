@@ -16,7 +16,7 @@ Outputs: OUTDIR/dosage_prediction_splits.csv (all splits; rows replaced by cohor
          OUTDIR/dosage_prediction.csv (split 0)
 """
 import sys, numpy as np, pandas as pd
-from poslayers.config import OUTDIR, upsert_csv
+from poslayers.config import OUTDIR, replace_groups_csv
 from lib_tumour import prepare
 
 LAGS = [1, 2, 3, 5, 8, 12, 20, 30, 50, 80]
@@ -57,7 +57,7 @@ for c in sys.argv[1].split(','):
             rows.append({'cohort': c, 'split': split, 'seed': seed, 'lag': L, 'observed_dosage_cov': obs, 'predicted_dosage_cov': pred, 'predicted_linear_only': lin / n})
     print(c, 'done', flush=True)
 R = pd.DataFrame(rows); R['ratio'] = R.observed_dosage_cov / R.predicted_dosage_cov; R['ratio_linear_only'] = R.observed_dosage_cov / R.predicted_linear_only
-R = upsert_csv(R, OUTDIR + 'dosage_prediction_splits.csv', ['cohort', 'split', 'lag'])
+R = replace_groups_csv(R, OUTDIR + 'dosage_prediction_splits.csv', ['cohort'], sys.argv[1].split(','), key=['cohort', 'split', 'lag'])
 P = R[R.split == 0].drop(columns=['split', 'seed']); P.to_csv(OUTDIR + 'dosage_prediction.csv', index=False)
 for c, d in R.groupby('cohort'):
     p0 = d[d.split == 0]

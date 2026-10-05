@@ -3,7 +3,7 @@ Clustering z per sample: among the top-3,000 expressed protein-coding genes, num
 200 random gene sets of the same size (as in their bootstrap test). TADs: segments between conserved boundaries
 (stability percentile >= 0.5, McArthur & Capra), genes placed with GRCh37 coordinates."""
 import sys
-from poslayers.config import DATA, OUTDIR
+from poslayers.config import DATA, OUTDIR, replace_groups_csv
 import glob, numpy as np, pandas as pd, pyannotables as pa
 from scipy import stats
 B = pd.read_csv(glob.glob(DATA + 'TAD-full/*/data/boundariesByStability/100kbBookendBoundaries_mainText/100kbBookendBoundaries_byStability.bed')[0], sep='\t')
@@ -24,7 +24,6 @@ def cluster_z(Y, ok_mask=None):
         z.append((obs - np.mean(null)) / (np.std(null) + 1e-9))
     return np.array(z)
 rows = []
-import sys
 COHORTS = sys.argv[1].split(',') if len(sys.argv) > 1 else ['BLCA', 'UCEC', 'STAD', 'COAD']
 from poslayers.config import upsert_csv
 SEED = {'BLCA': 11, 'UCEC': 12, 'STAD': 13, 'COAD': 14}
@@ -41,7 +40,7 @@ for c in COHORTS:
     zN_masked = cluster_z(Y[:, nor], ok_mask=M[:, rng.choice(M.shape[1], len(nor), replace=True)])   # same gene exclusion as random tumours
     per = pd.concat([pd.DataFrame({'cohort': c, 'sample': samp[nor], 'group': 'normal', 'z': zN}), pd.DataFrame({'cohort': c, 'sample': samp[tum], 'group': 'tumour', 'z': zT}),
                      pd.DataFrame({'cohort': c, 'sample': samp[tum], 'group': 'tumour_CNA_removed', 'z': zT_clean}), pd.DataFrame({'cohort': c, 'sample': samp[nor], 'group': 'normal_matched_exclusion', 'z': zN_masked})])
-    upsert_csv(per, OUTDIR + 'friction2_per_sample_z.csv', ['cohort', 'sample', 'group'])
+    replace_groups_csv(per, OUTDIR + 'friction2_per_sample_z.csv', ['cohort'], [c], key=['cohort', 'sample', 'group'])
     rows.append({'cohort': c, 'normals': len(nor), 'tumours': len(tum), 'z_normal': np.median(zN), 'z_tumour': np.median(zT), 'P_tumour_vs_normal': stats.mannwhitneyu(zT, zN).pvalue,
                  'rho_z_vs_CNA_burden': stats.spearmanr(zT, burden)[0], 'P_rho': stats.spearmanr(zT, burden)[1],
                  'z_tumour_CNA_genes_removed': np.nanmedian(zT_clean), 'z_normal_same_exclusion': np.nanmedian(zN_masked), 'P_clean_vs_normal_matched': stats.mannwhitneyu(zT_clean[np.isfinite(zT_clean)], zN_masked[np.isfinite(zN_masked)]).pvalue})

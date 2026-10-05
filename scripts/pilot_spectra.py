@@ -1,6 +1,6 @@
 import os, sys
 from poslayers.config import OUTDIR
-import sys, numpy as np, pandas as pd
+import numpy as np, pandas as pd
 sys.path.insert(0, os.path.join(os.environ.get('LIVER_SPECTRA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Liver_Spectra')), 'scripts'))  # liver pipeline: github.com/Danpc11/Liver_Spectra
 from common import *
 X, keep = pd.read_pickle(inter('expr.pkl')); A = pd.read_pickle(inter('expr_adj.pkl')); M = pd.read_pickle(inter('meta.pkl'))

@@ -1,8 +1,6 @@
 """Positional-layer atlas across GTEx tissues: landscape, technical isochore (GC) and cis covariance."""
 import os, sys
 from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
-import sys
-import os
 import numpy as np
 import pandas as pd
 from scipy import stats

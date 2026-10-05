@@ -1,7 +1,7 @@
 """Stream the GDC-PANCAN HTSeq matrix (log2(count+1)) from the zip and keep protein-coding genes for selected cohorts."""
 import sys
 from poslayers.config import DATA, OUTDIR
-import sys, subprocess, numpy as np, pandas as pd
+import subprocess, numpy as np, pandas as pd
 cohorts = sys.argv[1:]
 BP = pd.read_csv(DATA + 'tcga/GDC-PANCAN_basic_phenotype.tsv', sep='\t')
 pcol = [c for c in BP.columns if 'project' in c.lower()][0]; BP['proj'] = BP[pcol].astype(str).str.replace('TCGA-', '')

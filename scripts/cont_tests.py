@@ -1,12 +1,9 @@
 import sys
-from poslayers.config import OUTDIR
-import sys
+from poslayers.config import OUTDIR, replace_groups_csv
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from poslayers.config import OUTDIR, upsert_csv
 from lib_tumour import CHR, coding, prepare, trunc
-import sys
 WANT = sys.argv[1].split(',')
 def lagscore(D, chrs, lags):
     Z = (D - D.mean(1, keepdims=True)) / (D.std(1, keepdims=True) + 1e-9)
@@ -29,6 +26,7 @@ for c, gm in [x for x in [('BLCA', ['STAG2']), ('UCEC', ['CTCF']), ('STAD', None
                        'ci_low': 100 * fit.conf_int().loc['mutant', 0] / base, 'ci_high': 100 * fit.conf_int().loc['mutant', 1] / base, 'p_perm': (np.sum(np.abs(null) >= abs(obs)) + 1) / 10001})
     print(c, 'done', flush=True)
 A = pd.DataFrame(an); T = pd.DataFrame(te)
-upsert_csv(A, OUTDIR + 'aneuploidy_continuousCN.csv', ['cohort', 'expression'])
-if len(T): upsert_csv(T, OUTDIR + 'cohesin_continuousCN.csv', ['cohort', 'gene', 'class', 'tmb_q'])
+done_cohorts = sys.argv[1].split(',')                                        # every cohort of this run is replaced, even with no rows
+replace_groups_csv(A, OUTDIR + 'aneuploidy_continuousCN.csv', ['cohort'], done_cohorts, key=['cohort', 'expression'])
+replace_groups_csv(T, OUTDIR + 'cohesin_continuousCN.csv', ['cohort'], done_cohorts, key=['cohort', 'gene', 'class', 'tmb_q'])
 pd.set_option('display.width', 200); print(A.round(3).to_string(index=False)); print(T.round(3).to_string(index=False))

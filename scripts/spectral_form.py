@@ -4,7 +4,6 @@ Route B: mean periodogram of the residual profiles along gene order -> fit discr
 compare with a power law + floor. Theory: exponential ACF <=> Lorentzian spectrum with the same lambda, no discrete peaks."""
 import sys
 from poslayers.config import DATA, OUTDIR, upsert_csv
-import sys
 import numpy as np
 import pandas as pd
 import pyannotables as pa

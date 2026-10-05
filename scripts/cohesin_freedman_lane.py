@@ -6,7 +6,6 @@ Specification pre-declared as primary: any coding mutation, tumours above the 90
 The other three specifications are sensitivity analyses."""
 import os, sys
 from poslayers.config import OUTDIR
-import sys, os
 from lib_tumour import CHR, coding, prepare, trunc
 import numpy as np, pandas as pd, statsmodels.api as sm
 def lagscore(D, chrs, lags):
