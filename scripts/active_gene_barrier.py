@@ -72,4 +72,5 @@ P['stratum'] = P.db.astype(str) + '_' + P.eiq.astype(str) + '_' + P.ekq.astype(s
 def adjusted(d): return (d.r - d.groupby('stratum').r.transform('mean') + d.r.mean()).groupby(d.jq).mean()
 est = adjusted(P); r_ = np.random.default_rng(23); bs = pd.DataFrame([adjusted(P.iloc[np.concatenate([grp[q] for q in r_.integers(0, len(grp), len(grp))])]) for _ in range(200)])
 pd.DataFrame({'tissue': tis, 'quartile': est.index + 1, 'median_expression_log2cpm': P.groupby('jq').ej.median().values, 'triples': P['jq'].value_counts().sort_index().values,
-              'coupling': est.values, 'ci_low': bs.quantile(0.025).values, 'ci_high': bs.quantile(0.975).values}).to_csv(OUTDIR + f'active_gene_barrier_means_{tis}.csv', index=False)
+              'coupling': est.values, 'ci_low': bs.quantile(0.025).values, 'ci_high': bs.quantile(0.975).values, 'relative': (est / est[0]).values,
+              'relative_ci_low': bs.div(bs[0], axis=0).quantile(0.025).values, 'relative_ci_high': bs.div(bs[0], axis=0).quantile(0.975).values}).to_csv(OUTDIR + f'active_gene_barrier_means_{tis}.csv', index=False)

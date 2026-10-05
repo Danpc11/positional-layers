@@ -51,5 +51,7 @@ print('mean coupling by crossings (all distances):', H.groupby('ncross').r.mean(
 H['cq'] = H.groupby('db').logc.rank(pct=True).mul(5).clip(upper=4.999).astype(int); H['stratum'] = H.db.astype(str) + '_' + H.cq.astype(str)
 def adjusted(d): return (d.r - d.groupby('stratum').r.transform('mean') + d.r.mean()).groupby(d.ncross).mean()
 rng_m = np.random.default_rng(23); est = adjusted(H); bs = pd.DataFrame([adjusted(H.iloc[np.concatenate([grp[i] for i in rng_m.integers(0, len(grp), len(grp))])]) for _ in range(200)])
+rel = bs.div(bs[0], axis=0)                     # ratio to 'no loop crossed' within each replicate: includes denominator uncertainty
 pd.DataFrame({'cell': CELL, 'crossed_loops': est.index, 'pairs': H.ncross.value_counts().reindex(est.index).values, 'coupling': est.values,
-              'ci_low': bs.quantile(0.025).values, 'ci_high': bs.quantile(0.975).values}).to_csv(OUTDIR + f'ctcf_barrier_means_{CELL}.csv', index=False)
+              'ci_low': bs.quantile(0.025).values, 'ci_high': bs.quantile(0.975).values, 'relative': (est / est[0]).values,
+              'relative_ci_low': rel.quantile(0.025).values, 'relative_ci_high': rel.quantile(0.975).values}).to_csv(OUTDIR + f'ctcf_barrier_means_{CELL}.csv', index=False)

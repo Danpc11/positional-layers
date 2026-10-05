@@ -28,15 +28,15 @@ for c, col in [('GM12878', OI['blue']), ('IMR90', OI['red'])]:
 ax.set_xlabel('Mean Hi-C contact (KR)'); ax.set_ylabel('Mean coupling'); ax.legend(loc='lower left', bbox_to_anchor=(0.0, 1.0), fontsize=5.0, borderaxespad=0); lab(ax, 'd')
 ax = fig.add_subplot(gs[1, 0])                          # ctcf_barrier.py
 for cell, col, off in [('GM12878', OI['blue'], -0.08), ('IMR90', OI['red'], 0.08)]:
-    d = pd.read_csv(OUTDIR + f'ctcf_barrier_means_{cell}.csv'); b0 = d.coupling.iloc[0]
-    ax.errorbar(d.crossed_loops + off, d.coupling / b0, yerr=[(d.coupling - d.ci_low) / b0, (d.ci_high - d.coupling) / b0], fmt='o-', color=col, ms=3.5, lw=1, capsize=1.5, label=cell)
+    d = pd.read_csv(OUTDIR + f'ctcf_barrier_means_{cell}.csv')   # ratio intervals resample numerator and denominator together
+    ax.errorbar(d.crossed_loops + off, d.relative, yerr=[d.relative - d.relative_ci_low, d.relative_ci_high - d.relative], fmt='o-', color=col, ms=3.5, lw=1, capsize=1.5, label=cell)
 ax.axhline(1, color='0.7', lw=0.5, ls=':'); ax.set_xticks(range(4)); ax.set_xticklabels(['0', '1', '2', '≥3']); ax.set_xlabel('Convergent CTCF loops crossed'); ax.set_ylabel('Coupling relative to\nno loop crossed'); ax.set_ylim(0.3, 1.3); ax.legend(loc='lower left', fontsize=5.2)
 lab(ax, 'e', -0.3)
 ax = fig.add_subplot(gs[1, 1])                          # active_gene_barrier.py
 for tis, col, off, nm in [('cells_ebv-transformed_lymphocytes', OI['blue'], -0.1, 'lymphoblastoid'), ('thyroid', OI['green'], 0, 'thyroid'), ('cells_cultured_fibroblasts', OI['red'], 0.1, 'fibroblasts')]:
-    d = pd.read_csv(OUTDIR + f'active_gene_barrier_means_{tis}.csv'); b0 = d.coupling.iloc[0]
-    ax.errorbar(d.quartile + off, d.coupling / b0, yerr=[(d.coupling - d.ci_low) / b0, (d.ci_high - d.coupling) / b0], fmt='o-', color=col, ms=3.5, lw=1, capsize=1.5, label=nm)
-ax.axhline(1, color='0.7', lw=0.5, ls=':'); ax.set_xticks([1, 2, 3, 4]); ax.set_xticklabels(['1\nlowest', '2', '3', '4\nhighest']); ax.set_xlabel('Expression of the intervening gene (quartile)'); ax.set_ylabel('Coupling of flanking genes\nrelative to quartile 1'); ax.set_ylim(0.4, 1.2); ax.legend(loc='lower left', fontsize=5.2)
+    d = pd.read_csv(OUTDIR + f'active_gene_barrier_means_{tis}.csv')
+    ax.errorbar(d.quartile + off, d.relative, yerr=[d.relative - d.relative_ci_low, d.relative_ci_high - d.relative], fmt='o-', color=col, ms=3.5, lw=1, capsize=1.5, label=nm)
+ax.axhline(1, color='0.7', lw=0.5, ls=':'); ax.set_xticks([1, 2, 3, 4]); ax.set_xticklabels(['1\nlowest', '2', '3', '4\nhighest']); ax.set_xlabel('Expression of the intervening gene (quartile)'); ax.set_ylabel('Coupling of flanking genes\nrelative to quartile 1'); ax.set_ylim(0.3, 1.3); ax.legend(loc='lower left', fontsize=5.2)
 lab(ax, 'f')
 ax = fig.add_subplot(gs[1, 2:4]); rows = []
 for _, q in CO.iterrows(): rows.append((f"{'STAG2' if q.gene == 'STAG2' else 'CTCF'} {'BLCA' if q.cohort == 'BLCA' else 'UCEC'} {'trunc' if q['class'] == 'truncating' else 'any'}{', strict' if q.tmb_q == 0.7 else ''}", q.adj_pct, q.ci_low, q.ci_high, OI['red'] if q.gene == 'STAG2' else '0.5'))

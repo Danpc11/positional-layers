@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.1
+
+- Fig. 4e,f: intervals of the ratios to the reference group are now computed within each bootstrap replicate, so they
+  include the uncertainty of the reference (`ctcf_barrier.py`, `active_gene_barrier.py` write `relative`,
+  `relative_ci_low` and `relative_ci_high`).
+- `dosage_prediction.py` repeats the out-of-sample prediction for ten random splits of tumours
+  (`dosage_prediction_splits.csv`; Supplementary Table 9F); the split shown in Fig. 3b is unchanged.
+- Fig. 5 schematic descriptions updated to the revised text.
+
 ## 1.3.0
 
 Code for the restructured manuscript (5 figures, 5 Extended Data figures, Supplementary Tables 1-9).

@@ -43,7 +43,7 @@ Table = ST).
 | tumours | `cohesin_freedman_lane.py` | cohorts, permutations | as `cont_tests.py` | `cohesin_freedman_lane.csv` | Fig. 4g; ST6A |
 | tumours | `beataml_freedman_lane.py` | — | `beataml/` | `beataml_freedman_lane.csv` | Fig. 4g; ST6C |
 | tumours | `meta_stag2.py` | — | the two tables above | `stag2_meta.csv` | Fig. 4g; ST6C |
-| tumours | `dosage_prediction.py` | comma-separated cohorts | `expr_*`, `cn_cont_*` | `dosage_prediction.csv` | Fig. 3b; ST9A |
+| tumours | `dosage_prediction.py` | comma-separated cohorts | `expr_*`, `cn_cont_*` | `dosage_prediction.csv`, `dosage_prediction_splits.csv` | Fig. 3b; ST9A,F |
 | simulations | `theory_sim.py` | — | — | `sim_summary.csv`, `sim_lag_profiles.csv` | Fig. 1b |
 | simulations | `decay_recovery.py` | — | — | `sim_decay_recovery.csv` | Fig. 1h |
 | simulations | `gc_correlated_sim.py` | — | — | `gc_correlated_cis_sim.csv` | ST8C |
