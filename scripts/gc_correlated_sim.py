@@ -1,4 +1,4 @@
-"""Review point 12: GC correction when part of the real cis signal tracks GC (Supplementary Table 9C).
+"""GC correction when part of the real cis signal tracks GC (Supplementary Table 9C).
 A per-sample regulatory factor acts on each gene in proportion to its locally smoothed GC content, making up 0-75% of the cis variance;
 we report the fraction of the TRUE cis lag correlation that survives GC correction."""
 import numpy as np, pandas as pd
