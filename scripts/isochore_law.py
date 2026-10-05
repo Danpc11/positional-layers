@@ -10,7 +10,7 @@ For each tissue and lag L we report three things, all on the SAME normalisation 
 Also: corr(b_odd, b_even) across samples, and the share of the quadratic correction carried by the linear term.
 """
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, glob, numpy as np, pandas as pd, pyannotables as pa
 CHR = [str(i) for i in range(1, 23)]
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
@@ -64,5 +64,5 @@ for f in sorted(glob.glob(DATA + 'gtex/*_gct.gz')):
         Pe = lag_pairs(chrs, even, L); ne = sd[Pe[:, 0]] * sd[Pe[:, 1]]
         row[f'held_pred_L{L}'] = np.mean(b_o.var() * gz[Pe[:, 0]] * gz[Pe[:, 1]] / ne)
         row[f'held_obs_L{L}'] = np.mean((cov(D, Pe) - cov(R_e, Pe)) / ne)
-    pd.DataFrame([row]).to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False)
+    upsert_csv(pd.DataFrame([row]), OUT, ['tissue'])
     print(t, S, f"corr(b_odd,b_even)={row['corr_b_odd_even']:.3f}  L10 old {row['old_obs_L10']:.4f}/{row['old_pred_L10']:.4f}  held {row['held_obs_L10']:.4f}/{row['held_pred_L10']:.4f}", flush=True)
