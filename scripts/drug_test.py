@@ -1,4 +1,6 @@
 import os, sys
+from statsmodels.stats.multitest import multipletests
+from lib_boot import blocks_for
 from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys
 THR = float(sys.argv[1]) if len(sys.argv) > 1 else 10
@@ -47,8 +49,18 @@ for cell, drug, cls, ctrl, trt in COMP:
     d = P.assign(t1=res.reindex(P.g1).values, t2=res.reindex(P.g2).values).dropna()
     z1 = (d.t1 - d.t1.mean()) / d.t1.std(); z2 = (d.t2 - d.t2.mean()) / d.t2.std(); prod = z1 * z2
     slope, _, _, p, _ = stats.linregress(d.r, prod); q = pd.qcut(d.r, 5, labels=False)
-    rows.append({'cell': cell, 'perturbation': drug, 'class': cls, 'replicates': f'{len(ctrl)}v{len(trt)}', 'pairs': len(d), 'slope_on_baseline_coupling': slope, 'p': p,
+    # pairs share genes and neighbourhoods: 95% interval and P from 1,000 resamples of 10-Mb genomic blocks
+    blk = blocks_for(d.g1.values); grp = [np.where(blk == b_)[0] for b_ in np.unique(blk)]; rr, pp = d.r.values, prod.values
+    rng_b = np.random.default_rng(3); bs = []
+    for _ in range(1000):
+        ix = np.concatenate([grp[k] for k in rng_b.integers(0, len(grp), len(grp))]); bs.append(np.polyfit(rr[ix], pp[ix], 1)[0])
+    bs = np.array(bs); p_block = 2 * stats.norm.sf(abs(slope / bs.std()))
+    rows.append({'cell': cell, 'perturbation': drug, 'class': cls, 'replicates': f'{len(ctrl)}v{len(trt)}', 'pairs': len(d), 'slope_on_baseline_coupling': slope, 'slope_ci_low': np.percentile(bs, 2.5), 'slope_ci_high': np.percentile(bs, 97.5), 'p_block': p_block, 'p_nominal_pairs_independent': p,
                  'concordance_low_coupling': np.corrcoef(d.t1[q == 0], d.t2[q == 0])[0, 1], 'concordance_high_coupling': np.corrcoef(d.t1[q == 4], d.t2[q == 4])[0, 1]})
-R = pd.DataFrame(rows); R.to_csv(OUTDIR + f'drug_cis_results_thr{int(THR)}.csv', index=False); pd.set_option('display.width', 220); print(R.round(3).to_string(index=False))
+R = pd.DataFrame(rows)
+# Benjamini-Hochberg over the family of all comparisons in this table (defined before the results were seen: every
+# SLAM-seq comparison analysed), for the block-bootstrap P and, for reference, the nominal pair-level P
+R['q_BH_block'] = multipletests(R.p_block, method='fdr_bh')[1]; R['q_BH_nominal'] = multipletests(R.p_nominal_pairs_independent, method='fdr_bh')[1]
+R.to_csv(OUTDIR + f'drug_cis_results_thr{int(THR)}.csv', index=False); pd.set_option('display.width', 220); print(R.round(3).to_string(index=False))
 print('\nmedian slope by class:'); print(R.groupby('class').slope_on_baseline_coupling.median().round(3).to_string())
 print('Mann-Whitney chromatin vs signalling P = %.3f' % stats.mannwhitneyu(R[R['class'] == 'chromatin/transcription'].slope_on_baseline_coupling, R[R['class'] == 'signalling'].slope_on_baseline_coupling).pvalue)
