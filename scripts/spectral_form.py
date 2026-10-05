@@ -42,7 +42,7 @@ for t in sys.argv[1:]:
         P = np.mean(np.abs(np.fft.rfft(Z[i], axis=0)[1:n // 2 + 1]) ** 2, axis=1) / n; fr = np.arange(1, n // 2 + 1) / n
         k = np.digitize(fr, bins) - 1; ok = (k >= 0) & (k < 60); np.add.at(acc, k[ok], P[ok]); np.add.at(cnt, k[ok], 1)
     m = cnt > 0; fx = np.sqrt(bins[:-1] * bins[1:])[m]; S = acc[m] / cnt[m]
-    # Review point 7: fit and evaluate on the SAME scale. The log of a bin-averaged periodogram has variance ~ 1/n_bin
+    # Fit and evaluate on the SAME scale. The log of a bin-averaged periodogram has variance ~ 1/n_bin
     # (n_bin = number of Fourier frequencies averaged in the bin), so fit log S with weights sqrt(n_bin) and compute the
     # Gaussian AIC from the same weighted residual sum of squares.
     wcnt = cnt[m]
