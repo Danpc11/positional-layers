@@ -1,4 +1,4 @@
-"""Review point 14: Freedman-Lane permutation for the cohesin/CTCF effect on cis excess.
+"""Freedman-Lane permutation for the cohesin/CTCF effect on cis excess.
 Reduced model y ~ covariates gives fitted values and residuals; each permutation shuffles the RESIDUALS, adds them back to the
 reduced fit, refits the FULL model y* ~ mutant + covariates and records the HC3 t statistic of 'mutant'. The p-value compares the
 observed HC3 t with that null, so the permutation tests the same estimand that is reported, and the covariate design is kept.
