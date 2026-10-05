@@ -1,4 +1,4 @@
-"""Review point 9: donor x genomic-block bootstrap for the Hi-C results (Fig. 4c,d,f).
+"""Donor x genomic-block bootstrap for the Hi-C results (Fig. 4c,d,f).
 Each replicate resamples GTEx donors with replacement (re-standardising expression, then recomputing every pair's coupling) AND
 resamples 10-Mb genomic blocks with replacement (blocks defined on the first gene's position). Statistics per replicate:
   contact_coef : coefficient of log2 O/E contact in r ~ B-spline(log10 distance, 5 df) + log_oe
