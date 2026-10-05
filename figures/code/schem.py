@@ -37,7 +37,7 @@ def saturation(ax):
     ax.text(0.04, 1.06, 'elasticity = 1 − θ\n(hypothesis)', fontsize=6, va='top', fontweight='bold'); ax.tick_params(labelsize=5.5)
     for s in ('top', 'right'): ax.spines[s].set_visible(False)
 def perturbation_rules(ax):
-    _clean(ax); rules = [('shared element hit\n(HBG1/2 edit · BET inhibitor · variant · disease)', 'neighbours move with coupling', OI['green'], True), ('silences one promoter\n(CRISPRi)', 'only genes < 50 kb, by distance', OI['orange'], False), ('acts through a protein\n(BCL11A edit · kinase inhibitor)', 'no cis propagation', '0.55', False)]
+    _clean(ax); rules = [('shared element hit\n(HBG1/2 edit · BET inhibitor · variant · disease)', 'predicted: follows coupling', OI['green'], True), ('silences one promoter\n(CRISPRi)', 'observed (K562): < 50 kb, no coupling effect', OI['orange'], False), ('acts through a protein\n(BCL11A edit · kinase inhibitor)', 'predicted: no cis coupling effect', '0.55', False)]
     for i, (what, out, col, shared) in enumerate(rules):
         y = 9 - i * 4.3; ax.plot([2, 40], [y, y], color='k', lw=0.9)
         for xg in (10, 32): ax.add_patch(FancyArrowPatch((xg - 3.5, y + 0.45), (xg + 3.5, y + 0.45), arrowstyle='-|>', mutation_scale=5, color='0.3', lw=1.6))
