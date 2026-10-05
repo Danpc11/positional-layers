@@ -1,6 +1,6 @@
 """Cis layer by orientation and intergenic distance of adjacent gene pairs, per GTEx tissue (after GC and technical correction)."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
 OUT = OUTDIR + 'orientation_by_tissue.csv'; PAIRS = OUTDIR + 'pair_correlations.parquet'
 CHR = [str(i) for i in range(1, 23)] + ['X']
@@ -33,6 +33,6 @@ for f in sys.argv[1:]:
     rng = np.random.default_rng(1); j = rng.permutation(len(Z)); floor = float(np.mean((Z[j[:-1]] * Z[j[1:]]).mean(1)))
     S = P.groupby(['orientation', 'dist_bin'], observed=True).r.agg(['size', 'mean']).reset_index().rename(columns={'size': 'n_pairs', 'mean': 'mean_r'})
     S['tissue'] = t; S['random_pair_floor'] = floor
-    S.to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False)
+    upsert_csv(S, OUT, ['tissue', 'orientation', 'dist_bin'])
     P['tissue'] = t; P[['tissue', 'g1', 'g2', 'r', 'dist', 'orientation', 'pc']].to_csv(OUTDIR + f'pairs_{t}.csv.gz', index=False)
     print(t, len(P), 'pairs; floor', round(floor, 4), flush=True)
