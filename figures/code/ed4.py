@@ -36,9 +36,9 @@ for s in ax.spines.values(): s.set_visible(False)
 lab(ax, 'b', -0.42)
 
 # c: intervention rules as a rule table heatmap
-rules = ['shared element\n(HBG1/2 edit)', 'shared enhancer\n(BET inhibitor)', 'shared variant\n(eQTL)', 'disease programme\n(fibrosis)', 'promoter silencing\n(CRISPRi)', 'protein, trans\n(BCL11A edit)']
-obs = ['propagates with\ncoupling', 'distance only\n(<50 kb)', 'no cis effect']
-G = np.array([[1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], float)
+rules = ['shared element\n(HBG1/2 edit)', 'shared enhancer\n(BET inhibitor; q = 0.60)', 'shared variant\n(eQTL)', 'disease programme\n(fibrosis)', 'promoter silencing\n(CRISPRi)', 'protein, trans\n(BCL11A edit)']
+obs = ['concordance rises\nwith coupling', 'distance-dependent\n(mostly < 50 kb)', 'no coupling-dependent\ncis response detected']
+G = np.array([[1, 0, 0], [0.45, 0, 0], [1, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], float)   # lighter: direction only, not significant
 ax = fig.add_subplot(gs[1, 1])
 im = ax.imshow(G, aspect='auto', cmap='Blues', vmin=0, vmax=1.6)
 ax.set_xticks(range(3)); ax.set_xticklabels(obs, fontsize=5.0); ax.set_yticks(range(len(rules))); ax.set_yticklabels(rules, fontsize=5.0)
