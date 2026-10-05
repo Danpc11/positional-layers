@@ -26,3 +26,9 @@ The three `scripts/pilot_*.py` scripts (Fig. 1c-e, Extended Data Fig. 1a) run in
 to a checkout of github.com/Danpc11/Liver_Spectra after running it.
 
 Gene annotation (GRCh38 and GRCh37, Ensembl 100) comes from the `pyannotables` package.
+
+## Source data
+
+The tables that the figure scripts read (34 files, 55 MB) are archived on Zenodo with each release, together with
+Supplementary Tables 1-9. With them, `bash run_pipeline.sh figures` rebuilds every figure without any of the inputs above:
+set `POSLAYERS_RESULTS` to the unpacked folder.
