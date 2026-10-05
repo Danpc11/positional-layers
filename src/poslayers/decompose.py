@@ -52,7 +52,7 @@ def landscape_share(X: np.ndarray) -> float:
 def _gc_basis(gc, degree):
     """Orthonormal basis of [1, g, ..., g^degree] with its EFFECTIVE rank.
 
-    Review point 5: with constant GC (or fewer distinct GC values than the degree), the polynomial columns are collinear.
+    With constant GC (or fewer distinct GC values than the degree), the polynomial columns are collinear.
     A plain QR still returns `degree + 1` columns, and projecting on the spurious ones removes signal unrelated to GC.
     We keep only directions whose singular value is non-negligible."""
     g = np.asarray(gc, float)
