@@ -1,4 +1,4 @@
-"""Review point 4: inverse-variance combination of the STAG2 effect in bladder cancer (TCGA) and AML (BeatAML2), computed from the
+"""Inverse-variance combination of the STAG2 effect in bladder cancer (TCGA) and AML (BeatAML2), computed from the
 exported estimates rather than typed into the figure. Primary specification in both cohorts: STAG2, any coding mutation.
 Percent effects are combined on the percent scale; SE is recovered from the HC3 confidence interval (BLCA) or reported directly (AML)."""
 import os, sys
