@@ -1,8 +1,8 @@
 # Scripts
 
 Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inputs, see `data/MANIFEST.md`) or
-`$POSLAYERS_RESULTS` (everything else). `run_pipeline.sh` runs them in this order. Shared code lives in `lib_tad.py` and
-`lib_tumour.py` and is imported; no script reads or executes another script's source.
+`$POSLAYERS_RESULTS` (everything else). `run_pipeline.sh` runs them in this order. Shared code lives in `lib_tad.py`,
+`lib_tumour.py` and `lib_boot.py` (genomic-block bootstrap) and is imported; no script reads or executes another script's source.
 
 | Stage | Script | Arguments | Reads | Writes | Used in |
 | --- | --- | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | eqtl | `coloc_test.py` | — | `pairs_*`, `shares_*`, `coloc_*` | `coloc_cis_test.csv`, `coloc_dose_response.csv` | Fig. 3d |
 | eqtl | `predict.py` | GTEx count files | `gtex/`, SuSiE | `pred_pairs_<tissue>.csv.gz` (pair list for the eQTL law); also `isochore_law.csv`, the superseded metric kept for comparison | |
 | eqtl | `eqtl_law.py` | — | `pred_pairs_*`, `gtex_eqtl/` | `eqtl_law_v2_pairs.csv` | Fig. 3e; ST4B |
-| eqtl | `eqtl_law_summary.py` | — | `eqtl_law_v2_pairs.csv` | `eqtl_law_v2_summary.csv` | ST4A |
+| eqtl | `eqtl_law_summary.py` | — | `eqtl_law_v2_pairs.csv` | `eqtl_law_v2_summary.csv` (both score thresholds; sign concordance) | Fig. 3e; ST4A |
 | architecture | `tad_test.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `tad_cis_test.csv` | Fig. 4b; ST5 |
 | architecture | `tad_bootstrap.py` | — | `pairs_*`, `TAD-full/` | `tad_block_bootstrap.csv` | Fig. 2b; 4b; ST5 |
 | architecture | `pair_attributes.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `upset_pair_attributes.csv` | Fig. 2d |
@@ -40,7 +40,7 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | perturbations | `bystander_liver.py` | — | `pairs_liver`, `liver_tables/` | `bystander_liver_*.csv`, `bystander_block_bootstrap.csv` | Fig. 5b |
 | perturbations | `predict_first.py` → `test_edits.py` → `edit_cis.py` | — | `pairs_whole_blood`, `edit/` | `predictions_*.csv`, `edit_*.csv` | Fig. 5c,d |
 | perturbations | `drug_test.py` | read threshold | `slam/`, `beataml/` | `drug_cis_results_thr<k>.csv` | Fig. 5f; ST7 |
-| perturbations | `crispri_test.py` → `crispri_analyse.py` | — | `perturb/`, `beataml/` | `crispri_pairs.csv.gz` | Fig. 5e |
+| perturbations | `crispri_test.py` → `crispri_analyse.py` | — | `perturb/`, `beataml/` | `crispri_pairs.csv.gz` (pairs; trans control drawn at random), `crispri_coupling_distribution_cis_vs_trans.csv` | Fig. 5e |
 | simulations | `theory_sim.py` | — | — | `sim_summary.csv`, `sim_lag_profiles.csv` | Fig. 1b |
 | simulations | `decay_recovery.py` | — | — | `sim_decay_recovery.csv` | Fig. 1h |
 | simulations | `gc_correlated_sim.py` | — | — | `gc_correlated_cis_sim.csv` | ST9C |
