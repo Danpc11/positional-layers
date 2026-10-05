@@ -13,7 +13,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev]"
       - run: pytest -q
-      # Static check that would have caught the fDATA and rng errors of the review: fail on any undefined name.
+      # Static check: fail on any undefined name.
       # The three liver pilot scripts import an external module with '*', which pyflakes cannot see into.
       - name: undefined names
         run: |
