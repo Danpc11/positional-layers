@@ -1,4 +1,4 @@
-"""Review point 9: genomic-block bootstrap (10-Mb blocks) of the same-TAD effect in each tissue, with the model of Fig. 4b:
+"""Genomic-block bootstrap (10-Mb blocks) of the same-TAD effect in each tissue, with the model of Fig. 4b:
 r ~ same_tad + distance bin + orientation, on adjacent pairs with both genes in a TAD."""
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
