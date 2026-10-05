@@ -1,39 +1,44 @@
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys
-import pyannotables as pa
-from scipy import stats
-G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]
-BY = pd.read_csv(OUTDIR + 'bystander_liver_t_stage.csv'); ED = pd.read_csv(OUTDIR + 'edit_effects.csv', index_col=0)
-WB = pd.read_csv(A + 'pairs_whole_blood.csv.gz'); DR = pd.read_csv(OUTDIR + 'drug_cis_results_thr3.csv'); CR = pd.read_csv(OUTDIR + 'crispri_pairs.csv.gz')
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
+T = pd.read_csv(A + 'tad_cis_test.csv'); TT = pd.read_csv(OUTDIR + 'tad_tumour_results.csv'); CO = pd.read_csv(OUTDIR + 'cohesin_freedman_lane.csv'); MT = pd.read_csv(OUTDIR + 'stag2_meta.csv').iloc[0]; TB = pd.read_csv(OUTDIR + 'tad_block_bootstrap.csv').set_index('tissue')
+BA = pd.read_csv(OUTDIR + 'beataml_freedman_lane.csv'); AN = pd.read_csv(OUTDIR + 'aneuploidy_continuousCN.csv')
+H = {c: pd.read_csv(A + f'hic_coupling_{c}.csv.gz') for c in ['GM12878', 'IMR90']}
 import schem
-fig = plt.figure(figsize=(W * 0.92, W * 0.9)); gs = fig.add_gridspec(3, 6, hspace=0.6, wspace=1.4)
-def quint(d, a, b):
-    q = pd.qcut(d.r, 5, labels=False); return [d.r[q == i].mean() for i in range(5)], [stats.pearsonr(d[a][q == i], d[b][q == i])[0] for i in range(5)]
-ax = fig.add_subplot(gs[0, 0:3]); schem.perturbation_rules(ax); lab(ax, 'a', -0.04)
-ax = fig.add_subplot(gs[0, 3:6]); x, y = quint(BY, 't1', 't2'); ax.plot(x, y, 'o-', color=OI['purple'], ms=4, lw=1.2); ax.plot([-0.3, 0.6], [-0.3, 0.6], 'k:', lw=0.6)
-ax.axhline(0, color='0.8', lw=0.5); ax.set_xlabel('Coupling in healthy liver (GTEx)'); ax.set_ylabel('Concordance of stage effects'); lab(ax, 'b')
-ax = fig.add_subplot(gs[1, 0:2]); pos = ((G.Start + G.End) / 2).reindex(ED.index); ch = G.Chromosome.astype(str).reindex(ED.index)
-for (c, p0, col, tcol, nm) in [('11', 5.25e6, OI['red'], 't_HBG', 'HBG1/2 promoter edit'), ('2', 60.45e6, OI['blue'], 't_BCL11A', 'BCL11A enhancer edit (Casgevy)')]:
-    w = (ch == c) & ((pos - p0).abs() < 1.5e6); xx = (pos[w] - p0) / 1e6; yy = ED.loc[w, tcol]
-    ax.scatter(xx, yy, s=7, color=col, alpha=0.75, lw=0, label=nm)
-    for gid in ED.index[w][np.abs(yy.values) > 4]: ax.annotate(ED.at[gid, 'sym'], (xx[gid], yy[gid]), fontsize=4.8, xytext=(2, 1), textcoords='offset points', color=col)
-ax.axhline(0, color='0.7', lw=0.5); ax.set_xlabel('Distance from edited site (Mb)'); ax.set_ylabel('Response (t)'); ax.legend(loc='upper right', fontsize=5.2); lab(ax, 'c')
-ax = fig.add_subplot(gs[1, 2:4]); P = WB[WB.dist > 0]
-for tcol, col, nm in [('t_HBG', OI['red'], 'HBG1/2'), ('t_BCL11A', OI['blue'], 'BCL11A')]:
-    d = P.assign(t1=ED[tcol].reindex(P.g1).values, t2=ED[tcol].reindex(P.g2).values).dropna(); x, y = quint(d, 't1', 't2'); ax.plot(x, y, 'o-', color=col, ms=4, lw=1.2, label=nm)
-ax.axhline(0, color='0.8', lw=0.5); ax.set_xlabel('Coupling in healthy blood (GTEx)'); ax.set_ylabel('Concordance of edit responses'); ax.legend(loc='upper left'); lab(ax, 'd')
-ax = fig.add_subplot(gs[1, 4:6]); CR = CR[np.isfinite(CR.resp) & np.isfinite(CR.r)]; CR['resp'] = CR.resp.clip(-20, 20); C2 = CR[(CR.type == 'cis') & (CR.kd > 2)].copy()
-C2['db'] = pd.cut(C2.dist, [-1, 1e4, 5e4, 2e5, 5e5, 1e6], labels=['<10 kb', '10–50 kb', '50–200 kb', '0.2–0.5 Mb', '0.5–1 Mb']); qs = C2.r.quantile([1 / 3, 2 / 3]).values
-C2['rt'] = pd.cut(C2.r, [-1, qs[0], qs[1], 1], labels=['low', 'mid', 'high']); tab = C2.pivot_table(index='db', columns='rt', values='resp', aggfunc='mean', observed=True)
-xx = np.arange(len(tab))
-for j, (c, col) in enumerate(zip(['low', 'mid', 'high'], ['0.75', OI['sky'], OI['blue']])): ax.bar(xx + (j - 1) * 0.26, tab[c], 0.26, color=col, label=f'{c} coupling')
-ax.axhline(0, color='k', lw=0.6); ax.set_xticks(xx); ax.set_xticklabels(tab.index, fontsize=5.6, rotation=25); ax.set_ylabel('Neighbour response (robust z)'); ax.legend(loc='lower right', fontsize=5.6)
-lab(ax, 'e', -0.12)
-ax = fig.add_subplot(gs[2, 0:4]); DR['grp'] = np.where(DR.perturbation.str.contains('JQ1'), 'BET inhibitor (JQ1)', np.where(DR.perturbation.str.contains('BRD4'), 'BRD4 degradation', np.where(DR['class'] == 'signalling', 'signalling inhibitor', 'CDK9 inhibitor')))
-cmap = {'BET inhibitor (JQ1)': OI['green'], 'BRD4 degradation': OI['sky'], 'CDK9 inhibitor': OI['orange'], 'signalling inhibitor': '0.55'}
-d = DR.sort_values(['grp', 'slope_on_baseline_coupling']); y = np.arange(len(d))
-ax.barh(y, d.slope_on_baseline_coupling, color=[cmap[g] for g in d.grp], height=0.7); ax.axvline(0, color='k', lw=0.6)
-ax.set_yticks(y); ax.set_yticklabels([f'{a} · {b}' for a, b in zip(d.cell, d.perturbation)], fontsize=5); ax.set_xlabel('Propagation to coupled neighbours (slope)')
-from matplotlib.patches import Patch; ax.legend(handles=[Patch(color=v, label=k) for k, v in cmap.items()], loc='upper right', fontsize=5.4); lab(ax, 'f', -0.55)
-save(fig, 'Fig5_perturbations'); print('Fig5_perturbations ok')
+fig = plt.figure(figsize=(W, W * 0.62)); gs = fig.add_gridspec(2, 4, hspace=0.75, wspace=0.9)
+
+ax = fig.add_subplot(gs[0, 0]); schem.saturation(ax); lab(ax, 'a', -0.25)
+ax = fig.add_subplot(gs[0, 1]); s = T.sort_values('b_same_tad'); y = np.arange(len(s))
+tb = TB.reindex(s.tissue); ax.errorbar(s.b_same_tad, y + 0.15, xerr=[s.b_same_tad.values - tb.ci_low.values, tb.ci_high.values - s.b_same_tad.values], fmt='o', ms=3, color=OI['blue'], lw=0.6, capsize=0, label='all pairs (95% block CI)'); ax.scatter(s.b_same_tad_no_shared_eQTL, y - 0.15, s=12, color=OI['sky'], marker='s', label='no shared eQTL')
+ax.axvline(0, color='k', lw=0.6); ax.set_yticks(y); ax.set_yticklabels([tissue_label(t) for t in s.tissue], fontsize=5.3); ax.set_xlabel('Same-TAD increase in coupling\n(at equal distance)'); ax.set_xlim(-0.01, 0.11); ax.legend(loc='lower left', bbox_to_anchor=(-0.05, 1.0), fontsize=5.0, ncol=1, handletextpad=0.2, borderaxespad=0)
+lab(ax, 'b', -0.6)
+bins = [25e3, 50e3, 1e5, 2e5, 5e5, 1e6, 2e6]; mids = [37.5, 75, 150, 350, 750, 1500]
+ax = fig.add_subplot(gs[0, 2]); kk = {}
+for c, col in [('GM12878', OI['blue']), ('IMR90', OI['red'])]:
+    d = H[c].copy(); d['db'] = pd.cut(d.tss_distance, bins); lo, hi, mr, mc = [], [], [], []
+    for b, g in d.groupby('db', observed=True):
+        q = pd.qcut(g.oe.rank(method='first'), 5, labels=False); lo.append(g.r[q == 0].mean()); hi.append(g.r[q == 4].mean())
+        gp = g[g.contact_KR > 0]; mr.append(gp.r.mean()); mc.append(gp.contact_KR.mean())   # same pairs (contact > 0) as boot_hic.py
+    ax.plot(mids, hi, 'o-', color=col, ms=3, lw=1.1, label=f'{c}, most contact'); ax.plot(mids, lo, 'o--', color=col, ms=3, lw=0.9, mfc='white', label=f'{c}, least contact'); kk[c] = (mc, mr)
+ax.set_xscale('log'); ax.set_xlabel('Distance between promoters (kb)'); ax.set_ylabel('Coupling'); ax.set_ylim(-0.005, 0.16); ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.3), ncol=1, fontsize=5); lab(ax, 'c')
+ax = fig.add_subplot(gs[0, 3])
+for c, col in [('GM12878', OI['blue']), ('IMR90', OI['red'])]:
+    mc, mr = kk[c]; k = np.polyfit(np.log10(mc), np.log10(np.clip(mr, 1e-4, None)), 1)[0]; ax.loglog(mc, mr, 'o-', color=col, ms=3.5, lw=1, label=f'{c}: k = {k:.2f}')
+ax.set_xlabel('Mean Hi-C contact (KR)'); ax.set_ylabel('Mean coupling'); ax.legend(loc='lower left', bbox_to_anchor=(0.0, 1.0), fontsize=5.0, borderaxespad=0); lab(ax, 'd')
+ax = fig.add_subplot(gs[1, 0]); r = TT.drop_duplicates('cohort')
+x = np.arange(len(r)); ax.bar(x - 0.2, r.within_wt, 0.4, color=OI['green'], label='same TAD'); ax.bar(x + 0.2, r.stable_wt, 0.4, color='0.6', label='across stable boundary')
+ax.set_xticks(x); ax.set_xticklabels(['Bladder', 'Endometrium'], fontsize=6.3); ax.set_ylabel('Cis excess (adjacent genes)'); ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.22), fontsize=5.2, ncol=1); ax.set_ylim(0, 0.22)
+lab(ax, 'e', -0.3)
+ax = fig.add_subplot(gs[1, 1]); BS = pd.read_csv(OUTDIR + 'boot_hic_summary.csv').set_index(['cell', 'stat']); xk = np.arange(3)
+for cell, col, off in [('GM12878', OI['blue'], -0.15), ('IMR90', OI['red'], 0.15)]:
+    d = BS.loc[cell].loc[['k_t1', 'k_t2', 'k_t3']]; ax.errorbar(xk + off, d.estimate, yerr=[d.estimate - d.ci_low, d.ci_high - d.estimate], fmt='o', color=col, ms=4, capsize=2, label=cell)
+ax.set_xticks(xk); ax.set_xticklabels(['low', 'mid', 'high']); ax.set_xlabel('Expression of the pair (tertile)'); ax.set_ylabel('Contact exponent k'); ax.set_ylim(0, 1.05); ax.legend(loc='lower left', fontsize=5.4)
+lab(ax, 'f')
+ax = fig.add_subplot(gs[1, 2:4]); rows = []
+for _, q in CO.iterrows(): rows.append((f"{'STAG2' if q.gene == 'STAG2' else 'CTCF'} {'BLCA' if q.cohort == 'BLCA' else 'UCEC'} {'trunc' if q['class'] == 'truncating' else 'any'}{', strict' if q.tmb_q == 0.7 else ''}", q.adj_pct, q.ci_low, q.ci_high, OI['red'] if q.gene == 'STAG2' else '0.5'))
+for _, q in BA.iterrows(): rows.append((f"{q.group.replace(', ', ' ').replace('any coding', 'any').replace('truncating', 'trunc')} AML", q.adj_pct, q.ci_low, q.ci_high, OI['orange']))
+rows.append(('STAG2 BLCA + AML, meta', MT.meta_pct, MT.ci_low, MT.ci_high, 'k'))
+for i, (n, e, l, h, col) in enumerate(rows[::-1]): ax.errorbar(e, i, xerr=[[e - l], [h - e]], fmt='o', color=col, ms=3, capsize=1.5, lw=0.8)
+ax.set_yticks(range(len(rows))); ax.set_yticklabels([n for n, *_ in rows[::-1]], fontsize=5.2); ax.yaxis.tick_right(); ax.spines['right'].set_visible(True); ax.spines['left'].set_visible(False); ax.axvline(0, color='k', lw=0.6); ax.set_xlabel('Change in cis excess (%), adjusted')
+lab(ax, 'g', -0.12)
+save(fig, 'Fig4_architecture_cohesin'); print('Fig4_architecture_cohesin ok')
