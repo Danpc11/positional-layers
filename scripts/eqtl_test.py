@@ -1,6 +1,7 @@
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
 import glob, os, numpy as np, pandas as pd, statsmodels.formula.api as smf
+from lib_boot import block_bootstrap
 norm = lambda s: s.lower().replace('-', '_')
 BINS = [-np.inf, 0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]
 P = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(OUTDIR + 'pairs_*.csv.gz')}
@@ -12,11 +13,13 @@ for t in tis:
     d['bin'] = pd.cut(d.dist, BINS).astype(str); be = d[d.egene1 & d.egene2].copy()
     be['same'] = be.share_same.astype(int); be['opp_only'] = (be.share_any & ~be.share_same).astype(int)
     m = smf.ols('r ~ same + opp_only + C(bin) + C(orientation)', data=be).fit()
+    bb = block_bootstrap('r ~ same + opp_only + C(bin) + C(orientation)', be, ['same', 'opp_only'], seed=1)
     grp = lambda q: d.loc[q, 'r'].mean()
     r_all = d.r.mean(); delta = m.params['same']; f_same = be.same.sum() / len(d)
     rows.append({'tissue': t, 'pairs': len(d), 'both_eGenes': len(be), 'frac_share_same_of_all_pairs': f_same,
                  'r_share_same': grp(d.egene1 & d.egene2 & d.share_same), 'r_eGenes_no_share': grp(d.egene1 & d.egene2 & ~d.share_any), 'r_not_both_eGenes': grp(~(d.egene1 & d.egene2)),
-                 'delta_same_adj': delta, 'p_same': m.pvalues['same'], 'delta_opposite_only_adj': m.params['opp_only'],
+                 'delta_same_adj': delta, 'same_ci_low': bb['same']['ci_low'], 'same_ci_high': bb['same']['ci_high'], 'p_same_block': bb['same']['p_block'], 'p_same_ols_pairs_independent': m.pvalues['same'],
+                 'delta_opposite_only_adj': m.params['opp_only'], 'opp_ci_low': bb['opp_only']['ci_low'], 'opp_ci_high': bb['opp_only']['ci_high'],
                  'share_of_cis_from_shared_eQTL': f_same * delta / r_all})
 R = pd.DataFrame(rows); R.to_csv(OUTDIR + 'eqtl_cis_test.csv', index=False)
 pd.set_option('display.width', 250); print(R.round(3).to_string(index=False))
