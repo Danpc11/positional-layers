@@ -6,7 +6,7 @@ Predicted genetic correlation: sum over pairs of credible sets, and over each sh
 using each variant's own GTEx slope for each gene. The overlap max over credible-set pairs of sum_v PIP_1 PIP_2 is reported as a
 colocalisation SCORE, not a posterior probability of a shared causal variant."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, glob, numpy as np, pandas as pd, pyarrow.parquet as pq
 U = DATA + 'gtex_eqtl/'; OUT = OUTDIR + 'eqtl_law_v2_pairs.csv'
 done = set(pd.read_csv(OUT).tissue) if os.path.exists(OUT) else set()
@@ -52,6 +52,6 @@ for t, N in NAME.items():
         if tot_w == 0: continue
         rows.append({'tissue': t, 'g1': g1, 'g2': g2, 'coloc_score': score, 'pred_r': pred, 'pred_r_lead_only': lead_pred,
                      'weight_with_slopes': cov_w / tot_w, 'obs_r_int_pc15': corr(Xp, idx[g1], idx[g2]), 'obs_r_int_raw': corr(Xc, idx[g1], idx[g2])})
-    R = pd.DataFrame(rows); R.to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False)
+    R = pd.DataFrame(rows); upsert_csv(R, OUT, ['tissue', 'g1', 'g2'])
     print(t, len(R), 'pairs | slope coverage %.2f | r(pred, obs_pc15) %.2f' % (R.weight_with_slopes.mean(), R[['pred_r', 'obs_r_int_pc15']].corr().iloc[0, 1]), flush=True)
     del bed, X, Xc, Xp, U_, Vt
