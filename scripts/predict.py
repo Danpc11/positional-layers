@@ -3,7 +3,7 @@
 (2) eQTL law: correlation induced by a shared causal variant = sum over shared credible sets of
     P(same variant) * 2p(1-p) * (afc_1/2) * (afc_2/2) / (sd_1 * sd_2)   [afc: log2 allelic fold change; afc/2 = per-allele log2 effect]."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, glob, numpy as np, pandas as pd, pyannotables as pa, pyarrow.parquet as pq
 CHR = [str(i) for i in range(1, 23)] + ['X']; norm = lambda s: s.lower().replace('-', '_')
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
@@ -30,7 +30,7 @@ for f in sys.argv[1:]:
     for L in LAGS:
         pr = np.concatenate([varb * gcz[i[:-L]] * gcz[i[L:]] / (sd_raw[i[:-L]] * sd_raw[i[L:]]) for c in CHR for i in [np.where(chrs == c)[0]] if len(i) > L + 5]).mean()
         law[f'pred_L{L}'] = pr; law[f'obs_gc_component_L{L}'] = lagcorr(D, L) - lagcorr(Dg, L)
-    pd.DataFrame([law]).to_csv(OUTDIR + 'isochore_law.csv', mode='a', header=not os.path.exists(OUTDIR + 'isochore_law.csv'), index=False)
+    upsert_csv(pd.DataFrame([law]), OUTDIR + 'isochore_law.csv', ['tissue'])
     # ---- (2) eQTL law, on GC- and technically corrected expression (as for the cis layer)
     a = SA.loc[samp]; rin = a.SMRIN.astype(float).values; isch = pd.to_numeric(a.SMTSISCH, errors='coerce'); isch = isch.fillna(isch.median()).fillna(0).values
     tech = np.column_stack([rin, rin ** 2, isch, pd.get_dummies(a.SMNABTCH.astype(str), drop_first=True).values.astype(float), pd.get_dummies(a.SMGEBTCH.astype(str), drop_first=True).values.astype(float)])
