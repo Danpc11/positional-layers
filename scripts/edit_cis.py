@@ -34,7 +34,7 @@ print('=== Neighbourhood of BCL11A (chr2), edited target of the approved therapy
 NB = neighbours('BCL11A'); print(NB.round(3).to_string(index=False))
 print('\n=== Neighbourhood of HBG1 (chr11, beta-globin locus), target of reni-cel ===')
 NH = neighbours('HBG1'); print(NH.round(3).to_string(index=False))
-# local-window enrichment vs matched background: |lfc| of genes within +/-k positions of the edited gene
+# local-window enrichment vs random genome-wide background (not matched on expression or local structure): |lfc| of genes within +/-k positions of the edited gene
 def window_test(sym, col, k=10, nperm=20000):
     tid = ann.index[ann.sym == sym][0]; c = ann.loc[tid, 'chr']; sub = ann[ann.chr == c].sort_values('start'); pos = list(sub.index).index(tid)
     idx = [sub.index[j] for j in range(max(0, pos - k), min(len(sub), pos + k + 1)) if j != pos]
