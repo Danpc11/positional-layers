@@ -3,10 +3,7 @@ from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, DATA, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
 # ---- Extended Data Fig. 1: robustness of the cis layer
 P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); Lz = pd.read_csv(OUTDIR + 'lorentz_v2.csv'); E = pd.read_csv(A + 'eqtl_cis_test.csv'); F = pd.read_csv(A + 'robust_families.csv')
-import pyannotables as pa
-BMg = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
-Gg = pa.tables()['homo_sapiens-GRCh38-ensembl100']; Gg = Gg[~Gg.index.duplicated()]; Gg = Gg[Gg.Chromosome.astype(str).isin([str(i) for i in range(1, 23)])].join(BMg[['gc', 'type']], how='inner'); Gg = Gg[Gg.type == 'protein_coding'].sort_values(['Chromosome', 'Start'])
-lags_ = np.arange(1, 61); ac = [np.mean([np.mean(((g.gc.values - g.gc.mean()) / g.gc.std())[:-L] * ((g.gc.values - g.gc.mean()) / g.gc.std())[L:]) for c, g in Gg.groupby('Chromosome') if len(g) > L + 5]) for L in lags_]
+GA = pd.read_csv(OUTDIR + 'gc_autocorrelation.csv'); lags_ = GA.lag.values; ac = GA.autocorrelation.tolist()   # scripts/gc_autocorrelation.py
 fig, axs = plt.subplots(1, 4, figsize=(W, W * 0.33)); plt.subplots_adjust(wspace=0.75)
 ax = axs[0]; x = np.arange(len(P4)); ax.bar(x - 0.2, P4.cis_L1, 0.4, color=OI['blue'], label='adjacent (cis)'); ax.bar(x + 0.2, P4.domain_L10_30, 0.4, color=OI['red'], label='10–30 genes (domain)')
 ax.set_xticks(x); ax.set_xticklabels(['raw', '−comp.', '−props', '−5 PCs', '−10 PCs', '−20 PCs'], fontsize=5.4, rotation=45, ha='right'); ax.set_ylabel('Correlation vs permuted order'); ax.set_ylim(0, 0.3); ax.legend(fontsize=5.2, loc='upper right'); lab(ax, 'a')
