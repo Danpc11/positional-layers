@@ -1,4 +1,4 @@
-# positional-layers
+# Positional layers
 
 ### Common cis-regulatory inputs shape local gene co-expression across human tissues
 
@@ -7,8 +7,6 @@
 [![Simulator](https://img.shields.io/badge/Simulator-live-4285F4?logo=googlechrome&logoColor=white)](https://danpc11.github.io/positional-layers/)
 ![Version](https://img.shields.io/badge/version-0.1.0-1f6feb)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23165504.svg)](https://doi.org/10.5281/zenodo.23165504)
-
-Code for the article above.
 
 The mean single-sample periodogram of expression along a chromosome separates exactly into the spectrum of the
 tissue mean profile and the spectrum of the covariance between genes. We model that covariance as GC-associated
