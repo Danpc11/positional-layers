@@ -42,7 +42,8 @@ isochore_law(var_b=0.06, gc_i=1.2, gc_j=0.9, sd_i=1.0, sd_j=1.0)
 eqtl_law(freq=0.3, beta1=0.4, beta2=-0.5)                 # negative: opposite effects
 
 # 4. Shared-source model: the covariance of two genes is the sum over shared sources of source variance times the two
-#    footprints. It predicts the copy-number layer of tumours out of sample with no fitted parameter (Fig. 3b).
+#    footprints, assuming uncorrelated sources. A dosage model fitted in half of the tumours predicts the copy-number
+#    covariance of the other half without refitting (Fig. 3b).
 source_covariance(source_variance=[1.5, 0.6], footprint_i=[0.8, 0.3], footprint_j=[0.5, -0.7])
 ```
 
@@ -70,6 +71,12 @@ export POSLAYERS_FIGS=/path/to/figures       # default figures/output/
 
 ## Reproducing the analyses and figures
 
+Re-running a script recomputes every tissue or replicate. To reuse units already written by an earlier run with the same
+data, filters and code, set `POSLAYERS_RESUME=1`. Genomic-block intervals use 10-Mb blocks; set `POSLAYERS_BLOCK_MB` to
+change the block size for a sensitivity analysis. Run `dosage_prediction.py` with all cohorts at once
+(`BLCA,UCEC`), or one at a time: rows are replaced by cohort, split and lag.
+
+
 ```bash
 bash run_pipeline.sh            # everything, in dependency order (several hours)
 bash run_pipeline.sh tumours    # one stage: acquire, atlas, eqtl, architecture, tumours, simulations, liver, figures
@@ -95,14 +102,14 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 Cite the archived release of this code and the article:
 
-- Pérez-Calixto, D. *et al.* positional-layers, version 1.3.0 (2026). Zenodo DOI to be added when the release is archived.
+- Pérez-Calixto, D. *et al.* positional-layers, version 1.3.2 (2026). Zenodo DOI to be added when the release is archived.
 - Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 `CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").
 
 ## Rebuilding the figures without the raw data
 
-The 41 tables the figure scripts read (40 MB) are deposited on Zenodo as source data (DOI to be added). Unpack them and run only the
+The 41 tables the figure scripts read (40 MB) will be deposited on Zenodo as source data before publication (DOI to be added). Unpack them and run only the
 figure stage:
 
 ```bash

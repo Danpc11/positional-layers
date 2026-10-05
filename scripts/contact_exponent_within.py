@@ -1,12 +1,9 @@
-"""Test of the source theory, cis layer: one contact exponent for two independent sources of contact variation.
+"""Contact exponents within and across distance bins in the 25-kb Hi-C maps (Supplementary Note 1, section 6).
 
-Theory: if a gene's loading on a regulatory element scales as contact^k, coupling scales as contact^k whether contact
-varies because of genomic distance or, at a FIXED distance, because of 3D folding. k_within is estimated only from
-variation of observed/expected contact inside distance bins (quintiles of O/E within each bin, bin fixed effects);
-k_across only from the change of mean contact between distance bins. The theory predicts k_within = k_across, so the
-decay of coupling with distance follows from the Hi-C decay of contact with no fitted constant beyond the scale.
-95% intervals from 300 resamples of 10-Mb genomic blocks. Pairs with zero contact are excluded, as in boot_hic.py.
-Output: OUTDIR/contact_exponent_within.csv (Supplementary Note 1, section 6)
+k_within: slope of log mean coupling on log mean contact across quintiles of observed/expected contact inside distance
+bins (bin fixed effects); k_across: the same slope across distance bins. Pairs with zero contact are excluded, as in
+boot_hic.py. 95% intervals from 300 resamples of 10-Mb genomic blocks. The paper reports both as descriptive exponents.
+Output: OUTDIR/contact_exponent_within.csv
 """
 import numpy as np, pandas as pd
 from poslayers.config import OUTDIR

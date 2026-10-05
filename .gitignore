@@ -16,3 +16,6 @@ figures/output/
 data/*
 !data/MANIFEST.md
 results/
+
+# release and update archives are distributed outside the repository
+*.zip

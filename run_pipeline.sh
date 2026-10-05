@@ -11,7 +11,8 @@ run() { echo "+ python $*"; python "$@"; }
 
 if stage acquire; then                                   # network access; run once
   run $S/make_tss_table.py
-  [ -f "$D/hic/hic_contacts_GM12878.csv.gz" ] || run $S/hic_extract.py
+  ok=1; for c in GM12878 IMR90; do for k in contacts expected; do [ -f "$D/hic/hic_${k}_${c}.csv.gz" ] || ok=0; done; done
+  [ $ok = 1 ] || run $S/hic_extract.py                   # extracts both cell lines
   run $S/extract.py BLCA UCEC STAD COAD GBM LAML
   run $S/cn_continuous.py
 fi

@@ -6,13 +6,13 @@ Predicted genetic correlation: sum over pairs of credible sets, and over each sh
 using each variant's own GTEx slope for each gene. The overlap max over credible-set pairs of sum_v PIP_1 PIP_2 is reported as a
 colocalisation SCORE, not a posterior probability of a shared causal variant."""
 import os
-from poslayers.config import DATA, OUTDIR, upsert_csv
+from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
 import os
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 U = DATA + 'gtex_eqtl/'; OUT = OUTDIR + 'eqtl_law_v2_pairs.csv'
-done = set(pd.read_csv(OUT).tissue) if os.path.exists(OUT) else set()
+done = set(pd.read_csv(OUT).tissue) if (RESUME and os.path.exists(OUT)) else set()
 NAME = {'nerve_tibial': 'Nerve_Tibial', 'thyroid': 'Thyroid', 'cells_cultured_fibroblasts': 'Cells_Cultured_fibroblasts', 'artery_tibial': 'Artery_Tibial',
         'whole_blood': 'Whole_Blood', 'testis': 'Testis', 'skin_sun_exposed_lower_leg': 'Skin_Sun_Exposed_Lower_leg', 'esophagus_mucosa': 'Esophagus_Mucosa',
         'adipose_subcutaneous': 'Adipose_Subcutaneous', 'lung': 'Lung'}

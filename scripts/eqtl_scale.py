@@ -13,14 +13,14 @@ Input : OUTDIR/eqtl_law_v2_pairs.csv (eqtl_law.py), DATA/gtex_eqtl/<Tissue>_v11_
 Output: OUTDIR/eqtl_scale_pairs.csv (per pair and K), OUTDIR/eqtl_scale_sensitivity.csv (summary)
 """
 import os, numpy as np, pandas as pd
-from poslayers.config import DATA, OUTDIR, upsert_csv
+from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
 
 NAME = {'nerve_tibial': 'Nerve_Tibial', 'thyroid': 'Thyroid', 'cells_cultured_fibroblasts': 'Cells_Cultured_fibroblasts', 'artery_tibial': 'Artery_Tibial',
         'whole_blood': 'Whole_Blood', 'testis': 'Testis', 'skin_sun_exposed_lower_leg': 'Skin_Sun_Exposed_Lower_leg', 'esophagus_mucosa': 'Esophagus_Mucosa',
         'adipose_subcutaneous': 'Adipose_Subcutaneous', 'lung': 'Lung'}
 KS = [0, 5, 10, 15, 25, 40]
 P = pd.read_csv(OUTDIR + 'eqtl_law_v2_pairs.csv'); OUT = OUTDIR + 'eqtl_scale_pairs.csv'
-done = set(pd.read_csv(OUT).tissue) if os.path.exists(OUT) else set()
+done = set(pd.read_csv(OUT).tissue) if (RESUME and os.path.exists(OUT)) else set()
 for t, N in NAME.items():
     if t in done or t not in set(P.tissue): continue
     bed = pd.read_csv(DATA + f'gtex_eqtl/{N}_v11_normalized_expression_bed.gz', sep='\t'); bed['gid'] = bed.iloc[:, 3].str.split('.').str[0]

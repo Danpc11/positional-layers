@@ -34,3 +34,8 @@ def upsert_csv(df, path, key):
         raise ValueError(f'{path}: more than one row per {key}')
     out.to_csv(path, index=False)
     return out
+
+
+# Re-running a script recomputes everything by default. Set POSLAYERS_RESUME=1 to reuse units (tissues, replicates) that a
+# previous run already wrote; only do this when data, filters and code are unchanged since that run.
+RESUME = os.environ.get('POSLAYERS_RESUME', '0') == '1'

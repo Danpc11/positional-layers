@@ -10,7 +10,7 @@ For each tissue and lag L we report three things, all on the SAME normalisation 
 Also: corr(b_odd, b_even) across samples, and the share of the quadratic correction carried by the linear term.
 """
 import os
-from poslayers.config import DATA, OUTDIR, upsert_csv
+from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
 import os
 import glob
 import numpy as np
@@ -23,7 +23,7 @@ G = G[G.chr.isin(CHR)].join(BM[['gc']], how='inner')
 SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', sep='\t', low_memory=False, usecols=['SAMPID', 'SMRIN']).set_index('SAMPID')
 LAGS = [1, 2, 5, 10, 20, 30]
 OUT = OUTDIR + 'isochore_v2.csv'
-done = set(pd.read_csv(OUT).tissue) if os.path.exists(OUT) else set()
+done = set(pd.read_csv(OUT).tissue) if (RESUME and os.path.exists(OUT)) else set()
 
 def lag_pairs(chrs, keep, L):
     """index pairs (i, i+L) within the same chromosome, restricted to genes where keep is True"""

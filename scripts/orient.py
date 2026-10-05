@@ -1,6 +1,6 @@
 """Cis layer by orientation and intergenic distance of adjacent gene pairs, per GTEx tissue (after GC and technical correction)."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, upsert_csv
+from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
 OUT = OUTDIR + 'orientation_by_tissue.csv'; PAIRS = OUTDIR + 'pair_correlations.parquet'
 CHR = [str(i) for i in range(1, 23)] + ['X']
@@ -11,7 +11,7 @@ SA = pd.read_csv(DATA + 'GTEx_Analysis_v11_Annotations_SampleAttributesDS.txt', 
 def resid_samples(D, F): F1 = np.column_stack([np.ones(F.shape[0]), F]); B = np.linalg.lstsq(F1, D.T, rcond=None)[0]; return (D.T - F1 @ B).T
 def resid_genes(D, G): G1 = np.column_stack([np.ones(G.shape[0]), G]); B = np.linalg.lstsq(G1, D, rcond=None)[0]; return D - G1 @ B
 BINS = [-np.inf, 0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]; LAB = ['overlap', '0-1kb', '1-5kb', '5-20kb', '20-100kb', '100-500kb', '>500kb']
-done = set(pd.read_csv(OUT).tissue) if os.path.exists(OUT) else set(); allpairs = []
+done = set(pd.read_csv(OUT).tissue) if (RESUME and os.path.exists(OUT)) else set(); allpairs = []
 for f in sys.argv[1:]:
     t = os.path.basename(f).replace('gene_reads_adult_gtex_v11_', '').replace('gene_reads_v10_', '').replace('_gct.gz', '')
     if t in done or t == 'kidney_medulla': continue

@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.2
+
+- `dosage_prediction.py`: the dosage model (intercept, linear and quadratic terms) is fitted in the training half only
+  and applied without refitting to the validation half; the prediction is the covariance of the fitted dosage components
+  (validation copy number, training coefficients), so nothing is fitted in the validation half. Ratios change from
+  0.99-1.07 to 0.85-1.07 (split shown) and 0.71-1.07 across ten splits. A linear-only prediction is kept as a
+  sensitivity analysis. Rows are replaced by cohort, split and lag, so running one cohort keeps the other.
+- Fig. 3f: stratum means now have intervals from the tissue-stratified block bootstrap (`eqtl_law_strata.csv`) instead of
+  pair-level standard errors.
+- `eqtl_law_summary.py`: sensitivity to the block size (5, 10, 20 Mb) and to blocks coordinated across tissues
+  (`eqtl_law_block_sensitivity.csv`; Supplementary Table 8D).
+- Re-running a script now recomputes everything; `POSLAYERS_RESUME=1` reuses tissues or replicates already written
+  (atlas, orient, isochore_law, eqtl_law, eqtl_scale, boot_hic).
+- `lib_boot.py`: genes without a GRCh38 position get blocks of their own (they were placed in block 0); block size can be
+  set with `POSLAYERS_BLOCK_MB`; `p_block` documented as a normal approximation.
+- `run_pipeline.sh acquire` checks the contact and expected files of both cell lines before skipping `hic_extract.py`.
+- `*.zip` added to `.gitignore`; release archives are distributed outside the repository.
+
 ## 1.3.1
 
 - Fig. 4e,f: intervals of the ratios to the reference group are now computed within each bootstrap replicate, so they
@@ -16,7 +34,7 @@
 Code for the restructured manuscript (5 figures, 5 Extended Data figures, Supplementary Tables 1-9).
 
 - Shared-source model: `poslayers.source_covariance`, and `dosage_prediction.py`, which predicts the copy-number layer of
-  tumours out of sample with no fitted parameter (Fig. 3b).
+  tumours in held-out samples (Fig. 3b).
 - Architectural barriers: `ctcf_barrier.py` (coupling across convergent CTCF loop anchors; Fig. 4e) and
   `active_gene_barrier.py` (coupling across an active intervening gene; Fig. 4f), each writing the adjusted means for
   the figure itself; Extended Data Fig. 5.

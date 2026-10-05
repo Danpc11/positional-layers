@@ -15,7 +15,9 @@ for (c, d), col in zip(DS.groupby('cohort'), [OI['blue'], OI['red']]):
     ax.plot(d.lag, d.predicted_dosage_cov, '-', color=col, lw=1.2, label=f'{dict(BLCA="bladder", UCEC="endometrium")[c]}, predicted')
     ax.plot(d.lag, d.observed_dosage_cov, 'o', color=col, ms=3.5, mfc='white', mew=1, label=f'{dict(BLCA="bladder", UCEC="endometrium")[c]}, observed')
 ax.set_xscale('log'); ax.set_xlabel('Distance between genes (genes)'); ax.set_ylabel('Dosage covariance')
-ax.text(0.97, 0.95, 'no fitted parameter;\nobserved/predicted 0.99–1.07', transform=ax.transAxes, ha='right', va='top', fontsize=5.6); ax.legend(loc='lower left', fontsize=5.2); lab(ax, 'b')
+DP = DS; rr = DP.observed_dosage_cov / DP.predicted_dosage_cov
+ax.text(0.03, 0.04, f'dosage model fitted in the training half only;\nobserved/predicted {rr.min():.2f}–{rr.max():.2f} (split shown)', transform=ax.transAxes, ha='left', va='bottom', fontsize=5.2)
+ax.legend(loc='upper right', fontsize=5.0); lab(ax, 'b')
 ax = fig.add_subplot(gs[1, 0]); cats = [('r_not_both_eGenes', 'not both\neGenes', '0.6'), ('r_eGenes_no_share', 'no shared\nvariant', OI['sky']), ('r_share_same', 'shared,\nsame sign', OI['blue'])]
 for i, (c, n, col) in enumerate(cats): ax.scatter(i + rng.uniform(-0.15, 0.15, len(E)), E[c], s=6, color=col, lw=0); ax.hlines(E[c].median(), i - 0.25, i + 0.25, color='k', lw=1.2)
 ax.set_xticks(range(3)); ax.set_xticklabels([n for _, n, _ in cats], fontsize=5.4); ax.set_ylabel('Adjacent-pair correlation'); lab(ax, 'c')
@@ -28,8 +30,8 @@ med = [g.get_group(b).median() for b in order]; q1 = [g.get_group(b).quantile(0.
 ax.errorbar(range(5), med, yerr=[np.subtract(med, q1), np.subtract(q3, med)], fmt='o-', color=OI['purple'], ms=4, capsize=2, lw=1.2)
 ax.set_xticks(range(5)); ax.set_xticklabels(['none', '<0.1', '0.1–0.5', '0.5–0.8', '>0.8'], fontsize=5.4, rotation=30); ax.set_xlabel('Colocalisation score'); ax.set_ylabel('Adjacent-pair correlation')
 lab(ax, 'e')
-ax = fig.add_subplot(gs[1, 3]); PC['bin'] = pd.qcut(PC.pred_genetic_r, 8, duplicates='drop'); b = PC.groupby('bin', observed=True).agg(p=('pred_genetic_r', 'mean'), o=('obs_r', 'mean'), se=('obs_r', lambda x: x.std() / np.sqrt(len(x))))
-ax.errorbar(b.p, b.o, yerr=1.96 * b.se, fmt='o', color=OI['blue'], ms=4, capsize=2); sl = np.polyfit(PC.pred_genetic_r, PC.obs_r, 1); xx = np.linspace(b.p.min(), b.p.max(), 10)
+ax = fig.add_subplot(gs[1, 3]); b = pd.read_csv(OUTDIR + 'eqtl_law_strata.csv')     # eqtl_law_summary.py: tissue-stratified block bootstrap
+ax.errorbar(b.pred, b.obs, yerr=[b.obs - b.ci_low, b.ci_high - b.obs], fmt='o', color=OI['blue'], ms=4, capsize=2)
 ax.set_xscale('symlog', linthresh=0.01); ax.set_xlabel('Predicted genetic covariance'); ax.set_ylabel('Observed coupling')
 ES = pd.read_csv(OUTDIR + 'eqtl_law_v2_summary.csv'); es = ES[(ES.score_threshold == 0.1) & (ES.observed_scale == 'obs_r_int_pc15') & (ES.prediction == 'pred_r')].iloc[0]
 ax.text(0.05, 0.9, f'r = {es.pearson_r:.2f}', transform=ax.transAxes, fontsize=5.6, va='top'); lab(ax, 'f')

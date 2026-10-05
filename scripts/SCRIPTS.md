@@ -24,7 +24,7 @@ Table = ST).
 | eqtl | `coloc_test.py` | — | `pairs_*`, `shares_*`, `coloc_*` | `coloc_cis_test.csv`, `coloc_dose_response.csv` | Fig. 3e; ST3 |
 | eqtl | `predict.py` | GTEx count files | `gtex/`, SuSiE | `pred_pairs_<tissue>.csv.gz` | input |
 | eqtl | `eqtl_law.py` | — | `pred_pairs_*`, `gtex_eqtl/` | `eqtl_law_v2_pairs.csv` | Fig. 3f; ST4B |
-| eqtl | `eqtl_law_summary.py` | — | `eqtl_law_v2_pairs.csv` | `eqtl_law_v2_summary.csv` | Fig. 3f; ST4A |
+| eqtl | `eqtl_law_summary.py` | — | `eqtl_law_v2_pairs.csv` | `eqtl_law_v2_summary.csv`, `eqtl_law_strata.csv`, `eqtl_law_block_sensitivity.csv` | Fig. 3f; ST4A,D; ST8D |
 | eqtl | `eqtl_scale.py` | — | `eqtl_law_v2_pairs.csv`, `gtex_eqtl/` | `eqtl_scale_pairs.csv`, `eqtl_scale_sensitivity.csv` | ST4C |
 | architecture | `tad_test.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `tad_cis_test.csv` | Fig. 4b; ST5 |
 | architecture | `tad_bootstrap.py` | — | `pairs_*`, `TAD-full/` | `tad_block_bootstrap.csv` | Fig. 2b; Fig. 4b; ST5 |

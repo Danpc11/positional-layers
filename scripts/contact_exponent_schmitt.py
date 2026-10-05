@@ -1,19 +1,12 @@
 """Contact exponents in 40-kb Hi-C maps of human tissues (Schmitt et al. 2016; Supplementary Note 1, section 6).
-Gene-pair tables are made from the Fit-Hi-C files of GSE87112 with reduce_fithic.py (DATA/schmitt/schmitt_gene_pairs/).
 
-Predictions fixed in advance (as established in GM12878 and IMR-90 at 25 kb): k_across = 1/2, k_within = 1,
-k_within / k_across = 2, with the same values in every tissue.
-k_across: log mean coupling on log mean observed contact across distance bins (80 kb - 2 Mb).
-k_within: inside each distance bin, quintiles of Fit-Hi-C O/E; log mean coupling on log mean observed contact, with
-distance-bin fixed effects.
-Coupling: GTEx GC- and technically-corrected correlations of protein-coding gene pairs, same pipeline as hic_test.py.
-Bin biases: Fit-Hi-C observed counts are not normalised, so per-bin biases (coverage, mappability) are removed by
-matrix balancing on the available bin pairs (as KR/ICE): b_i = sum_j obs_ij / sum_j exp_ij b_j, iterated per chromosome;
-contact = obs / (b_i b_j), O/E = contact / expected. Calibration rule: GM12878 and IMR-90 must reproduce the Rao et al.
-25-kb KR estimates (k_within 0.95 and 0.78; k_across 0.51 and 0.52) before tissues are interpreted.
-Inclusion rule fixed in advance: median observed contact >= 5 at 80 kb (low-depth maps reported but flagged).
-95% intervals: 100 resamples of 10-Mb genomic blocks. Usage: python contact_exponent_schmitt.py AD,AO,...
-Output: OUTDIR/contact_exponent_schmitt.csv (one row per tissue; re-runs replace rows)
+Estimates the exponent of coupling on Hi-C contact across distance bins (k_across) and within distance bins (k_within,
+from quintiles of observed/expected contact with distance-bin fixed effects), for comparison with the 25-kb estimates of
+contact_exponent_within.py. Bin biases of the Fit-Hi-C counts are removed by matrix balancing. The paper reports these
+exponents as descriptive: k_within depends on map resolution and protocol.
+Gene-pair tables are made from the Fit-Hi-C files of GSE87112 with reduce_fithic.py (DATA/schmitt/schmitt_gene_pairs/).
+95% intervals: 100 resamples of 10-Mb genomic blocks. Usage: python contact_exponent_schmitt.py GM12878,imr90,...
+Output: OUTDIR/contact_exponent_schmitt.csv (one row per map; re-runs replace rows)
 """
 import sys, numpy as np, pandas as pd
 from poslayers.config import DATA, OUTDIR, upsert_csv

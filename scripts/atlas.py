@@ -1,6 +1,6 @@
 """Positional-layer atlas across GTEx tissues: landscape, technical isochore (GC) and cis covariance."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, upsert_csv
+from poslayers.config import DATA, OUTDIR, upsert_csv, RESUME
 import sys
 import os
 import numpy as np
@@ -35,7 +35,7 @@ def n_universal(Yc, chrs, perm_seed=None):
         Z = Yc[idx]; n = len(idx); W = np.array([whiten(pgram(Z[:, i]), n) for i in range(Z.shape[1])])
         tot += int((np.mean(W > 3, 0) >= 0.9).sum())
     return tot
-done = set(pd.read_csv(OUT).tissue) if os.path.exists(OUT) else set()
+done = set(pd.read_csv(OUT).tissue) if (RESUME and os.path.exists(OUT)) else set()
 for f in sys.argv[1:]:
     t = os.path.basename(f).replace('gene_reads_adult_gtex_v11_', '').replace('gene_reads_v10_', '').replace('_gct.gz', '')
     if t in done: continue
