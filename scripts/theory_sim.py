@@ -4,8 +4,7 @@ x[s,j] = mu[j] + beta[j]*z[s] + c[s,j] + b[s]*gc[j] + e[s,j]
   b*gc: per-sample technical GC bias acting on isochore-clustered GC; beta*z: stage effect, locally smoothed.
 Checks: (1) spectral decomposition identity; (2) 'universal peaks' with real vs random gene order; (3) GC creates a false
 domain scale; (4) recovery of the cis decay length by naive vs corrected estimators."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import OUTDIR
 import numpy as np, pandas as pd
 rng = np.random.default_rng(42)
 def ar1(n, phi, rng): x = np.zeros(n); x[0] = rng.normal()

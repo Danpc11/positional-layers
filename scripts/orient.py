@@ -1,6 +1,6 @@
 """Cis layer by orientation and intergenic distance of adjacent gene pairs, per GTEx tissue (after GC and technical correction)."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
+from poslayers.config import DATA, OUTDIR, upsert_csv
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
 OUT = OUTDIR + 'orientation_by_tissue.csv'; PAIRS = OUTDIR + 'pair_correlations.parquet'
 CHR = [str(i) for i in range(1, 23)] + ['X']

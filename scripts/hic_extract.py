@@ -6,9 +6,11 @@ Usage:
     python scripts/hic_extract.py
 Output: DATA/hic/hic_contacts_<cell>.csv.gz and DATA/hic/hic_expected_<cell>.csv.gz (a few tens of MB each).
 """
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import gzip, sys, numpy as np, pandas as pd, hicstraw
+import os
+from poslayers.config import DATA
+import numpy as np
+import pandas as pd
+import hicstraw
 os.makedirs(DATA + 'hic', exist_ok=True)
 MAPS = {'GM12878': 'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic',
         'IMR90': 'https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic'}

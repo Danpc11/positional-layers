@@ -1,6 +1,9 @@
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys, os, glob, numpy as np, pandas as pd, pyannotables as pa, statsmodels.api as sm
+from poslayers.config import DATA, OUTDIR
+import glob
+import numpy as np
+import pandas as pd
+import pyannotables as pa
+import statsmodels.api as sm
 from lib_tumour import CHR, coding, prepare, trunc
 
 B = pd.read_csv(glob.glob(DATA + 'TAD-full/*/data/boundariesByStability/100kbBookendBoundaries_mainText/100kbBookendBoundaries_byStability.bed')[0], sep='\t')

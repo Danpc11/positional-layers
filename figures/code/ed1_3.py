@@ -1,6 +1,8 @@
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, DATA, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
+import numpy as np, pandas as pd
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from style import A, OI, OUTDIR, W, lab, save, tissue_label
+import matplotlib.pyplot as plt
 # ---- Extended Data Fig. 1: robustness of the cis layer
 P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); Lz = pd.read_csv(OUTDIR + 'lorentz_v2.csv'); E = pd.read_csv(A + 'eqtl_cis_test.csv'); F = pd.read_csv(A + 'robust_families.csv')
 GA = pd.read_csv(OUTDIR + 'gc_autocorrelation.csv'); lags_ = GA.lag.values; ac = GA.autocorrelation.tolist()   # scripts/gc_autocorrelation.py

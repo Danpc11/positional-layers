@@ -5,7 +5,7 @@ observed HC3 t with that null, so the permutation tests the same estimand that i
 Specification pre-declared as primary: any coding mutation, tumours above the 90th percentile of mutation burden excluded.
 The other three specifications are sensitivity analyses."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import OUTDIR
 import sys, os
 from lib_tumour import CHR, coding, prepare, trunc
 import numpy as np, pandas as pd, statsmodels.api as sm

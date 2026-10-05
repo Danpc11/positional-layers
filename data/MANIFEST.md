@@ -17,18 +17,20 @@ the current directory. The layout below is what the code expects; file names are
 | `hic/hic_contacts_<cell>.csv.gz`, `hic/hic_expected_<cell>.csv.gz` | KR contacts between promoters within 2 Mb and expected contact by distance, GM12878 and IMR90 | produced by `scripts/hic_extract.py` from Rao et al. 2014 (GSE63525) |
 | `tcga/GDC-PANCAN.htseq_counts.tsv.zip`, `tcga/GDC-PANCAN.mutect2_snv.tsv`, `tcga/GDC-PANCAN.gistic.tsv`, `tcga/GDC-PANCAN_cnv.tsv`, `tcga/GDC-PANCAN_basic_phenotype.tsv` | GDC Pan-Cancer release | UCSC Xena |
 | `beataml/beataml_waves1to4_counts_dbgap.txt`, `beataml/beataml_waves1to4_sample_mapping.xlsx`, `beataml/beataml_wes_wv1to4_mutations_dbgap.txt`, `beataml/beataml_wv1to4_clinical.xlsx` | BeatAML2 | biodev.github.io/BeatAML2 |
-| `edit/GSE264491_merged_counts.csv.gz` | Edited erythroblasts | GEO GSE264491 |
-| `slam/GSM*_tcount.tsv.gz` | SLAM-seq T>C counts | GEO GSE100708 |
-| `perturb/K562_gwps_normalized_bulk_01.h5ad` | Genome-wide Perturb-seq, pseudobulk | gwps.wi.mit.edu |
-| `liver_tables/Table_S6c_stage_effect_per_gene_with_without_composition.csv` | Per-gene fibrosis stage effects in the liver biopsy cohort | output of the liver pipeline, github.com/Danpc11/Liver_Spectra |
+| `hic/GSE63525_GM12878_primary_replicate_HiCCUPS_looplist_with_motifs_txt.gz`, `hic/GSE63525_IMR90_HiCCUPS_looplist_with_motifs_txt.gz` | HiCCUPS loops with CTCF motif orientation (`scripts/ctcf_barrier.py`) | GEO GSE63525 |
+| `schmitt/FitHiC_primary_cohort/` | Optional: Fit-Hi-C output of 40-kb tissue Hi-C maps (`schmitt` stage) | GEO GSE87112 |
+| `edit/GSE264491_merged_counts.csv.gz` | Review only: edited erythroblasts | GEO GSE264491 |
+| `slam/GSM*_tcount.tsv.gz` | Review only: SLAM-seq T>C counts | GEO GSE100708 |
+| `perturb/K562_gwps_normalized_bulk_01.h5ad` | Review only: genome-wide Perturb-seq, pseudobulk | gwps.wi.mit.edu |
+| `liver_tables/Table_S6c_stage_effect_per_gene_with_without_composition.csv` | Review only: per-gene fibrosis stage effects in the liver biopsy cohort | output of the liver pipeline, github.com/Danpc11/Liver_Spectra |
 
-The three `scripts/pilot_*.py` scripts (Fig. 1c-e, Extended Data Fig. 1a) run inside the liver pipeline: set `LIVER_SPECTRA`
+The three `scripts/pilot_*.py` scripts (Fig. 1d,e, Extended Data Fig. 1a) run inside the liver pipeline: set `LIVER_SPECTRA`
 to a checkout of github.com/Danpc11/Liver_Spectra after running it.
 
 Gene annotation (GRCh38 and GRCh37, Ensembl 100) comes from the `pyannotables` package.
 
 ## Source data
 
-The tables that the figure scripts read (34 files, 55 MB) are archived on Zenodo with each release, together with
+The tables that the figure scripts read (41 files, 40 MB) are deposited on Zenodo, together with
 Supplementary Tables 1-9. With them, `bash run_pipeline.sh figures` rebuilds every figure without any of the inputs above:
 set `POSLAYERS_RESULTS` to the unpacked folder.

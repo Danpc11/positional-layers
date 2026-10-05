@@ -1,7 +1,7 @@
 """Friction 1: is the TAD effect explained by 3D contact? All gene pairs within 2 Mb (GM12878 / IMR-90 Hi-C, GTEx EBV / fibroblasts)."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import numpy as np, pandas as pd, statsmodels.formula.api as smf
+from poslayers.config import OUTDIR
+import pandas as pd
+import statsmodels.formula.api as smf
 from lib_tad import tads, assign
 rows = []
 for cell, tadname in [('GM12878', 'GM12878_lymphoblastoid_Lieberman'), ('IMR90', 'IMR90_fetalLungFibroblast_Lieberman')]:

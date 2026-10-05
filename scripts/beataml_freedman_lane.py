@@ -1,8 +1,7 @@
 """Replication of the cohesin effect on the cis layer in BeatAML2 (open data). Per-sample cis-excess score as in TCGA:
 neighbour products at 1-3 genes minus 20-30 genes, on GC-corrected expression. Covariates: blasts, monocytic score, log TMB, sex,
 specimen type. 10,000 label permutations on covariate-residualised scores."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR
 import numpy as np, pandas as pd, pyannotables as pa, statsmodels.api as sm
 CHR = [str(i) for i in range(1, 23)] + ['X']
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')

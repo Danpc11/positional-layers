@@ -1,4 +1,4 @@
-# Positional layers
+# positional-layers
 
 Code for **"Common cis-regulatory inputs shape local gene co-expression across human tissues"**.
 
@@ -25,7 +25,7 @@ scripts import (pyannotables, pyarrow, anndata, patsy, openpyxl, hic-straw).
 ## The model equations in thirty seconds
 
 ```python
-from poslayers import simulate_genome, periodogram_identity, isochore_law, eqtl_law, saturation_exponent
+from poslayers import simulate_genome, periodogram_identity, isochore_law, eqtl_law, source_covariance
 
 sim = simulate_genome(decay_len=5, gc_bias_sd=0.25, seed=1)
 
@@ -41,9 +41,9 @@ isochore_law(var_b=0.06, gc_i=1.2, gc_j=0.9, sd_i=1.0, sd_j=1.0)
 #    coupling (r = 0.58) but not its scale: colocalised pairs share more covariance than their variants carry.
 eqtl_law(freq=0.3, beta1=0.4, beta2=-0.5)                 # negative: opposite effects
 
-# 4. Local elasticity of a saturating response, 1 - occupancy. A HYPOTHESIS for the contact exponent: supported by the
-#    expression gradient in lymphoblastoid cells, not significant in fibroblasts.
-saturation_exponent(contact=1.0, K=1.0)                   # 0.5
+# 4. Shared-source model: the covariance of two genes is the sum over shared sources of source variance times the two
+#    footprints. It predicts the copy-number layer of tumours out of sample with no fitted parameter (Fig. 3b).
+source_covariance(source_variance=[1.5, 0.6], footprint_i=[0.8, 0.3], footprint_j=[0.5, -0.7])
 ```
 
 ## Layout
@@ -51,10 +51,10 @@ saturation_exponent(contact=1.0, K=1.0)                   # 0.5
 | Path | What it holds |
 | --- | --- |
 | `src/poslayers/` | Reference implementation: `decompose.py`, `laws.py`, `simulate.py` |
-| `scripts/` | Analysis scripts, one per result, and two shared libraries; see `scripts/SCRIPTS.md` |
+| `scripts/` | Analysis scripts, one per result, and three shared libraries; see `scripts/SCRIPTS.md`. `scripts/review/` holds perturbation analyses kept for peer review |
 | `figures/code/` | One script per main and Extended Data figure; `style.py` places panel letters and keeps legends off the data |
 | `docs/` | The interactive simulator served by GitHub Pages |
-| `tests/` | Tests of the identity and of each law |
+| `tests/` | Tests of the identity, the GC and eQTL relations, the shared-source model and the pipeline |
 | `data/` | `MANIFEST.md` only. Inputs are public; see below |
 
 ## Data and configuration
@@ -72,7 +72,8 @@ export POSLAYERS_FIGS=/path/to/figures       # default figures/output/
 
 ```bash
 bash run_pipeline.sh            # everything, in dependency order (several hours)
-bash run_pipeline.sh tumours    # one stage: acquire, atlas, eqtl, architecture, tumours, perturbations, simulations, liver, figures
+bash run_pipeline.sh tumours    # one stage: acquire, atlas, eqtl, architecture, tumours, simulations, liver, figures
+                                # optional, not run by 'all': schmitt (tissue Hi-C, Supplementary Note 1), review (perturbations)
 ```
 
 `scripts/SCRIPTS.md` gives, for every script, its arguments, the files it reads and writes, and the figure panel it
@@ -94,14 +95,14 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 Cite the archived release of this code and the article:
 
-- Pérez-Calixto, D. *et al.* positional-layers, version 1.2.0 (2026). Zenodo DOI to be added when the release is archived.
+- Pérez-Calixto, D. *et al.* positional-layers, version 1.3.0 (2026). Zenodo DOI to be added when the release is archived.
 - Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 `CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").
 
 ## Rebuilding the figures without the raw data
 
-The 36 tables the figure scripts read (55 MB) are deposited on Zenodo as source data (DOI to be added). Unpack them and run only the
+The 41 tables the figure scripts read (40 MB) are deposited on Zenodo as source data (DOI to be added). Unpack them and run only the
 figure stage:
 
 ```bash

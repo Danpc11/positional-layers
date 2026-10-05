@@ -1,7 +1,7 @@
 """Approximate colocalisation of adjacent genes with SuSiE credible sets: P(same causal variant) = max over credible-set
 pairs of sum_v pip1(v)*pip2(v); direction from the shared variant with the highest pip product (afc sign)."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import OUTDIR
 import sys, os, glob, numpy as np, pandas as pd, pyarrow.parquet as pq
 norm = lambda s: s.lower().replace('-', '_')
 PAIRS = pd.concat([pd.read_csv(f, usecols=['g1', 'g2']) for f in glob.glob(OUTDIR + 'pairs_*.csv.gz')]).drop_duplicates(); genes = set(PAIRS.g1) | set(PAIRS.g2)

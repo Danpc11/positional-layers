@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.0
+
+Code for the restructured manuscript (5 figures, 5 Extended Data figures, Supplementary Tables 1-9).
+
+- Shared-source model: `poslayers.source_covariance`, and `dosage_prediction.py`, which predicts the copy-number layer of
+  tumours out of sample with no fitted parameter (Fig. 3b).
+- Architectural barriers: `ctcf_barrier.py` (coupling across convergent CTCF loop anchors; Fig. 4e) and
+  `active_gene_barrier.py` (coupling across an active intervening gene; Fig. 4f), each writing the adjusted means for
+  the figure itself; Extended Data Fig. 5.
+- Contact exponents for Supplementary Note 1, section 6: `contact_exponent_within.py` (25-kb maps) and the optional
+  `schmitt` stage (`reduce_fithic.py`, `contact_exponent_schmitt.py`; 40-kb tissue maps).
+- Figures: Fig. 5 is the model; schematic panels are reserved for drawings (Figs 1a, 2a, 3a, 4a, 5). Extended Data
+  Fig. 4 no longer has an intervention panel; Extended Data Fig. 5 is new.
+- Perturbation analyses moved to `scripts/review/` and the optional `review` stage; they are not in the paper.
+  `derive.py` (fixed-hub saturation model) removed.
+- Supplementary Tables renumbered: perturbations removed; former 8 and 9 are now 7 and 8; new 9 for the shared-source
+  model and the barriers.
+
 ## 1.2.0 (2026-10-04)
 
 Release accompanying the submitted manuscript.
@@ -13,6 +31,10 @@ Release accompanying the submitted manuscript.
 - Re-runs replace rows of results tables by key instead of appending (`poslayers.config.upsert_csv`).
 - `crispri_test.py` builds the pair table only; the models are fitted in `crispri_analyse.py`, which also reports the
   coupling distribution of the random trans control.
+- Analyses of the scale of the eQTL relation (`eqtl_scale.py`), detectable effects and equivalence for the perturbation
+  analyses (`perturbation_detectability.py`), gene-editing predictions under an explicit rule with false-discovery
+  control (`edit_predictions.py`), and a direct test of the change in tumour-normal TAD clustering
+  (`tad_clustering_contrast.py`); per-quintile intervals for the liver concordance; fixed random seed per tumour cohort.
 - Figures can be rebuilt from the source data tables without any raw input; the tables are to be deposited on Zenodo.
 - Interactive simulator of the decomposition (`docs/`).
 - Citation metadata (`CITATION.cff`, `.zenodo.json`); tests of the identity, the estimators, the edge cases of the API and

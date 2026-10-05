@@ -4,7 +4,8 @@ Pairs that share genes or neighbourhoods are not independent. block_bootstrap() 
 10-Mb genomic blocks (defined on the first gene of each pair) and returns a percentile interval and a bootstrap SE for
 the requested coefficients. The design matrix is built once with patsy, so categorical levels stay fixed across replicates.
 """
-import numpy as np, pandas as pd, pyannotables as pa
+import numpy as np
+import pyannotables as pa
 from patsy import dmatrices
 from scipy import stats
 

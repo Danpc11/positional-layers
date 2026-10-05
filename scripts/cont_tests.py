@@ -1,9 +1,12 @@
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys, os, numpy as np, pandas as pd, statsmodels.api as sm
+import sys
+from poslayers.config import OUTDIR
+import sys
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
 from poslayers.config import OUTDIR, upsert_csv
 from lib_tumour import CHR, coding, prepare, trunc
-import sys, os
+import sys
 WANT = sys.argv[1].split(',')
 def lagscore(D, chrs, lags):
     Z = (D - D.mean(1, keepdims=True)) / (D.std(1, keepdims=True) + 1e-9)

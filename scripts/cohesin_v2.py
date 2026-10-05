@@ -2,9 +2,10 @@
 Score: for each tumour, mean product of pooled-standardised residual expression of genes 1-3 positions apart minus that of
 genes 20-30 apart (GC- and own-copy-number-corrected expression). Covariates: expression-based immune and stromal scores
 (purity proxy), copy-number burden, log mutation burden, cohort-specific subtype score."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys, os, numpy as np, pandas as pd, statsmodels.api as sm
+from poslayers.config import OUTDIR
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
 from lib_tumour import coding, prepare, scores, trunc
 rows = []
 for c, genes_mut in [('BLCA', ['STAG2']), ('UCEC', ['CTCF']), ('UCEC', ['STAG2', 'RAD21', 'SMC1A', 'SMC3', 'STAG1', 'NIPBL']), ('STAD', ['CTCF', 'STAG2', 'RAD21', 'SMC1A', 'SMC3', 'STAG1', 'NIPBL']), ('COAD', ['CTCF', 'STAG2', 'RAD21', 'SMC1A', 'SMC3', 'STAG1', 'NIPBL'])]:

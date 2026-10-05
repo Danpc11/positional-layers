@@ -1,6 +1,6 @@
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys, os, numpy as np, pandas as pd, statsmodels.api as sm
+from poslayers.config import OUTDIR
+import numpy as np
+import pandas as pd
 from lib_tumour import CHR, prepare
 
 def lagscore(D, chrs, lags):

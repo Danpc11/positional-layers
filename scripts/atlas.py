@@ -1,7 +1,10 @@
 """Positional-layer atlas across GTEx tissues: landscape, technical isochore (GC) and cis covariance."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
-import sys, os, glob, numpy as np, pandas as pd
+from poslayers.config import DATA, OUTDIR, upsert_csv
+import sys
+import os
+import numpy as np
+import pandas as pd
 from scipy import stats
 OUT = OUTDIR + 'atlas_results.csv'
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene start (bp)': 'start', 'Chromosome/scaffold name': 'chr'})

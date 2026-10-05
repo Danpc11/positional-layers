@@ -1,6 +1,7 @@
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys, os, numpy as np, pandas as pd, statsmodels.api as sm
+from poslayers.config import OUTDIR
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
 from lib_tumour import coding, prepare, scores, trunc
 
 COH = ['STAG2', 'RAD21', 'SMC1A', 'SMC3', 'STAG1', 'NIPBL']; rows = []

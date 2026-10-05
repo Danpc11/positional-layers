@@ -1,17 +1,18 @@
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, DATA, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys
+import numpy as np, pandas as pd
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from style import A, OI, OUTDIR, W, lab, save, placeholder
+import matplotlib.pyplot as plt
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'scripts'))
 from theory_sim import simulate
 R = pd.read_csv(A + 'atlas_results.csv'); P1 = pd.read_csv(OUTDIR + 'p1_spectra.csv')
 R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(OUTDIR + 'isochore_v2.csv'); L = L.rename(columns={**{f'held_pred_L{k}': f'pred_L{k}' for k in (1, 2, 5, 10, 20, 30)}, **{f'held_obs_L{k}': f'obs_gc_component_L{k}' for k in (1, 2, 5, 10, 20, 30)}}); P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); P5 = pd.read_csv(OUTDIR + 'p5a_liver_gc.csv'); S = pd.read_csv(OUTDIR + 'sim_decay_recovery.csv'); P1 = pd.read_csv(OUTDIR + 'p1_spectra.csv')
-import schem
 fig = plt.figure(figsize=(W, W * 0.85)); gs = fig.add_gridspec(3, 3, hspace=0.55, wspace=0.5)
 # B identity in simulation
 Xs, chrs, GC, mu_, z = simulate(seed=1, land_sd=4); c0 = chrs == 0; Xc = Xs[:, c0]; nn = Xc.shape[1]; mbar = Xc.mean(0); Dv = Xc - mbar
 lhs = np.mean([np.abs(np.fft.fft(x)) ** 2 for x in Xc], 0); Cl = np.array([np.mean(np.sum(Dv * np.roll(Dv, -L, axis=1), 1)) for L in range(nn)])
 land = np.abs(np.fft.fft(mbar)) ** 2; cov = np.real(np.fft.fft(Cl)); k = slice(1, nn // 2)
-ax = fig.add_subplot(gs[0, 0:2]); schem.decomposition(ax); lab(ax, 'a', -0.04)
+ax = fig.add_subplot(gs[0, 0:2]); placeholder(ax, 'Schematic: decomposing the expression spectrum', 'One sample\'s expression profile along a chromosome = tissue mean landscape + deviation.\nMean periodogram = |M(f)|² (landscape) + S(f) (covariance).\nS(f) contains a GC-associated layer, copy-number dosage (tumours) and the cis layer.'); lab(ax, 'a', -0.04)
 ax = fig.add_subplot(gs[0, 2]); ax.loglog(lhs[k], (land + cov)[k], '.', ms=1.4, color='0.35', rasterized=True); lim = [lhs[k].min(), lhs[k].max()]; ax.plot(lim, lim, color=OI['red'], lw=0.7)
 ax.set_xlabel('Mean periodogram'); ax.set_ylabel('|M(f)|² + S(f)'); ax.text(0.95, 0.06, f'landscape {np.sum(land) / np.sum(lhs):.0%}', transform=ax.transAxes, fontsize=6, ha='right'); lab(ax, 'b')
 # D universal peaks real vs random gene order

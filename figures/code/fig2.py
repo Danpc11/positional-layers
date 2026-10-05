@@ -1,11 +1,12 @@
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys, tissue_label
+import numpy as np, pandas as pd
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from style import A, OI, OUTDIR, W, lab, save, tissue_label, placeholder
+import matplotlib.pyplot as plt
 R = pd.read_csv(A + 'atlas_results.csv'); O = pd.read_csv(A + 'orientation_by_tissue.csv'); F = pd.read_csv(A + 'robust_families.csv'); Lz = pd.read_csv(OUTDIR + 'lorentz_v2.csv')
-import schem
 fig = plt.figure(figsize=(W, W * 0.95)); gs = fig.add_gridspec(3, 4, hspace=0.75, wspace=0.7, height_ratios=[1, 1, 1.05])
 
-ax = fig.add_subplot(gs[0, 0:2]); schem.two_scales(ax); lab(ax, 'a', -0.04)
+ax = fig.add_subplot(gs[0, 0:2]); placeholder(ax, 'Schematic: coupling between neighbouring genes', 'Coupling = correlation of corrected expression between adjacent genes across individuals.\nTwo genomic scales: short range (~1 gene) and domain scale (7–24 genes).\nRings in b summarise four measures per tissue.'); lab(ax, 'a', -0.04)
 # b: circular overview of every tissue and tumour cohort (replaces the per-tissue bar chart)
 EQ = pd.read_csv(A + 'eqtl_cis_test.csv').set_index('tissue'); TB = pd.read_csv(OUTDIR + 'tad_block_bootstrap.csv').set_index('tissue')
 CV = pd.read_csv(OUTDIR + 'cohesin_v2_results.csv').drop_duplicates('cohort').set_index('cohort').mean_cis_excess_wt
@@ -39,8 +40,8 @@ for j, (c, v) in enumerate(zip(tum, tumv)):
     ax.text(a, 1.50, c + ' (tumour)', rotation=deg + (180 if flip else 0), rotation_mode='anchor', ha='right' if flip else 'left', va='center', fontsize=3.9, color=OI['red'])
 ax.text(0, 0, '36 GTEx tissues\n+ 5 tumour cohorts', ha='center', va='center', fontsize=4.6)
 hs = [plt.Rectangle((0, 0), 1, 1, color=c) for *_, c in RINGS] + [plt.Rectangle((0, 0), 1, 1, color=OI['red'])]
-fig.legend(hs, ['outer: adjacent coupling', '2nd: domain scale, raw (light) and GC-corrected', '3rd: shared-eQTL effect', 'inner: same-TAD effect',
-                'red: tumours'], loc='center left', bbox_to_anchor=(ax.get_position().x0 - 0.33, ax.get_position().y0 + 0.62 * ax.get_position().height),
+fig.legend(hs, [f'outer: adjacent coupling (bar = 0 to {mx[0]:.2f})', f'2nd: domain scale, raw and GC-corrected (0 to {mx[1]:.3f})', f'3rd: shared-eQTL effect (0 to {mx[2]:.2f})', f'inner: same-TAD effect (0 to {mx[3]:.3f})',
+                f'red: tumours, cis excess (0 to {tmx:.2f});\ninner ring, TAD contrast (0 to 0.12)'], loc='center left', bbox_to_anchor=(ax.get_position().x0 - 0.33, ax.get_position().y0 + 0.62 * ax.get_position().height),
            bbox_transform=fig.transFigure, fontsize=4.8, frameon=False, handlelength=0.8)
 lab(ax, 'b')
 ax = fig.add_subplot(gs[1, 0:2]); O['excess'] = O.mean_r - O.random_pair_floor

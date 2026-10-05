@@ -1,5 +1,5 @@
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import OUTDIR
 import sys, numpy as np, pandas as pd, pyannotables as pa
 sys.path.insert(0, os.path.join(os.environ.get('LIVER_SPECTRA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'Liver_Spectra')), 'scripts'))  # liver pipeline: github.com/Danpc11/Liver_Spectra
 from common import *

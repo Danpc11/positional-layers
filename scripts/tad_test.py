@@ -1,9 +1,9 @@
 """Does the cis layer respect TAD boundaries? Adjacent gene pairs within one TAD vs across a boundary, at matched distance,
 using the tissue's own TAD partition (McArthur & Capra 20-bin landscape, hg19; genes placed with GRCh37 coordinates)."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+import os
+from poslayers.config import OUTDIR
 import glob, os, numpy as np, pandas as pd, statsmodels.formula.api as smf
-from lib_tad import CHR, MATCH, tads, assign
+from lib_tad import MATCH, tads, assign
 TADA = {n: assign(tads(n)) for n in sorted(set(MATCH.values()))}
 norm = lambda s: s.lower().replace('-', '_'); BINS = [0, 1e3, 5e3, 2e4, 1e5, 5e5, np.inf]
 P = {norm(os.path.basename(f)[6:-7]): pd.read_csv(f) for f in glob.glob(OUTDIR + 'pairs_*.csv.gz')}

@@ -1,6 +1,5 @@
 """Continuous gene-level copy number from GDC segment log2 ratios, for the cohorts already extracted."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR
 import numpy as np, pandas as pd, pyannotables as pa
 CHR = [str(i) for i in range(1, 23)] + ['X']
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; G = G[G.Chromosome.astype(str).isin(CHR)]

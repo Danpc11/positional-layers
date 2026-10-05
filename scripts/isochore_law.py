@@ -9,9 +9,13 @@ For each tissue and lag L we report three things, all on the SAME normalisation 
             per-sample scalar measured elsewhere in the genome must predict the positional covariance in held-out chromosomes.
 Also: corr(b_odd, b_even) across samples, and the share of the quadratic correction carried by the linear term.
 """
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
-import sys, os, glob, numpy as np, pandas as pd, pyannotables as pa
+import os
+from poslayers.config import DATA, OUTDIR, upsert_csv
+import os
+import glob
+import numpy as np
+import pandas as pd
+import pyannotables as pa
 CHR = [str(i) for i in range(1, 23)]
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')
 G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()][['Chromosome', 'Start']]; G.columns = ['chr', 'start']; G['chr'] = G.chr.astype(str)

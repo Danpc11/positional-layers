@@ -5,11 +5,11 @@ Reference implementation of the three laws described in
 """
 from .decompose import (periodogram_identity, landscape_share, lag_covariance,
                         lag_profile_linear, gc_correct, gc_slopes)
-from .laws import isochore_law, eqtl_law, saturation_exponent, fit_contact_law
+from .laws import isochore_law, eqtl_law, saturation_exponent, fit_contact_law, source_covariance
 from .simulate import simulate_genome
 
-__version__ = "1.2.0"
-__all__ = ["periodogram_identity", "landscape_share", "lag_covariance",
+__version__ = "1.3.0"
+__all__ = ["source_covariance", "periodogram_identity", "landscape_share", "lag_covariance",
            "lag_profile_linear", "gc_correct", "gc_slopes",
            "lag_profile_linear", "gc_correct", "gc_slopes",
            "isochore_law", "eqtl_law", "saturation_exponent", "fit_contact_law",

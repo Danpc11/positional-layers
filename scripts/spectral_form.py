@@ -2,9 +2,12 @@
 Route A: autocorrelation rho(L) across samples -> fit exponential(s) -> lambda_acf.
 Route B: mean periodogram of the residual profiles along gene order -> fit discrete Lorentzian(s) + floor -> lambda_spec;
 compare with a power law + floor. Theory: exponential ACF <=> Lorentzian spectrum with the same lambda, no discrete peaks."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
-import sys, os, numpy as np, pandas as pd, pyannotables as pa
+import sys
+from poslayers.config import DATA, OUTDIR, upsert_csv
+import sys
+import numpy as np
+import pandas as pd
+import pyannotables as pa
 from scipy.optimize import curve_fit
 CHR = [str(i) for i in range(1, 23)] + ['X']; norm = lambda s: s.lower().replace('-', '_')
 BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc'}).drop_duplicates('gid').set_index('gid')

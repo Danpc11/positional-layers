@@ -1,7 +1,7 @@
 """Genomic-block bootstrap (10-Mb blocks) of the same-TAD effect in each tissue, with the model of Fig. 4b:
 r ~ same_tad + distance bin + orientation, on adjacent pairs with both genes in a TAD."""
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+import os
+from poslayers.config import OUTDIR
 import os, glob, numpy as np, pandas as pd, pyannotables as pa
 from lib_tad import MATCH, tads, assign
 TADA = {n: assign(tads(n)) for n in sorted(set(MATCH.values()))}

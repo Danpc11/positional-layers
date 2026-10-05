@@ -60,3 +60,19 @@ def fit_contact_law(contact, coupling, sigma=None) -> dict:
         "power_law": {"r0": p_pw[0], "A": p_pw[1], "k": p_pw[2], "chi2": float(np.sum(w * (r - _power(c, *p_pw)) ** 2))},
         "hub": {"r0": p_hb[0], "A": p_hb[1], "c_star": p_hb[2], "chi2": float(np.sum(w * (r - _hub(c, *p_hb)) ** 2))},
     }
+
+
+def source_covariance(source_variance, footprint_i, footprint_j):
+    """Covariance of two genes under the shared-source model (Supplementary Note 1, section 3).
+
+    Each source q (regulatory element, genotype, copy-number segment) has variance Var(A_q) across samples and reaches
+    gene i with footprint a_iq. If sources are uncorrelated with each other and with gene-private noise,
+        Cov(x_i, x_j) = sum_q Var(A_q) * a_iq * a_jq.
+    The GC layer (footprint = gene GC, source = per-sample GC slope) and the copy-number layer (footprint = dosage
+    response, source = copy number) are special cases.
+    """
+    import numpy as np
+    v, a, b = (np.asarray(x, dtype=float) for x in (source_variance, footprint_i, footprint_j))
+    if not (v.shape == a.shape == b.shape):
+        raise ValueError('source_variance and the two footprints must have the same shape')
+    return float(np.sum(v * a * b))

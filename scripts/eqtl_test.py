@@ -1,5 +1,5 @@
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+import os
+from poslayers.config import OUTDIR
 import glob, os, numpy as np, pandas as pd, statsmodels.formula.api as smf
 from lib_boot import block_bootstrap
 norm = lambda s: s.lower().replace('-', '_')

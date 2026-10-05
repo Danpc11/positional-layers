@@ -35,7 +35,7 @@ def test_crispri_analysis_runs_end_to_end(tmp_path):
             rows.append(pd.DataFrame({'pert': p, 'target': f'G{p}', 'type': typ, 'kd': kd, 'r': r, 'resp': resp, 'dist': d}))
     pd.concat(rows).to_csv(tmp_path / 'crispri_pairs.csv.gz', index=False)
     env = dict(os.environ, POSLAYERS_RESULTS=str(tmp_path), PYTHONPATH=str(ROOT / 'src'))
-    res = subprocess.run([sys.executable, str(ROOT / 'scripts' / 'crispri_analyse.py')], env=env, capture_output=True, text=True)
+    res = subprocess.run([sys.executable, str(ROOT / 'scripts' / 'review' / 'crispri_analyse.py')], env=env, capture_output=True, text=True)
     assert res.returncode == 0, res.stderr[-2000:]
     assert 'coupling x knockdown' in res.stdout
     assert (tmp_path / 'crispri_coupling_distribution_cis_vs_trans.csv').exists()

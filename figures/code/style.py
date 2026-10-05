@@ -1,6 +1,5 @@
-import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
-import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt, numpy as np, pandas as pd
+from poslayers.config import OUTDIR, FIGDIR
+import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 plt.rcParams.update({'font.family': 'sans-serif', 'font.sans-serif': ['Liberation Sans', 'Arial'], 'font.size': 7, 'axes.labelsize': 7, 'axes.titlesize': 7.5,
                      'xtick.labelsize': 6.5, 'ytick.labelsize': 6.5, 'legend.fontsize': 6.2, 'axes.linewidth': 0.6, 'xtick.major.width': 0.6, 'ytick.major.width': 0.6,
                      'xtick.major.size': 2.5, 'ytick.major.size': 2.5, 'axes.spines.top': False, 'axes.spines.right': False, 'legend.frameon': False, 'pdf.fonttype': 42, 'savefig.dpi': 300})
@@ -112,3 +111,18 @@ NAMES = {'cells_ebv-transformed_lymphocytes': 'EBV lymphocytes', 'cells_ebv_tran
 def tissue_label(t):
     t = t.replace('-', '_') if t not in NAMES else t
     return NAMES.get(t, NAMES.get(t.replace('_', '-'), t.replace('_', ' ').capitalize()))
+
+
+def placeholder(ax, title, description, fontsize=5.6):
+    """Reserved panel for a schematic drawn by the authors: dashed frame, light fill, and a description of its content.
+    The description is wrapped to the width of the panel."""
+    import textwrap
+    from matplotlib.patches import FancyBboxPatch
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis('off')
+    ax.add_patch(FancyBboxPatch((0.01, 0.02), 0.98, 0.96, boxstyle='round,pad=0,rounding_size=0.03', transform=ax.transAxes,
+                                fc='#f4f4f4', ec='0.55', lw=0.7, ls=(0, (3, 2)), zorder=0))
+    width_in = ax.get_position().width * ax.figure.get_figwidth() * 0.9
+    n = max(14, int(width_in * 72 / (fontsize * 0.55)))
+    body = '\n'.join(textwrap.fill(p.strip(), n) for p in description.replace('\n', ' ').split('|')) if '|' in description else textwrap.fill(description.replace('\n', ' '), n)
+    ax.text(0.5, 0.92, textwrap.fill(title, max(12, int(n * 0.85))), transform=ax.transAxes, ha='center', va='top', fontsize=fontsize + 0.8, fontweight='bold', color='0.25')
+    ax.text(0.5, 0.70, body, transform=ax.transAxes, ha='center', va='top', fontsize=fontsize, color='0.35', linespacing=1.35)
