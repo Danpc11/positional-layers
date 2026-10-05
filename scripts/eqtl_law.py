@@ -1,4 +1,4 @@
-"""Review point 10: eQTL law on a common scale, with every shared variant's own effect.
+"""eQTL law on a common scale, with every shared variant's own effect.
 Observed coupling: correlation of the two genes in GTEx's normalized (inverse-normal) expression, the scale on which GTEx slopes are
 estimated, after removing 15 expression PCs as a stand-in for the hidden factors in the eQTL model (raw INT also kept).
 Predicted genetic correlation: sum over pairs of credible sets, and over each shared variant v, of
