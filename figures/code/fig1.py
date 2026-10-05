@@ -1,19 +1,9 @@
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from style import A, DATA, OI, OUTDIR, W, lab, np, os, pd, plt, save, sys
-import pyannotables as pa
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'scripts'))
 from theory_sim import simulate
 R = pd.read_csv(A + 'atlas_results.csv'); P1 = pd.read_csv(OUTDIR + 'p1_spectra.csv')
-BM = pd.read_csv(DATA + 'biomart_GRCh38_gene_gc.txt', sep='\t', low_memory=False).rename(columns={'Gene stable ID': 'gid', 'Gene % GC content': 'gc', 'Gene type': 'type'}).drop_duplicates('gid').set_index('gid')
-G = pa.tables()['homo_sapiens-GRCh38-ensembl100']; G = G[~G.index.duplicated()]; G = G[G.Chromosome.astype(str).isin([str(i) for i in range(1, 23)])].join(BM[['gc', 'type']], how='inner'); G = G[G.type == 'protein_coding'].sort_values(['Chromosome', 'Start'])
-lags = np.arange(1, 61); ac = []
-for L_ in lags:
-    v = []
-    for c, g in G.groupby('Chromosome'):
-        x = (g.gc.values - g.gc.mean()) / g.gc.std()
-        if len(x) > L_ + 5: v.append(np.mean(x[:-L_] * x[L_:]))
-    ac.append(np.mean(v))
 R = pd.read_csv(A + 'atlas_results.csv'); L = pd.read_csv(OUTDIR + 'isochore_v2.csv'); L = L.rename(columns={**{f'held_pred_L{k}': f'pred_L{k}' for k in (1, 2, 5, 10, 20, 30)}, **{f'held_obs_L{k}': f'obs_gc_component_L{k}' for k in (1, 2, 5, 10, 20, 30)}}); P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); P5 = pd.read_csv(OUTDIR + 'p5a_liver_gc.csv'); S = pd.read_csv(OUTDIR + 'sim_decay_recovery.csv'); P1 = pd.read_csv(OUTDIR + 'p1_spectra.csv')
 import schem
 fig = plt.figure(figsize=(W, W * 0.85)); gs = fig.add_gridspec(3, 3, hspace=0.55, wspace=0.5)
