@@ -46,7 +46,3 @@ Run order, inputs and outputs. All paths are relative to `$POSLAYERS_DATA` (inpu
 | simulations | `gc_correlated_sim.py` | — | — | `gc_correlated_cis_sim.csv` | ST9C |
 | liver | `pilot_spectra.py`, `pilot_domain_tests.py`, `pilot_liver_gc.py` | — | Liver_Spectra outputs (`LIVER_SPECTRA`) | `p1_spectra.csv`, `p4_domain_scale_tests.csv`, `p5a_liver_gc.csv` | Fig. 1c-e; ED 1a |
 | — | `simulate_demo.py` | `--decay`, `--gc-bias` | — | prints | web simulator |
-
-Removed in 1.1.0: `predict_cal.py` (replaced by `eqtl_law.py`), `derive2.py` (printed results that were then typed into a
-table; replaced by `boot_hic.py`), `cohesin_test.py` (superseded), `lorentz.py` (replaced by `spectral_form.py`, which fits
-and evaluates on the same scale) and `beat_test.py` (replaced by `beataml_freedman_lane.py`). See `REVIEW_RESPONSE.md`.
