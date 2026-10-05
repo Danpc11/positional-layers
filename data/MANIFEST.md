@@ -31,6 +31,6 @@ Gene annotation (GRCh38 and GRCh37, Ensembl 100) comes from the `pyannotables` p
 
 ## Source data
 
-The tables that the figure scripts read (41 files, 40 MB) are deposited on Zenodo, together with
+The tables that the figure scripts read (44 files, 40 MB) will be deposited on Zenodo, together with
 Supplementary Tables 1-9. With them, `bash run_pipeline.sh figures` rebuilds every figure without any of the inputs above:
 set `POSLAYERS_RESULTS` to the unpacked folder.

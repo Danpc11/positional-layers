@@ -1,7 +1,7 @@
 {
   "upload_type": "software",
   "title": "positional-layers: code for 'Common cis-regulatory inputs shape local gene co-expression across human tissues'",
-  "version": "1.3.3",
+  "version": "0.1.0",
   "creators": [
     {
       "name": "Pérez-Calixto, Daniel",
@@ -56,5 +56,5 @@
       "resource_type": "other"
     }
   ],
-  "notes": "Release accompanying the submitted manuscript (5 figures, 5 Extended Data figures, Supplementary Tables 1-9). Add the article DOI as a related identifier (relation: isSupplementTo) on publication."
+  "notes": "First public release, accompanying the submitted manuscript (5 figures, 5 Extended Data figures, Supplementary Tables 1-9). Add the article DOI as a related identifier (relation: isSupplementTo) on publication."
 }

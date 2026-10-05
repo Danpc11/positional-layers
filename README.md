@@ -103,14 +103,14 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 Cite the archived release of this code and the article:
 
-- Pérez-Calixto, D. *et al.* positional-layers, version 1.3.3 (2026). Zenodo DOI to be added when the release is archived.
+- Pérez-Calixto, D. *et al.* positional-layers, version 0.1.0 (2026). Zenodo DOI to be added when the release is archived.
 - Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 `CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").
 
 ## Rebuilding the figures without the raw data
 
-The 41 tables the figure scripts read (40 MB) will be deposited on Zenodo as source data before publication (DOI to be added). Unpack them and run only the
+The 44 tables the figure scripts read (40 MB) will be deposited on Zenodo as source data before publication (DOI to be added). Unpack them and run only the
 figure stage:
 
 ```bash
