@@ -17,3 +17,7 @@ S = CI[CI.kd > 2].copy(); qs = S.r.quantile([1 / 3, 2 / 3]).values
 S['rt'] = pd.cut(S.r, [-1, qs[0], qs[1], 1], labels=['low r', 'mid r', 'high r']); TS = TR[TR.kd > 2].copy(); TS['rt'] = pd.cut(TS.r, [-1, qs[0], qs[1], 1], labels=['low r', 'mid r', 'high r'])
 print('\nstrong knockdowns (>4-fold): mean response by coupling tertile')
 tab = S.pivot_table(index='dbin', columns='rt', values='resp', aggfunc='mean', observed=True); tab.loc['trans (other chromosomes)'] = TS.groupby('rt', observed=True).resp.mean(); print(tab.round(3).to_string())
+
+# The trans control is random, not matched on coupling: report both distributions so the comparison can be judged.
+dist = pd.DataFrame({'cis': CI.r.describe(percentiles=[.1, .25, .5, .75, .9]), 'trans': TR.r.describe(percentiles=[.1, .25, .5, .75, .9])})
+dist.to_csv(OUTDIR + 'crispri_coupling_distribution_cis_vs_trans.csv'); print('coupling distribution, cis vs random trans:'); print(dist.round(3).to_string())
