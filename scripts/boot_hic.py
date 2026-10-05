@@ -7,7 +7,7 @@ resamples 10-Mb genomic blocks with replacement (blocks defined on the first gen
   k_t1..k_t3   : the same exponent within expression tertiles (Fig. 4f)
 Resumable: appends one row per replicate to boot_hic_<cell>.csv."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, numpy as np, pandas as pd, pyannotables as pa
 from scipy.optimize import curve_fit
 from patsy import dmatrix
@@ -57,5 +57,5 @@ if done == 0:
 for b in range(done, B + 1):
     cols = rng.integers(0, D.shape[1], D.shape[1]); idx = np.concatenate([members[k] for k in rng.integers(0, len(members), len(members))])
     st = stats_for(coupling(cols), idx); st['rep'] = b
-    pd.DataFrame([st]).to_csv(OUT, mode='a', header=False, index=False)
+    upsert_csv(pd.DataFrame([st]), OUT, ['rep'])
     if b % 10 == 0: print(b, {k: round(v, 3) for k, v in st.items()}, flush=True)
