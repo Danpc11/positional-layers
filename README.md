@@ -1,4 +1,4 @@
-# positional-layers
+# Positional layers
 
 ### Common cis-regulatory inputs shape local gene co-expression across human tissues
 
