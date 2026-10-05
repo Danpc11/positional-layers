@@ -56,5 +56,5 @@
       "resource_type": "other"
     }
   ],
-  "notes": "Version 1.2.0 answers an external code and methods review (REVIEW_RESPONSE.md) and contains the figure code for the revised manuscript. Add the article DOI as a related identifier (relation: isSupplementTo) on publication."
+  "notes": "Release accompanying the submitted manuscript. Add the article DOI as a related identifier (relation: isSupplementTo) on publication."
 }
