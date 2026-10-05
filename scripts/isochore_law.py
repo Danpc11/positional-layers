@@ -1,7 +1,7 @@
-"""Isochore law, re-done after review point 6.
+"""Isochore law: in-sample and out-of-sample tests of the GC component of covariance.
 
 For each tissue and lag L we report three things, all on the SAME normalisation (raw per-gene SD):
-  old     : corr(raw) - corr(quadratic-GC-corrected)      [the published metric, kept for comparison]
+  old     : corr(raw) - corr(quadratic-GC-corrected)      [difference of correlations, for comparison]
   insample: [cov(raw) - cov(raw minus per-sample LINEAR GC fit)] / (sd_i sd_j)  versus  Var(b) g_i g_j / (sd_i sd_j)
             -> nearly an identity; the gap is the cross term cov(b g, residual), i.e. how far b is from independent of biology
   heldout : b_s estimated on odd chromosomes only; prediction Var(b_odd) g_i g_j / (sd_i sd_j) for gene pairs on EVEN chromosomes,
