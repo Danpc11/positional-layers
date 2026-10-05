@@ -1,6 +1,6 @@
 """Positional-layer atlas across GTEx tissues: landscape, technical isochore (GC) and cis covariance."""
 import os, sys
-from poslayers.config import DATA, OUTDIR, FIGDIR
+from poslayers.config import DATA, OUTDIR, FIGDIR, upsert_csv
 import sys, os, glob, numpy as np, pandas as pd
 from scipy import stats
 OUT = OUTDIR + 'atlas_results.csv'
@@ -59,4 +59,4 @@ for f in sys.argv[1:]:
            'cis_L1_raw': e_raw[0], 'domain_L10_30_raw': e_raw[6:10].mean(), 'long_L150_300_raw': e_raw[10:].mean(),
            'cis_L1_minusGC': e_gc[0], 'domain_minusGC': e_gc[6:10].mean(),
            'cis_L1_minusGC_tech': e_gct[0], 'cis_L2_minusGC_tech': e_gct[1], 'cis_L5_minusGC_tech': e_gct[4], 'domain_minusGC_tech': e_gct[6:10].mean(), 'cis_decay_length_genes': -1 / b[0]}
-    pd.DataFrame([row]).to_csv(OUT, mode='a', header=not os.path.exists(OUT), index=False); print(t, D.shape, 'ok', flush=True)
+    upsert_csv(pd.DataFrame([row]), OUT, ['tissue']); print(t, D.shape, 'ok', flush=True)
