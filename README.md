@@ -6,9 +6,7 @@
 [![Tests](https://github.com/Danpc11/positional-layers/actions/workflows/ci.yml/badge.svg)](https://github.com/Danpc11/positional-layers/actions/workflows/ci.yml)
 [![Simulator](https://img.shields.io/badge/Simulator-live-4285F4?logo=googlechrome&logoColor=white)](https://danpc11.github.io/positional-layers/)
 ![Version](https://img.shields.io/badge/version-0.1.0-1f6feb)
-<!-- When Zenodo assigns the DOI, replace XXXXXXX in the next line and remove the comment markers around it:
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
--->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23165504.svg)](https://doi.org/10.5281/zenodo.23165504)
 
 Code for the article above.
 
@@ -113,7 +111,7 @@ cannot identify a saturating response. CI also fails on any undefined name.
 
 Cite the archived release of this code and the article:
 
-- Pérez-Calixto, D. *et al.* positional-layers, version 0.1.0 (2026). Zenodo DOI to be added when the release is archived.
+- Pérez-Calixto, D. *et al.* positional-layers, version 0.1.0. Zenodo https://doi.org/10.5281/zenodo.23165504 (2026).
 - Pérez-Calixto, D. *et al.* Common cis-regulatory inputs shape local gene co-expression across human tissues (2026).
 
 `CITATION.cff` holds the same information in machine-readable form (GitHub's "Cite this repository").

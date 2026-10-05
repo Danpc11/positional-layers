@@ -3,7 +3,12 @@ message: "If you use this software, please cite both the software release and th
 type: software
 title: "positional-layers: code for 'Common cis-regulatory inputs shape local gene co-expression across human tissues'"
 version: 0.1.0
+doi: 10.5281/zenodo.23165504
 date-released: 2026-10-05
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23165504
+    description: Zenodo archive of release 0.1.0
 license: MIT
 repository-code: "https://github.com/Danpc11/positional-layers"
 url: "https://danpc11.github.io/positional-layers"
