@@ -1,6 +1,16 @@
 # positional-layers
 
-Code for **"Common cis-regulatory inputs shape local gene co-expression across human tissues"**.
+### Common cis-regulatory inputs shape local gene co-expression across human tissues
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+[![Tests](https://github.com/Danpc11/positional-layers/actions/workflows/ci.yml/badge.svg)](https://github.com/Danpc11/positional-layers/actions/workflows/ci.yml)
+[![Simulator](https://img.shields.io/badge/Simulator-live-4285F4?logo=googlechrome&logoColor=white)](https://danpc11.github.io/positional-layers/)
+![Version](https://img.shields.io/badge/version-0.1.0-1f6feb)
+<!-- When Zenodo assigns the DOI, replace XXXXXXX in the next line and remove the comment markers around it:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+-->
+
+Code for the article above.
 
 The mean single-sample periodogram of expression along a chromosome separates exactly into the spectrum of the
 tissue mean profile and the spectrum of the covariance between genes. We model that covariance as GC-associated
