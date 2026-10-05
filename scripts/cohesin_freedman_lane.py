@@ -33,5 +33,10 @@ for c, gm in [x for x in [('BLCA', ['STAG2']), ('UCEC', ['CTCF'])] if x[0] in sy
                          'p_HC3': full.pvalues[1], 'p_freedman_lane': (np.sum(np.abs(tnull) >= abs(t_obs)) + 1) / (B + 1),
                          'corr_mutant_with_covariates_max': float(np.max(np.abs([np.corrcoef(m, Xs[k])[0, 1] for k in Xs.columns])))})
             print(rows[-1], flush=True)
-out = OUTDIR + 'cohesin_freedman_lane.csv'
-pd.DataFrame(rows).to_csv(out, mode='a', header=not os.path.exists(out), index=False)
+# Idempotent output: rows for the cohorts run now replace any earlier rows for the same cohort; one row per specification.
+out = OUTDIR + 'cohesin_freedman_lane.csv'; new = pd.DataFrame(rows)
+if os.path.exists(out):
+    prev = pd.read_csv(out); new = pd.concat([prev[~prev.cohort.isin(new.cohort.unique())], new], ignore_index=True)
+key = ['cohort', 'gene', 'class', 'tmb_q']
+assert not new.duplicated(key).any(), 'duplicate specifications in cohesin_freedman_lane.csv'
+new.to_csv(out, index=False)
