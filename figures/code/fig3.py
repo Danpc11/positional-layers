@@ -23,7 +23,8 @@ lab(ax, 'd')
 ax = fig.add_subplot(gs[1, 1]); PC['bin'] = pd.qcut(PC.pred_genetic_r, 8, duplicates='drop'); b = PC.groupby('bin', observed=True).agg(p=('pred_genetic_r', 'mean'), o=('obs_r', 'mean'), se=('obs_r', lambda x: x.std() / np.sqrt(len(x))))
 ax.errorbar(b.p, b.o, yerr=1.96 * b.se, fmt='o', color=OI['blue'], ms=4, capsize=2); sl = np.polyfit(PC.pred_genetic_r, PC.obs_r, 1); xx = np.linspace(b.p.min(), b.p.max(), 10)
 ax.set_xscale('symlog', linthresh=0.01); ax.set_xlabel('Predicted genetic correlation, Σ w·2p(1−p)β₁β₂'); ax.set_ylabel('Observed coupling (normalized expr.)')
-ax.text(0.05, 0.9, f'slope {sl[0]:.2f}; r = {np.corrcoef(PC.pred_genetic_r, PC.obs_r)[0, 1]:.2f}', transform=ax.transAxes, fontsize=6); lab(ax, 'e')
+ES = pd.read_csv(OUTDIR + 'eqtl_law_v2_summary.csv'); es = ES[(ES.score_threshold == 0.1) & (ES.observed_scale == 'obs_r_int_pc15') & (ES.prediction == 'pred_r')].iloc[0]
+ax.text(0.05, 0.9, f'r = {es.pearson_r:.2f}; slope {es.slope_tissue_intercepts:.2f}\n(tissue intercepts)', transform=ax.transAxes, fontsize=5.6, va='top'); lab(ax, 'e')
 # f: tissue x tissue heatmap of the effect of sharing a variant; the diagonal (same tissue) dominates each row
 SP['diff'] = SP.b_own - SP.b_other
 Mx = SP.pivot_table(index='coupling_tissue', columns='eqtl_tissue', values='diff', aggfunc='mean')
