@@ -1,7 +1,9 @@
 """Does CRISPRi silencing of a gene propagate to its cis-coupled neighbours? (Replogle 2022 K562 genome-wide Perturb-seq)
 Response: z-normalised pseudobulk (relative to non-targeting controls), robustly rescaled per perturbation.
 Baseline coupling: correlation across 615 BeatAML2 leukaemias (GC-corrected), for target-gene pairs.
-Cis: measured genes within 1 Mb of the target. Trans control: genes on other chromosomes with the same coupling range."""
+Cis: measured genes within 1 Mb of the target. Trans control: up to 60 genes drawn at random from other chromosomes for
+each perturbation; they are NOT matched on coupling (crispri_analyse.py reports both coupling distributions).
+This script only builds the pair table; every model is fitted in crispri_analyse.py."""
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
 import numpy as np, pandas as pd, anndata as ad, pyannotables as pa, statsmodels.formula.api as smf
@@ -34,15 +36,4 @@ for k, (pid, o) in enumerate(obs.iterrows()):
         d = (sub.tss - tt).abs().values if typ == 'cis' else np.full(len(sub), np.nan)
         rows.append(pd.DataFrame({'pert': pid, 'target': t, 'type': typ, 'kd': kd, 'r': r, 'resp': resp, 'dist': d}))
 D = pd.concat(rows, ignore_index=True); D.to_csv(OUTDIR + 'crispri_pairs.csv.gz', index=False)
-D['rk'] = D.r * D.kd; C = D[D.type == 'cis'].copy(); T = D[D.type == 'trans']
-C['dbin'] = pd.cut(C.dist, [-1, 1e4, 5e4, 2e5, 5e5, 1e6], labels=['<10kb', '10-50kb', '50-200kb', '200-500kb', '0.5-1Mb'])
-print(f'cis pairs {len(C):,} | trans pairs {len(T):,}')
-mc = smf.ols('resp ~ rk + r + kd + C(dbin) + C(dbin):kd', data=C).fit(cov_type='cluster', cov_kwds={'groups': C.pert.astype('category').cat.codes})
-mt = smf.ols('resp ~ rk + r + kd', data=T).fit(cov_type='cluster', cov_kwds={'groups': T.pert.astype('category').cat.codes})
-print(f"cis:   coupling x knockdown {mc.params['rk']:.3f} (95% CI {mc.conf_int().loc['rk', 0]:.3f} to {mc.conf_int().loc['rk', 1]:.3f}), P = {mc.pvalues['rk']:.1e}")
-print(f"trans: coupling x knockdown {mt.params['rk']:.3f} (95% CI {mt.conf_int().loc['rk', 0]:.3f} to {mt.conf_int().loc['rk', 1]:.3f}), P = {mt.pvalues['rk']:.1e}")
-print('\nmean response of cis neighbours by distance (all) and by coupling tertile, strong knockdowns (kd>2):')
-S = C[C.kd > 2].copy(); S['rt'] = pd.qcut(S.r, 3, labels=['low r', 'mid r', 'high r'])
-print(S.pivot_table(index='dbin', columns='rt', values='resp', aggfunc='mean', observed=True).round(3).to_string())
-St = T[T.kd > 2].copy(); St['rt'] = pd.cut(St.r, [-1, S.r.quantile(1 / 3), S.r.quantile(2 / 3), 1], labels=['low r', 'mid r', 'high r'])
-print('trans genes, same coupling cut-offs:', St.groupby('rt', observed=True).resp.mean().round(3).to_dict())
+print(f"pairs written: {(D.type == 'cis').sum():,} cis, {(D.type == 'trans').sum():,} trans")
