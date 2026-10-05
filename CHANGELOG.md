@@ -8,6 +8,8 @@
 - `dosage_prediction.py` repeats the out-of-sample prediction for ten random splits of tumours
   (`dosage_prediction_splits.csv`; Supplementary Table 9F); the split shown in Fig. 3b is unchanged.
 - Fig. 5 schematic descriptions updated to the revised text.
+- Fig. 2b is a ranked dot plot (tissues on one common scale, tumour cis excess on its own scale) instead of the circular
+  overview; Fig. 2d names each attribute combination; the Fig. 2f legend sits above the plot.
 
 ## 1.3.0
 
