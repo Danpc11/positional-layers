@@ -1,6 +1,7 @@
 import os, sys
 from poslayers.config import DATA, OUTDIR, FIGDIR
 import sys, os, numpy as np, pandas as pd, statsmodels.api as sm
+from poslayers.config import OUTDIR, upsert_csv
 from lib_tumour import CHR, coding, prepare, trunc
 import sys, os
 WANT = sys.argv[1].split(',')
@@ -25,6 +26,6 @@ for c, gm in [x for x in [('BLCA', ['STAG2']), ('UCEC', ['CTCF']), ('STAD', None
                        'ci_low': 100 * fit.conf_int().loc['mutant', 0] / base, 'ci_high': 100 * fit.conf_int().loc['mutant', 1] / base, 'p_perm': (np.sum(np.abs(null) >= abs(obs)) + 1) / 10001})
     print(c, 'done', flush=True)
 A = pd.DataFrame(an); T = pd.DataFrame(te)
-A.to_csv(OUTDIR + 'aneuploidy_continuousCN.csv', mode='a', header=not os.path.exists(OUTDIR + 'aneuploidy_continuousCN.csv'), index=False)
-if len(T): T.to_csv(OUTDIR + 'cohesin_continuousCN.csv', mode='a', header=not os.path.exists(OUTDIR + 'cohesin_continuousCN.csv'), index=False)
+upsert_csv(A, OUTDIR + 'aneuploidy_continuousCN.csv', ['cohort', 'expression'])
+if len(T): upsert_csv(T, OUTDIR + 'cohesin_continuousCN.csv', ['cohort', 'gene', 'class', 'tmb_q'])
 pd.set_option('display.width', 200); print(A.round(3).to_string(index=False)); print(T.round(3).to_string(index=False))
