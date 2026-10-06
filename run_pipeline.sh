@@ -16,13 +16,14 @@ if stage acquire; then                                   # network access; run o
   run $S/extract.py BLCA UCEC STAD COAD GBM LAML
   run $S/cn_continuous.py
 fi
-if stage atlas; then                                     # Fig. 1c,f,g; Fig. 2; Extended Data Figs 1 and 4; Supplementary Tables 1, 2, 8
+if stage atlas; then                                     # Fig. 1c,f,g; Fig. 2; Extended Data Figs 1, 4 and 6; Supplementary Tables 1, 2, 8
   run $S/atlas.py   "$D"/gtex/*_gct.gz
   run $S/orient.py  "$D"/gtex/*_gct.gz
   run $S/isochore_law.py
   run $S/spectral_form.py thyroid nerve_tibial skin_sun_exposed_lower_leg cells_cultured_fibroblasts cells_ebv-transformed_lymphocytes muscle_skeletal
   run $S/robust_families.py
   run $S/gc_autocorrelation.py
+  run $S/coupling_robustness.py thyroid cells_ebv-transformed_lymphocytes muscle_skeletal lung
 fi
 if stage eqtl; then                                      # Fig. 3c-g; Supplementary Tables 3, 4
   run $S/eqtl_share.py "$D"/gtex_eqtl/*_v11_eQTLs_signif_pairs.parquet
@@ -70,7 +71,7 @@ if stage liver; then                                     # Fig. 1d,e; Extended D
   run $S/pilot_spectra.py; run $S/pilot_domain_tests.py; run $S/pilot_liver_gc.py
 fi
 if stage figures; then
-  for f in fig1 fig2 fig3 fig4 fig5 ed1_3 ed4 ed5; do run figures/code/$f.py; done
+  for f in fig1 fig2 fig3 fig4 fig5 ed1_3 ed4 ed5 ed6; do run figures/code/$f.py; done
 fi
 if stage schmitt; then                                   # optional: Supplementary Note 1, section 6 (40-kb tissue Hi-C)
   run $S/reduce_fithic.py "$D"/schmitt/FitHiC_primary_cohort "$D"/schmitt/schmitt_gene_pairs GM12878,imr90

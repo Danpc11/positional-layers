@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- `coupling_robustness.py` and Extended Data Fig. 6 (`ed6.py`): coupling of adjacent pairs is compared between Pearson and
+  Spearman, between random halves of donors, and with distant pairs matched for expression and GC content, without and
+  with removal of 15 expression principal components (Supplementary Note 1, section 7; Supplementary Table 8E).
+- Figures are saved at exactly 180 mm width (Nature double column), scaling width and height together, so the font sizes
+  in the code are the printed sizes; all text is at least 5.5 pt and raster elements are written at 600 ppi.
+- Schematic panels (Figs 1a, 2a, 3a, 4a and 5) are drawn from `figures/schematics/*.png`; the reserved frame is used only
+  when a drawing is missing.
+- Layout: more height for Fig. 2b and Fig. 3g so that tissue names do not overlap; Fig. 2c legend moved; Fig. 1b label
+  states that the landscape share refers to the simulation.
+- Extended Data Figs 1a and 2a: legends placed clear of the axes and data (legends can be fixed with `keep_position`);
+  Extended Data Fig. 1b: labels of nearby points separated.
+- Fig. 5 is drawn in code as vector schematics (numbered layers with their effect on expression, the sign of a shared
+  variant's contribution, and coupling arcs for domains, boundaries and active intervening genes).
+
 ## 0.1.0 (2026-10-05)
 
 First public release, accompanying the submitted manuscript "Common cis-regulatory inputs shape local gene co-expression

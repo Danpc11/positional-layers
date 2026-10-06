@@ -2,7 +2,7 @@ from poslayers.config import OUTDIR, FIGDIR
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 plt.rcParams.update({'font.family': 'sans-serif', 'font.sans-serif': ['Liberation Sans', 'Arial'], 'font.size': 7, 'axes.labelsize': 7, 'axes.titlesize': 7.5,
                      'xtick.labelsize': 6.5, 'ytick.labelsize': 6.5, 'legend.fontsize': 6.2, 'axes.linewidth': 0.6, 'xtick.major.width': 0.6, 'ytick.major.width': 0.6,
-                     'xtick.major.size': 2.5, 'ytick.major.size': 2.5, 'axes.spines.top': False, 'axes.spines.right': False, 'legend.frameon': False, 'pdf.fonttype': 42, 'savefig.dpi': 300})
+                     'xtick.major.size': 2.5, 'ytick.major.size': 2.5, 'axes.spines.top': False, 'axes.spines.right': False, 'legend.frameon': False, 'pdf.fonttype': 42, 'savefig.dpi': 600})
 OI = {'blue': '#0072B2', 'orange': '#E69F00', 'green': '#009E73', 'red': '#D55E00', 'purple': '#CC79A7', 'sky': '#56B4E9', 'yellow': '#F0E442', 'grey': '#7F7F7F', 'black': '#000000'}
 W = 180 / 25.4
 OUT = FIGDIR
@@ -53,11 +53,12 @@ def _overlaps(bb, pts, boxes):
 
 
 def _fix_legends(fig):
-    """Move any legend that covers data to the first free corner of its axes, or above the axes if none is free."""
+    """Move any legend that covers data to the first free corner of its axes, or above the axes if none is free.
+    A legend with the attribute keep_position = True was placed by hand and is not moved."""
     r = fig.canvas.get_renderer()
     for ax in fig.axes:
         leg = ax.get_legend()
-        if leg is None or not leg.get_visible(): continue
+        if leg is None or not leg.get_visible() or getattr(leg, 'keep_position', False): continue   # placed by hand: leave it
         if not leg.get_window_extent(r).overlaps(ax.get_window_extent(r)): continue      # already outside the axes
         pts, boxes = _data_boxes(ax, r)
         if not _overlaps(leg.get_window_extent(r), pts, boxes): continue
@@ -101,8 +102,17 @@ def _place_letters(fig):
 
 
 def save(fig, name):
+    """Save at exactly 180 mm width (Nature double column) without rescaling text: the figure is scaled (width and height together,
+    keeping its aspect ratio) until the tight bounding box is W wide, so font sizes in the code are the final printed sizes. Raster elements at 600 ppi."""
     fig.canvas.draw(); _fix_legends(fig); _place_letters(fig)
-    fig.savefig(OUT + name + '.pdf', bbox_inches='tight'); fig.savefig(OUT + name + '.png', dpi=220, bbox_inches='tight'); plt.close(fig)
+    for _ in range(6):
+        fig.canvas.draw(); bb = fig.get_tightbbox(fig.canvas.get_renderer()).padded(0.02)
+        if abs(bb.width - W) < 0.002: break
+        w0 = fig.get_figwidth(); w1 = w0 + (W - bb.width)
+        fig.set_size_inches(w1, fig.get_figheight() * w1 / w0, forward=True)          # keep the aspect ratio of the layout
+        fig.canvas.draw(); _place_letters(fig)
+    fig.savefig(OUT + name + '.pdf', bbox_inches='tight', pad_inches=0.02, dpi=600)
+    fig.savefig(OUT + name + '.png', dpi=300, bbox_inches='tight', pad_inches=0.02); plt.close(fig)
 A = OUTDIR
 NAMES = {'cells_ebv-transformed_lymphocytes': 'EBV lymphocytes', 'cells_ebv_transformed_lymphocytes': 'EBV lymphocytes', 'cells_cultured_fibroblasts': 'Fibroblasts', 'esophagus_gastroesophageal_junction': 'Oesophagus, GEJ',
          'esophagus_mucosa': 'Oesophagus, mucosa', 'esophagus_muscularis': 'Oesophagus, muscularis', 'skin_sun_exposed_lower_leg': 'Skin', 'brain_frontal_cortex_ba9': 'Brain, frontal cortex',
@@ -113,9 +123,13 @@ def tissue_label(t):
     return NAMES.get(t, NAMES.get(t.replace('_', '-'), t.replace('_', ' ').capitalize()))
 
 
-def placeholder(ax, title, description, fontsize=5.6):
-    """Reserved panel for a schematic drawn by the authors: dashed frame, light fill, and a description of its content.
-    The description is wrapped to the width of the panel."""
+def placeholder(ax, title, description, fontsize=5.6, key=None):
+    """Schematic panel. If figures/schematics/<key>.png exists, the drawing is placed in the panel at its own aspect ratio;
+    otherwise a reserved frame with a description of the intended content is drawn (dashed frame, light fill)."""
+    import os
+    png = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'schematics', f'{key}.png') if key else None
+    if png and os.path.exists(png):
+        img = plt.imread(png); ax.imshow(img, interpolation='lanczos'); ax.set_anchor('NW'); ax.axis('off'); return
     import textwrap
     from matplotlib.patches import FancyBboxPatch
     ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis('off')

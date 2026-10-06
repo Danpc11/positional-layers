@@ -18,6 +18,7 @@ Table = ST).
 | atlas | `spectral_form.py` | tissues | `gtex/` | `lorentz_v2.csv`, `spec_v2_<tissue>.npy` | Fig. 2e,f; ED 1b; ST8B |
 | atlas | `robust_families.py` | — | `pairs_*.csv.gz` | `robust_families.csv` | text (family exclusion) |
 | atlas | `gc_autocorrelation.py` | — | `biomart_GRCh38_gene_gc.txt` | `gc_autocorrelation.csv` | ED 1d |
+| atlas | `coupling_robustness.py` | GTEx tissues | `gtex/`, sample attributes, BioMart GC | `coupling_robustness.csv`, `coupling_robustness_pairs_<tissue>.csv.gz` | ED 6; ST8E; Supplementary Note 1, section 7 |
 | eqtl | `eqtl_share.py` | signif-pairs parquet files | `gtex_eqtl/` | `shares_<tissue>.csv.gz` | input |
 | eqtl | `eqtl_test.py` | — | `pairs_*`, `shares_*` | `eqtl_cis_test.csv`, `eqtl_tissue_specificity.csv` | Fig. 3c,d,g; ED 1c; ST3 |
 | eqtl | `coloc.py` | SuSiE parquet files | `gtex_eqtl/` | `coloc_<tissue>.csv.gz` | input |
@@ -52,8 +53,8 @@ Table = ST).
 | schmitt (optional) | `contact_exponent_schmitt.py` | codes | `schmitt/schmitt_gene_pairs/`, `gtex/` | `contact_exponent_schmitt.csv` | Supplementary Note 1, section 6 |
 | — | `simulate_demo.py` | `--decay`, `--gc-bias` | — | prints | web simulator |
 
-Figures: `figures/code/fig1.py` to `fig5.py`, `ed1_3.py` (Extended Data Figs 1–3), `ed4.py` and `ed5.py`. Panels marked
-as reserved in the figure files (Figs 1a, 2a, 3a, 4a and 5) are schematics drawn separately.
+Figures: `figures/code/fig1.py` to `fig5.py`, `ed1_3.py` (Extended Data Figs 1–3), `ed4.py`, `ed5.py` and `ed6.py`. Schematic panels of Figs 1a, 2a, 3a and 4a are drawings in `figures/schematics/`, placed by the figure scripts;
+Fig. 5 is drawn in code by `fig5.py`.
 
 ## Analyses kept for peer review (`scripts/review/`, stage `review`)
 
