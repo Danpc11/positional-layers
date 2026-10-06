@@ -2,7 +2,7 @@
 
 Run order, inputs and outputs. Input paths are relative to `$POSLAYERS_DATA` (see `data/MANIFEST.md`); everything else is
 written to and read from `$POSLAYERS_RESULTS`. `run_pipeline.sh` runs the scripts in this order. Shared code lives in
-`lib_tad.py`, `lib_tumour.py` and `lib_boot.py` (genomic-block bootstrap) and is imported; no script reads or executes
+`lib_tad.py`, `lib_tumour.py`, `lib_boot.py` (genomic-block bootstrap) and `cohesin_freedman_lane_lib.py` (per-tumour positional score) and is imported; no script reads or executes
 another script's source. Figure and table references are to the paper (Fig., Extended Data Fig. = ED, Supplementary
 Table = ST).
 
@@ -19,6 +19,7 @@ Table = ST).
 | atlas | `robust_families.py` | — | `pairs_*.csv.gz` | `robust_families.csv` | text (family exclusion) |
 | atlas | `gc_autocorrelation.py` | — | `biomart_GRCh38_gene_gc.txt` | `gc_autocorrelation.csv` | ED 1d |
 | atlas | `coupling_robustness.py` | GTEx tissues | `gtex/`, sample attributes, BioMart GC | `coupling_robustness.csv`, `coupling_robustness_pairs_<tissue>.csv.gz` | ED 6; ST8E; Supplementary Note 1, section 7 |
+| atlas | `spectral_rigour.py` | GTEx tissue | `gtex/`, sample attributes, BioMart GC | `spectral_rigour.csv`, `coupling_by_bp_<tissue>.csv` | ST8F; Supplementary Note 1, sections 1 and 5 |
 | eqtl | `eqtl_share.py` | signif-pairs parquet files | `gtex_eqtl/` | `shares_<tissue>.csv.gz` | input |
 | eqtl | `eqtl_test.py` | — | `pairs_*`, `shares_*` | `eqtl_cis_test.csv`, `eqtl_tissue_specificity.csv` | Fig. 3c,d,g; ED 1c; ST3 |
 | eqtl | `coloc.py` | SuSiE parquet files | `gtex_eqtl/` | `coloc_<tissue>.csv.gz` | input |
@@ -26,7 +27,7 @@ Table = ST).
 | eqtl | `predict.py` | GTEx count files | `gtex/`, SuSiE | `pred_pairs_<tissue>.csv.gz` | input |
 | eqtl | `eqtl_law.py` | — | `pred_pairs_*`, `gtex_eqtl/` | `eqtl_law_v2_pairs.csv` | Fig. 3f; ST4B |
 | eqtl | `eqtl_law_summary.py` | — | `eqtl_law_v2_pairs.csv` | `eqtl_law_v2_summary.csv`, `eqtl_law_strata.csv`, `eqtl_law_block_sensitivity.csv` | Fig. 3f; ST4A,D; ST8D |
-| eqtl | `eqtl_scale.py` | — | `eqtl_law_v2_pairs.csv`, `gtex_eqtl/` | `eqtl_scale_pairs.csv`, `eqtl_scale_sensitivity.csv` | ST4C |
+| eqtl | `eqtl_scale.py` | — | `eqtl_law_v2_pairs.csv`, `gtex_eqtl/` | `eqtl_scale_pairs.csv`, `eqtl_scale_sensitivity.csv` | ST4C,E |
 | architecture | `tad_test.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `tad_cis_test.csv` | Fig. 4b; ST5 |
 | architecture | `tad_bootstrap.py` | — | `pairs_*`, `TAD-full/` | `tad_block_bootstrap.csv` | Fig. 2b; Fig. 4b; ST5 |
 | architecture | `pair_attributes.py` | — | `pairs_*`, `shares_*`, `TAD-full/` | `upset_pair_attributes.csv` | Fig. 2d |
@@ -44,7 +45,9 @@ Table = ST).
 | tumours | `cohesin_freedman_lane.py` | cohorts, permutations | as `cont_tests.py` | `cohesin_freedman_lane.csv` | Fig. 4g; ST6A |
 | tumours | `beataml_freedman_lane.py` | — | `beataml/` | `beataml_freedman_lane.csv` | Fig. 4g; ST6C |
 | tumours | `meta_stag2.py` | — | the two tables above | `stag2_meta.csv` | Fig. 4g; ST6C |
+| tumours | `tumour_baseline_sensitivity.py` | cohorts, permutations | as `cohesin_freedman_lane.py` | `tumour_baseline_sensitivity.csv` | ST6H |
 | tumours | `dosage_prediction.py` | comma-separated cohorts | `expr_*`, `cn_cont_*` | `dosage_prediction.csv`, `dosage_prediction_splits.csv` | Fig. 3b; ST9A,F |
+| tumours | `dosage_controls.py` | comma-separated cohorts | `expr_*`, `cn_cont_*` | `dosage_controls.csv` | ST9G |
 | simulations | `theory_sim.py` | — | — | `sim_summary.csv`, `sim_lag_profiles.csv` | Fig. 1b |
 | simulations | `decay_recovery.py` | — | — | `sim_decay_recovery.csv` | Fig. 1h |
 | simulations | `gc_correlated_sim.py` | — | — | `gc_correlated_cis_sim.csv` | ST8C |

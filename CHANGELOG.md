@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- `dosage_controls.py`: the copy-number prediction with copy number permuted across tumours, with segments shifted along
+  chromosomes, and with purity proxies (immune and stromal scores) in the dosage model (Supplementary Table 9G).
+- `eqtl_scale.py` also removes 60 expression components, the largest number of hidden factors in the GTEx eQTL model
+  (Supplementary Table 4E).
+- `spectral_rigour.py`: peaks of the mean profile tested against nulls that preserve local autocorrelation (block
+  permutation, AR(1) red noise; null maximum over frequencies), Whittle-likelihood fits of the covariance spectrum, and
+  decay scales of coupling against physical distance (Supplementary Note 1, sections 1 and 5; Supplementary Table 8F).
+- `tumour_baseline_sensitivity.py`: the primary tumour analysis repeated with a cis-excess baseline beyond the domain
+  scale (Supplementary Table 6H); the lag score is shared through `cohesin_freedman_lane_lib.py`.
 - Documentation aligned with the article: the "isochore law" is the GC-associated layer and the "eQTL law" is the
   predicted genetic covariance, in the README, the simulator and the package. `gc_layer_correlation` and
   `predicted_genetic_covariance` are the new names; `isochore_law` and `eqtl_law` remain as aliases.

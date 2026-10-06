@@ -24,6 +24,7 @@ if stage atlas; then                                     # Fig. 1c,f,g; Fig. 2; 
   run $S/robust_families.py
   run $S/gc_autocorrelation.py
   run $S/coupling_robustness.py thyroid cells_ebv-transformed_lymphocytes muscle_skeletal lung
+  for t in thyroid nerve_tibial skin_sun_exposed_lower_leg cells_cultured_fibroblasts cells_ebv-transformed_lymphocytes muscle_skeletal; do run $S/spectral_rigour.py $t; done
 fi
 if stage eqtl; then                                      # Fig. 3c-g; Supplementary Tables 3, 4
   run $S/eqtl_share.py "$D"/gtex_eqtl/*_v11_eQTLs_signif_pairs.parquet
@@ -60,7 +61,9 @@ if stage tumours; then                                   # Fig. 3b; Fig. 4g; Ext
   run $S/cohesin_freedman_lane.py BLCA,UCEC 2000
   run $S/beataml_freedman_lane.py
   run $S/meta_stag2.py
+  run $S/tumour_baseline_sensitivity.py BLCA,UCEC 2000
   run $S/dosage_prediction.py BLCA,UCEC
+  run $S/dosage_controls.py BLCA,UCEC
 fi
 if stage simulations; then                               # Fig. 1b,h; Supplementary Table 8C
   run $S/theory_sim.py

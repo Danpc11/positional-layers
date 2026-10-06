@@ -6,11 +6,9 @@ Specification pre-declared as primary: any coding mutation, tumours above the 90
 The other three specifications are sensitivity analyses."""
 import os, sys
 from poslayers.config import OUTDIR
-from lib_tumour import CHR, coding, prepare, trunc
+from lib_tumour import coding, prepare, trunc
+from cohesin_freedman_lane_lib import lagscore
 import numpy as np, pandas as pd, statsmodels.api as sm
-def lagscore(D, chrs, lags):
-    Z = (D - D.mean(1, keepdims=True)) / (D.std(1, keepdims=True) + 1e-9)
-    return np.mean([np.concatenate([Z[x[:-L]] * Z[x[L:]] for c in CHR for x in [np.where(chrs == c)[0]] if len(x) > L + 5], 0).mean(0) for L in lags], 0)
 B = int(sys.argv[2]) if len(sys.argv) > 2 else 5000
 rows = []
 for c, gm in [x for x in [('BLCA', ['STAG2']), ('UCEC', ['CTCF'])] if x[0] in sys.argv[1].split(',')]:

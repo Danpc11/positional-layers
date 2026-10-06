@@ -18,7 +18,7 @@ from poslayers.config import DATA, OUTDIR, RESUME, replace_groups_csv
 NAME = {'nerve_tibial': 'Nerve_Tibial', 'thyroid': 'Thyroid', 'cells_cultured_fibroblasts': 'Cells_Cultured_fibroblasts', 'artery_tibial': 'Artery_Tibial',
         'whole_blood': 'Whole_Blood', 'testis': 'Testis', 'skin_sun_exposed_lower_leg': 'Skin_Sun_Exposed_Lower_leg', 'esophagus_mucosa': 'Esophagus_Mucosa',
         'adipose_subcutaneous': 'Adipose_Subcutaneous', 'lung': 'Lung'}
-KS = [0, 5, 10, 15, 25, 40]
+KS = [0, 5, 10, 15, 25, 40, 60]          # 60 = largest number of hidden factors in the GTEx eQTL model
 P = pd.read_csv(OUTDIR + 'eqtl_law_v2_pairs.csv'); OUT = OUTDIR + 'eqtl_scale_pairs.csv'
 done = set(pd.read_csv(OUT).tissue) if (RESUME and os.path.exists(OUT)) else set()
 for t, N in NAME.items():
