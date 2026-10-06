@@ -31,21 +31,22 @@ scripts import (pyannotables, pyarrow, anndata, patsy, openpyxl, hic-straw).
 ## The model equations in thirty seconds
 
 ```python
-from poslayers import simulate_genome, periodogram_identity, isochore_law, eqtl_law, source_covariance
+from poslayers import simulate_genome, periodogram_identity, gc_layer_correlation, predicted_genetic_covariance, source_covariance
 
 sim = simulate_genome(decay_len=5, gc_bias_sd=0.25, seed=1)
 
 # 1. The spectral decomposition is an exact identity
 periodogram_identity(sim["X"])["max_relative_error"]      # ~1e-15
 
-# 2. Isochore law: the covariance a per-sample GC bias creates between two genes, from one number per sample.
+# 2. GC-associated layer: the correlation a per-sample GC bias creates between two genes, from one number per sample.
 #    Tested out of sample in 36 tissues (slope from odd chromosomes, covariance on even ones). It cannot tell
 #    technical bias from regulation that also tracks GC.
-isochore_law(var_b=0.06, gc_i=1.2, gc_j=0.9, sd_i=1.0, sd_j=1.0)
+gc_layer_correlation(var_b=0.06, gc_i=1.2, gc_j=0.9, sd_i=1.0, sd_j=1.0)
 
-# 3. eQTL law: the correlation a shared variant induces, sign included. In GTEx it predicts the sign and rank of
-#    coupling (r = 0.58) but not its scale: colocalised pairs share more covariance than their variants carry.
-eqtl_law(freq=0.3, beta1=0.4, beta2=-0.5)                 # negative: opposite effects
+# 3. Predicted genetic covariance, 2p(1 - p) beta1 beta2: the contribution of a shared variant, sign included. In GTEx it
+#    correlates with coupling (r = 0.58); on the covariance scale observed coupling is 1.33-1.46 times the prediction,
+#    which is compatible with undetected variants, linkage disequilibrium and error in effect estimates.
+predicted_genetic_covariance(freq=0.3, beta1=0.4, beta2=-0.5)   # negative: opposite effects
 
 # 4. Shared-source model: the covariance of two genes is the sum over shared sources of source variance times the two
 #    footprints, assuming uncorrelated sources. A dosage model fitted in half of the tumours predicts the copy-number
@@ -57,7 +58,7 @@ source_covariance(source_variance=[1.5, 0.6], footprint_i=[0.8, 0.3], footprint_
 
 | Path | What it holds |
 | --- | --- |
-| `src/poslayers/` | Reference implementation: `decompose.py`, `laws.py`, `simulate.py` |
+| `src/poslayers/` | Reference implementation: `decompose.py`, `laws.py` (model relations), `simulate.py`. The names `isochore_law` and `eqtl_law` of release 0.1.0 remain available as aliases |
 | `scripts/` | Analysis scripts, one per result, and three shared libraries; see `scripts/SCRIPTS.md`. `scripts/review/` holds perturbation analyses kept for peer review |
 | `figures/code/` | One script per main and Extended Data figure; `style.py` places panel letters and keeps legends off the data |
 | `docs/` | The interactive simulator served by GitHub Pages |
@@ -100,10 +101,10 @@ liver pipeline (github.com/Danpc11/Liver_Spectra); point `LIVER_SPECTRA` at a ch
 pytest -q
 ```
 
-The tests check the decomposition identity to machine precision, the behaviour of each law, the edge cases of the
-API (constant GC, chromosomes shorter than the lag), the decay-length estimator, and two limitations kept visible on
-purpose: GC correction removes GC-tracking regulation at domain scale, and comparing a power law with a fixed-size hub
-cannot identify a saturating response. CI also fails on any undefined name.
+The tests check the decomposition identity to machine precision, the GC-associated layer, the predicted genetic
+covariance and the shared-source model, the edge cases of the API (constant GC, chromosomes shorter than the lag), the
+decay-length estimator, the pipeline's handling of re-runs, and a limitation kept visible on purpose: GC correction
+removes regulation that tracks GC at domain scale. CI also fails on any undefined name.
 
 ## How to cite
 
@@ -116,7 +117,7 @@ Cite the archived release of this code and the article:
 
 ## Rebuilding the figures without the raw data
 
-The 44 tables the figure scripts read (40 MB) will be deposited on Zenodo as source data before publication (DOI to be added). Unpack them and run only the
+The 46 tables the figure scripts read (40 MB) will be deposited on Zenodo as source data before publication (DOI to be added). Unpack them and run only the
 figure stage:
 
 ```bash

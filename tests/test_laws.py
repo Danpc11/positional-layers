@@ -97,3 +97,9 @@ def test_power_law_vs_hub_does_not_identify_saturation():
     def sat(): K = np.exp(rng.normal(np.log(30), 1.5, 4000)); return np.array([np.mean(0.15 * ci / (ci + K)) for ci in c])
     wins = [fit_contact_law(c, sat() + rng.normal(0, se), sigma=se) for _ in range(20)]
     assert np.mean([w["hub"]["chi2"] < w["power_law"]["chi2"] for w in wins]) > 0.5
+
+
+def test_release_0_1_0_names_are_aliases():
+    import poslayers as pl
+    assert pl.isochore_law is pl.gc_layer_correlation and pl.eqtl_law is pl.predicted_genetic_covariance
+    assert pl.predicted_genetic_covariance(0.3, 0.4, 0.5) == pytest.approx(2 * 0.3 * 0.7 * 0.4 * 0.5)

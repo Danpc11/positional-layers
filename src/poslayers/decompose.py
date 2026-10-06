@@ -81,7 +81,7 @@ def gc_correct(X: np.ndarray, gc: np.ndarray, degree: int = 2) -> np.ndarray:
 
 
 def gc_slopes(X: np.ndarray, gc: np.ndarray) -> np.ndarray:
-    """Per-sample GC slope b_s (OLS on standardised GC with an intercept), whose variance drives the isochore law.
+    """Per-sample GC slope b_s (OLS on standardised GC with an intercept), whose variance drives the GC-associated layer.
     Returns zeros when GC is constant, where the slope is not identifiable."""
     X = np.asarray(X, float)
     g = np.asarray(gc, float)

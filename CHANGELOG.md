@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Documentation aligned with the article: the "isochore law" is the GC-associated layer and the "eQTL law" is the
+  predicted genetic covariance, in the README, the simulator and the package. `gc_layer_correlation` and
+  `predicted_genetic_covariance` are the new names; `isochore_law` and `eqtl_law` remain as aliases.
+  `saturation_exponent` and the hub model of `fit_contact_law` are marked as not used in the article.
+- Duplicated entries removed from `poslayers.__all__`; source-data table count (46) and Extended Data figure count (6)
+  updated in the README, the data manifest and `.zenodo.json`.
 - `coupling_robustness.py` and Extended Data Fig. 6 (`ed6.py`): coupling of adjacent pairs is compared between Pearson and
   Spearman, between random halves of donors, and with distant pairs matched for expression and GC content, without and
   with removal of 15 expression principal components (Supplementary Note 1, section 7; Supplementary Table 8E).

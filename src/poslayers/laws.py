@@ -4,8 +4,9 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 
-def isochore_law(var_b: float, gc_i, gc_j, sd_i, sd_j) -> np.ndarray:
-    """Correlation between two genes induced by per-sample GC bias.
+def gc_layer_correlation(var_b: float, gc_i, gc_j, sd_i, sd_j) -> np.ndarray:
+    """Correlation between two genes induced by per-sample GC bias: the GC-associated layer (Supplementary Note 1,
+    section 2). Called isochore_law in release 0.1.0; that name is kept as an alias.
 
     rho_GC(i, j) = Var(b) * g_i * g_j / (sigma_i * sigma_j)
 
@@ -16,8 +17,9 @@ def isochore_law(var_b: float, gc_i, gc_j, sd_i, sd_j) -> np.ndarray:
     return var_b * np.asarray(gc_i) * np.asarray(gc_j) / (np.asarray(sd_i) * np.asarray(sd_j))
 
 
-def eqtl_law(freq, beta1, beta2, p_same_causal=1.0) -> np.ndarray:
-    """Correlation between two genes induced by a shared causal variant.
+def predicted_genetic_covariance(freq, beta1, beta2, p_same_causal=1.0) -> np.ndarray:
+    """Covariance (correlation, for unit-variance expression) between two genes induced by a shared causal variant,
+    2p(1 - p) beta1 beta2 (Supplementary Note 1, section 4). Called eqtl_law in release 0.1.0; kept as an alias.
 
     rho_eQTL = P(same variant) * 2p(1 - p) * beta1 * beta2
 
@@ -30,7 +32,9 @@ def eqtl_law(freq, beta1, beta2, p_same_causal=1.0) -> np.ndarray:
 
 
 def saturation_exponent(contact, K: float) -> np.ndarray:
-    """Local exponent of coupling on contact, k = 1 - occupancy = K / (c + K)."""
+    """Local exponent of coupling on contact, k = 1 - occupancy = K / (c + K).
+
+    Not used in the article; kept for compatibility with release 0.1.0."""
     c = np.asarray(contact, float)
     return K / (c + K)
 
@@ -45,6 +49,8 @@ def _hub(c, r0, A, cstar):
 
 def fit_contact_law(contact, coupling, sigma=None) -> dict:
     """Fit the power law and the fixed-size hub model to mean coupling versus mean contact.
+    The article reports only the power-law exponent, as a description of the Hi-C maps; the hub model is kept for
+    compatibility with release 0.1.0.
 
     Returns both fits with their weighted chi-square, so the hub model can be rejected as it
     is in the paper. The power-law exponent k is the quantity that equals one minus the
@@ -76,3 +82,8 @@ def source_covariance(source_variance, footprint_i, footprint_j):
     if not (v.shape == a.shape == b.shape):
         raise ValueError('source_variance and the two footprints must have the same shape')
     return float(np.sum(v * a * b))
+
+
+# Names used in release 0.1.0, kept so that existing code keeps working.
+isochore_law = gc_layer_correlation
+eqtl_law = predicted_genetic_covariance

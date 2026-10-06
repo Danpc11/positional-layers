@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 from poslayers import simulate_genome, periodogram_identity
 from poslayers.decompose import gc_correct, gc_slopes
-from poslayers.laws import isochore_law
+from poslayers.laws import gc_layer_correlation
 
 # The cis kernel is exp(-i/lambda), whose normalised autocorrelation is exp(-L/lambda).
 # The decay length of that autocorrelation is lambda itself, so no calibration is needed.
@@ -66,7 +66,7 @@ def main():
     print("\nisochore law, predicted vs observed GC component")
     for L in (1, 2, 5, 10, 20, 30):
         i = np.arange(len(gc) - L)
-        pred = float(np.mean(isochore_law(var_b, gc[i], gc[i + L], sd[i], sd[i + L])))
+        pred = float(np.mean(gc_layer_correlation(var_b, gc[i], gc[i + L], sd[i], sd[i + L])))
         print(f"  {L:>2} genes   predicted {pred:+.4f}   observed {naive[L] - corr[L]:+.4f}")
 
 

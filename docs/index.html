@@ -123,7 +123,7 @@ estimator reports. Here you control every component, so you can see how the tiss
       <tr><th>Estimator</th><th>Truth</th><th>Reports</th><th>Verdict</th></tr>
     </table>
 
-    <h2>The isochore law</h2>
+    <h2>The GC-associated layer</h2>
     <figure>
       <div class="canvaswrap"><canvas id="lawplot" width="1500" height="420"></canvas></div>
       <figcaption><strong>Predicted versus observed GC component.</strong> The law
@@ -293,7 +293,7 @@ function drawLag(naive,corr,decay){
 function drawLaw(pred,obs){
   const {cv,x}=prep('lawplot'),X0=130,Y0=cv.height-70,W=cv.width-X0-60,H=cv.height-130;
   const lim=Math.max(1e-4,...pred,...obs)*1.12;
-  axis(x,X0,Y0,W,H,'Predicted by the isochore law','Observed GC component');
+  axis(x,X0,Y0,W,H,'Predicted from the GC slopes','Observed GC component');
   x.strokeStyle=css('--line');x.lineWidth=1.6;x.setLineDash([6,5]);
   x.beginPath();x.moveTo(X0,Y0);x.lineTo(X0+Math.min(W,H),Y0-Math.min(W,H));x.stroke();x.setLineDash([]);
   const cols=[css('--blue'),css('--green'),css('--orange'),css('--red'),css('--purple'),css('--grey')];
@@ -378,7 +378,7 @@ function run(){
   row(est,['Correlation of adjacent genes, naive','—',{html:naive[1].toFixed(3),cls:'num'},'']);
   row(est,['Correlation of adjacent genes, GC-corrected','—',{html:corr[1].toFixed(3),cls:'num'},'']);
 
-  // isochore law
+  // GC-associated layer
   const varb=sd(Array.from(sim.b))**2;
   const S=sim.S,n=sim.n,sdg=new Float64Array(n);
   for(let j=0;j<n;j++){let s=0;for(let i=0;i<S;i++)s+=dev.Y[i][j]*dev.Y[i][j];sdg[j]=Math.sqrt(s/S)||1;}
