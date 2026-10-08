@@ -1,4 +1,4 @@
-"""The web simulator, in Python. Reproduces Fig. 1b and Fig. 1h.
+"""The web simulator, in Python. Reproduces Extended Data Figs 1a and 1c.
 
     python scripts/simulate_demo.py --decay 5 --gc-bias 0.25
 """

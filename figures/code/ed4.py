@@ -1,4 +1,4 @@
-"""Extended Data Fig. 4: heatmaps summarising the atlas and the out-of-sample GC law."""
+"""Extended Data Fig. 3: heatmaps summarising the atlas and the out-of-sample GC law."""
 import os, sys
 import numpy as np, pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

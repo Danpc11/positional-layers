@@ -1,4 +1,4 @@
-"""Extended Data Fig. 5: replication and robustness of the two architectural barriers."""
+"""Extended Data Fig. 7: replication and robustness of the two architectural barriers."""
 import os, sys
 import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

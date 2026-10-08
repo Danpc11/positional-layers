@@ -1,5 +1,5 @@
 """Does excluding copy-number-altered genes reduce the tumour-normal difference in TAD clustering of active genes?
-(Extended Data Fig. 2c; Supplementary Table 6G)
+(Extended Data Fig. 5c; Supplementary Table 6G)
 
 Tests the change of the contrast directly instead of comparing significant / non-significant labels:
   delta_before = median z(tumour) - median z(normal)

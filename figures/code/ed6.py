@@ -1,4 +1,4 @@
-"""Extended Data Fig. 6: coupling is a reproducible, local property of gene pairs (coupling_robustness.py)."""
+"""Extended Data Fig. 4: coupling is a reproducible, local property of gene pairs (coupling_robustness.py)."""
 import os, sys
 import numpy as np, pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

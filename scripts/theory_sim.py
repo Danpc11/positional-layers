@@ -70,6 +70,6 @@ if __name__ == '__main__':
     Xg, ch, GCg, _, zg = simulate(seed=3, cis=True, gc=True); Xt, cht, *_ = simulate(seed=3, cis=True, gc=False)
     prof_raw = lagprof(deviations(Xg, z=zg), ch); prof_corr = lagprof(deviations(Xg, GC=GCg, z=zg), ch); prof_truth = lagprof(deviations(Xt, z=zg), cht)
     pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corrected': prof_corr, 'truth_no_GC': prof_truth}).to_csv(OUTDIR + 'sim_lag_profiles.csv', index=False)
-    # (4) recovery of the true cis decay length: see decay_recovery.py (Fig. 1h).
+    # (4) recovery of the true cis decay length: see decay_recovery.py (Extended Data Fig. 1c).
     pd.Series(out).to_csv(OUTDIR + 'sim_summary.csv')
     print(pd.Series(out).round(4).to_string()); print(pd.DataFrame({'lag': LAGS, 'raw': prof_raw, 'GC_corr': prof_corr, 'truth': prof_truth}).round(3).to_string(index=False))

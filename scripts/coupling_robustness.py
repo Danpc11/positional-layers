@@ -9,7 +9,7 @@ For each tissue (GTEx, GC- and technically-corrected expression, as in the atlas
 Each analysis is run with 0 and with 15 expression principal components removed (genome-wide, non-positional co-expression).
 Usage: python coupling_robustness.py TISSUE [TISSUE ...]
 Outputs: OUTDIR/coupling_robustness.csv (rows replaced per tissue) and, with 15 PCs removed,
-         OUTDIR/coupling_robustness_pairs_<tissue>.csv.gz (pair-level values; Extended Data Fig. 6)
+         OUTDIR/coupling_robustness_pairs_<tissue>.csv.gz (pair-level values; Extended Data Fig. 4)
 """
 import sys
 import numpy as np, pandas as pd, pyannotables as pa

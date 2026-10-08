@@ -1,4 +1,4 @@
-"""Autocorrelation of gene GC content along the genome (Extended Data Fig. 1d).
+"""Autocorrelation of gene GC content along the genome (Extended Data Fig. 2d).
 
 Protein-coding genes on chromosomes 1-22 (Ensembl 100, GRCh38) in genomic order; GC content standardised within each
 chromosome; lag-L autocorrelation averaged over chromosomes with more than L + 5 genes, for L = 1..60.

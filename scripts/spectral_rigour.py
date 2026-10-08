@@ -11,7 +11,7 @@ For one GTEx tissue (same preprocessing as atlas.py):
      the mean for pairs 20-40 Mb apart; a two-exponential model fitted on the base-pair axis.
 Usage: python spectral_rigour.py TISSUE
 Outputs: OUTDIR/spectral_rigour.csv (row replaced per tissue), OUTDIR/coupling_by_bp_<tissue>.csv and
-         OUTDIR/landscape_null_<tissue>_chr1.csv (Extended Data Fig. 1e,f)
+         OUTDIR/landscape_null_<tissue>_chr1.csv (Fig. 2e and Extended Data Fig. 2f)
 """
 import sys
 import numpy as np, pandas as pd, pyannotables as pa
@@ -48,7 +48,7 @@ for c in np.unique(chrs):
     z = m - m.mean(); phi = np.corrcoef(z[:-1], z[1:])[0, 1]; s2 = z.var() * (1 - phi ** 2)
     f = np.arange(1, len(P) + 1) / n; Sar = s2 / (1 + phi ** 2 - 2 * phi * np.cos(2 * np.pi * f))
     counts['ar1'] += int((P / Sar > -np.log(0.05 / len(P))).sum())                 # exponential ordinates, Bonferroni over frequencies
-    if c == '1':                                                                    # spectrum and thresholds of one chromosome (Extended Data Fig. 1f)
+    if c == '1':                                                                    # spectrum and thresholds of one chromosome (Extended Data Fig. 2f)
         bmax = []; rng_f = np.random.default_rng(99)                               # own generator: leaves the main nulls unchanged
         for _ in range(200):
             blocks = [m[i:i + 30] for i in range(0, n, 30)]; bmax.append(pw(np.concatenate([blocks[k] for k in rng_f.permutation(len(blocks))])).max())

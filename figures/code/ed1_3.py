@@ -3,7 +3,7 @@ import numpy as np, pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from style import A, OI, OUTDIR, W, lab, save, tissue_label
 import matplotlib.pyplot as plt
-# ---- Extended Data Fig. 1: robustness of the cis layer
+# ---- Extended Data Fig. 2: robustness of the cis layer
 P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); Lz = pd.read_csv(OUTDIR + 'lorentz_v2.csv'); E = pd.read_csv(A + 'eqtl_cis_test.csv'); F = pd.read_csv(A + 'robust_families.csv')
 GA = pd.read_csv(OUTDIR + 'gc_autocorrelation.csv'); lags_ = GA.lag.values; ac = GA.autocorrelation.tolist()   # scripts/gc_autocorrelation.py
 fig = plt.figure(figsize=(W, W * 0.7)); gs = fig.add_gridspec(2, 4, wspace=0.75, hspace=0.6, height_ratios=[1, 1.05])
@@ -36,7 +36,7 @@ ax.set_ylim(top=max(L.red_noise_threshold.max(), L.block30_threshold.iloc[0]) * 
 ax.text(0.03, 0.04, f'frequencies above either threshold: {int(((L.landscape_power > L.red_noise_threshold) | (L.landscape_power > L.block30_threshold)).sum())} of {len(L):,}', transform=ax.transAxes, fontsize=5.5)
 lg = ax.legend(loc='upper right', fontsize=5.5); lg.keep_position = True; lab(ax, 'f')
 save(fig, 'ExtData_Fig1_robustness')
-# ---- Extended Data Fig. 2: tumours and gene dosage
+# ---- Extended Data Fig. 5: tumours and gene dosage
 AN = pd.read_csv(OUTDIR + 'aneuploidy_continuousCN.csv'); FR2 = pd.read_csv(OUTDIR + 'friction2_tumour_tad_clustering.csv')
 fig, axs = plt.subplots(2, 2, figsize=(W, W * 0.62)); plt.subplots_adjust(wspace=0.35, hspace=0.75); axs = axs.ravel()
 p = AN.pivot(index='cohort', columns='expression', values='mean_far'); x = np.arange(len(p)); ax = axs[0]
@@ -59,7 +59,7 @@ ax.axhline(100, color='0.6', lw=0.6, ls=':'); ax.axhline(0, color='k', lw=0.6)
 ax.set_xticks(x); ax.set_xticklabels(names, fontsize=5.5); ax.set_ylabel('Dosage covariance\n(% of the value with true copy number)'); ax.set_ylim(-10, 125)
 lg = ax.legend(loc='center', bbox_to_anchor=(0.5, 0.62), fontsize=5.5); lg.keep_position = True; lab(ax, 'd')
 save(fig, 'ExtData_Fig2_dosage')
-# ---- Extended Data Fig. 3: TAD effect across distance, with and without contact
+# ---- Extended Data Fig. 6: TAD effect across distance, with and without contact
 FR1 = pd.read_csv(OUTDIR + 'friction1_tad_vs_contact.csv'); order = ['(25000.0, 50000.0]', '(50000.0, 100000.0]', '(100000.0, 200000.0]', '(200000.0, 500000.0]', '(500000.0, 1000000.0]', '(1000000.0, 2000000.0]']
 labels = ['25–50 kb', '50–100 kb', '100–200 kb', '0.2–0.5 Mb', '0.5–1 Mb', '1–2 Mb']
 fig, axs = plt.subplots(1, 2, figsize=(W * 0.7, W * 0.3)); plt.subplots_adjust(wspace=0.45)

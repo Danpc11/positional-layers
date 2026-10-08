@@ -6,9 +6,9 @@
   co-expression is measured and keeps the panels that carry the argument; its validation panels (identity, consensus
   versus tissue-average spectrum, decay-length recovery) form the new Extended Data Fig. 1 (`ed_validation.py`).
   Fig. 2e,f show coupling against physical distance and the two scales in kb/Mb; the Lorentzian spectrum moved to
-  Extended Data Fig. 2e. Fig. 3a and Fig. 5 use the new schematics; Fig. 5 is a single-column synthesis
-  (`style.save` accepts a width). Extended Data figures are renumbered by first citation (1-7); the script that draws
-  each one is unchanged. Schematic images go in `figures/schematics/` (fig1a, fig2a, fig3a, fig4a, fig5).
+  Extended Data Fig. 2e. Fig. 3a uses the new schematic of shared variants, and the former Fig. 5 is folded into Fig. 4a, so the paper has
+  four main figures (`fig5.py` removed; `style.save` accepts a width). Extended Data figures are renumbered by first citation (1-7); the script that draws
+  each one is unchanged. Schematic images go in `figures/schematics/` (fig1a, fig2a, fig3a, fig4a).
 - `coupling_robustness.py` and `spectral_rigour.py` apply the technical (batch) covariates only when samples outnumber them
   by at least ten, as `atlas.py` does; previously small GTEx tissues could lose all residual variation. The tissues
   analysed in the paper all satisfy the rule, so the reported results are unchanged.

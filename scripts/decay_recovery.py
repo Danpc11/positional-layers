@@ -1,4 +1,4 @@
-"""Recovery of the simulated cis decay length, naive versus GC-corrected (Fig. 1h).
+"""Recovery of the simulated cis decay length, naive versus GC-corrected (Extended Data Fig. 1c).
 
 Genomes of 4 x 1,000 genes and 200 samples (poslayers.simulate_genome; AR(1) GC track with phi = 0.97, per-sample GC bias
 SD 0.25) for lambda = 2, 3, 5, 8 and 12 genes, three replicates each. The decay length is fitted to the linear lag

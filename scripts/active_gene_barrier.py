@@ -1,4 +1,4 @@
-"""Coupling across an active intervening gene (Fig. 4f; Extended Data Fig. 5a,b; Supplementary Table 9D,E).
+"""Coupling across an active intervening gene (Fig. 4f; Extended Data Fig. 7a,b; Supplementary Table 9D,E).
 Valton et al. 2022: termination sites of active genes stall and unload cohesin.
 
 Prediction fixed in advance: for consecutive genes (i, j, k), the coupling of the flanking genes i and k decreases with the

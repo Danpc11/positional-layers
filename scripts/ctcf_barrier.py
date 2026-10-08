@@ -1,4 +1,4 @@
-"""Coupling across convergent CTCF loop anchors at equal distance and contact (Fig. 4e; Extended Data Fig. 5c,d; Supplementary Table 9B,C).
+"""Coupling across convergent CTCF loop anchors at equal distance and contact (Fig. 4e; Extended Data Fig. 7c,d; Supplementary Table 9B,C).
 Rao et al. 2014 HiCCUPS loops with CTCF motifs; GTEx coupling of the matching cell type. Usage: python ctcf_barrier.py GM12878|IMR90
 
 Convergent CTCF loops (forward motif at the left anchor, reverse at the right) mark where extrusion stops. For each gene
