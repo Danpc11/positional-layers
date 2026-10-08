@@ -56,7 +56,7 @@ Table = ST).
 | schmitt (optional) | `contact_exponent_schmitt.py` | codes | `schmitt/schmitt_gene_pairs/`, `gtex/` | `contact_exponent_schmitt.csv` | Supplementary Note 1, section 6 |
 | — | `simulate_demo.py` | `--decay`, `--gc-bias` | — | prints | web simulator |
 
-Figures: `figures/code/fig1.py` to `fig5.py`, `ed1_3.py` (Extended Data Figs 1–3), `ed4.py`, `ed5.py` and `ed6.py`. Schematic panels of Figs 1a, 2a, 3a and 4a are drawings in `figures/schematics/`, placed by the figure scripts;
+Figures: `figures/code/fig1.py` to `fig5.py`, `ed1_3.py` (Extended Data Figs 1–3), `ed_validation.py`, `ed4.py`, `ed5.py` and `ed6.py`. Schematic panels of Figs 1a, 2a, 3a and 4a are drawings in `figures/schematics/`, placed by the figure scripts;
 Fig. 5 is drawn in code by `fig5.py`.
 
 ## Analyses kept for peer review (`scripts/review/`, stage `review`)

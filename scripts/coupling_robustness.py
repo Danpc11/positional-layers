@@ -29,7 +29,8 @@ def residuals(tis):
     G1 = np.column_stack([np.ones(len(gz)), gz, gz ** 2]); D = D - G1 @ np.linalg.lstsq(G1, D, rcond=None)[0]
     a = SA.loc[samp]; rin = a.SMRIN.astype(float).values; isch = pd.to_numeric(a.SMTSISCH, errors='coerce'); isch = isch.fillna(isch.median()).fillna(0).values
     T = np.column_stack([np.ones(len(rin)), rin, rin ** 2, isch, pd.get_dummies(a.SMNABTCH.astype(str), drop_first=True).values.astype(float), pd.get_dummies(a.SMGEBTCH.astype(str), drop_first=True).values.astype(float)])
-    D = (D.T - T @ np.linalg.lstsq(T, D.T, rcond=None)[0]).T
+    if T.shape[1] < D.shape[1] - 10:                       # as in atlas.py: technical covariates only when samples clearly outnumber them
+        D = (D.T - T @ np.linalg.lstsq(T, D.T, rcond=None)[0]).T
     donors = np.array(['-'.join(s.split('-')[:2]) for s in samp])
     return D, g.Chromosome.astype(str).values, mean_expr, gz, donors
 

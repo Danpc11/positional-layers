@@ -74,7 +74,7 @@ if stage liver; then                                     # Fig. 1d,e; Extended D
   run $S/pilot_spectra.py; run $S/pilot_domain_tests.py; run $S/pilot_liver_gc.py
 fi
 if stage figures; then
-  for f in fig1 fig2 fig3 fig4 fig5 ed1_3 ed4 ed5 ed6; do run figures/code/$f.py; done
+  for f in fig1 fig2 fig3 fig4 fig5 ed_validation ed1_3 ed4 ed5 ed6; do run figures/code/$f.py; done
 fi
 if stage schmitt; then                                   # optional: Supplementary Note 1, section 6 (40-kb tissue Hi-C)
   run $S/reduce_fithic.py "$D"/schmitt/FitHiC_primary_cohort "$D"/schmitt/schmitt_gene_pairs GM12878,imr90

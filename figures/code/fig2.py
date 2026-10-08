@@ -54,12 +54,24 @@ ax3.set_xticks(x); ax3.set_xticklabels([names[tuple(int(bool(M[k].iloc[i])) for 
 ax3.set_xlabel('Attributes of the adjacent pair (filled dot = present)', fontsize=5.6)
 for sp_ in ('top', 'right', 'bottom'): ax3.spines[sp_].set_visible(False)
 ax3.invert_yaxis()
-ax = fig.add_subplot(gs[2, 2]); sp = np.load(OUTDIR + 'spec_v2_thyroid.npy'); ax.loglog(sp[0], sp[1], 'o', ms=2.5, color='0.25', label='thyroid, 684 samples'); ax.loglog(sp[0], sp[2], color=OI['blue'], lw=1.2, label='two Lorentzians')
-ax.loglog(sp[0], sp[3], color=OI['red'], lw=0.9, ls='--', label='power law'); ax.set_xlabel('Spatial frequency (cycles per gene)'); ax.set_ylabel('Covariance spectrum S(f)'); ax.legend(loc='lower left', fontsize=5.5)
+# e: coupling against physical distance in six tissues, with two-exponential fits (scripts/spectral_rigour.py)
+SR = pd.read_csv(OUTDIR + 'spectral_rigour.csv').set_index('tissue')
+T6 = ['thyroid', 'nerve_tibial', 'skin_sun_exposed_lower_leg', 'cells_cultured_fibroblasts', 'cells_ebv-transformed_lymphocytes', 'muscle_skeletal']
+C6 = [OI['blue'], OI['green'], OI['orange'], OI['red'], OI['purple'], OI['sky']]
+ax = fig.add_subplot(gs[2, 2]); xx = np.logspace(np.log10(5e3), np.log10(5e6), 200)
+for t, col in zip(T6, C6):
+    d = pd.read_csv(OUTDIR + f'coupling_by_bp_{t}.csv'); r = SR.loc[t]
+    ax.scatter(d.distance_bp / 1e6, d.coupling_minus_far, s=5, color=col, zorder=3, label=tissue_label(t))
+    ax.plot(xx / 1e6, r.bp_short_amplitude * np.exp(-xx / (r.bp_short_length_kb * 1e3)) + r.bp_long_amplitude * np.exp(-xx / (r.bp_long_length_Mb * 1e6)), color=col, lw=0.7)
+ax.set_xscale('log'); ax.axhline(0, color='0.7', lw=0.5); ax.set_xlabel('Distance between genes (Mb)'); ax.set_ylabel('Coupling')
+lg = ax.legend(loc='lower left', bbox_to_anchor=(-0.05, 1.01), fontsize=5.5, ncol=2, handletextpad=0.1, columnspacing=0.6, borderaxespad=0, markerscale=1.2); lg.keep_position = True
 lab(ax, 'e')
-ax = fig.add_subplot(gs[2, 3]); xs = np.arange(len(Lz))
-ax.scatter(xs - 0.12, Lz.lam_acf_short, s=14, color=OI['blue'], label='short, autocorrelation'); ax.scatter(xs + 0.12, Lz.lam_spec_short, s=14, marker='s', color=OI['sky'], label='short, spectrum')
-ax.scatter(xs - 0.12, Lz.lam_acf_long, s=14, color=OI['red'], label='long, autocorrelation'); ax.set_yscale('log')
-ax.set_xticks(xs); ax.set_xticklabels([tissue_label(t) for t in Lz.tissue], rotation=45, ha='right', fontsize=5.5); ax.set_ylabel('Decay length (genes)'); ax.set_ylim(0.6, 60); ax.legend(loc='lower left', bbox_to_anchor=(0.0, 1.01), fontsize=5.5, ncol=1, borderaxespad=0)
+# f: the two scales in physical units
+ax = fig.add_subplot(gs[2, 3]); xs = np.arange(len(T6)); R6 = SR.loc[T6]
+ax.scatter(xs, R6.bp_short_length_kb / 1e3, s=16, color=OI['blue'], label='immediate neighbours')
+ax.scatter(xs, R6.bp_long_length_Mb, s=16, marker='s', color=OI['red'], label='domain scale')
+ax.set_yscale('log'); ax.set_ylim(0.03, 6); ax.set_yticks([0.05, 0.1, 0.5, 1, 5]); ax.set_yticklabels(['50 kb', '100 kb', '500 kb', '1 Mb', '5 Mb'])
+ax.set_xticks(xs); ax.set_xticklabels([tissue_label(t) for t in T6], rotation=45, ha='right', fontsize=5.5); ax.set_ylabel('Decay length')
+lg = ax.legend(loc='lower left', bbox_to_anchor=(0.0, 1.01), fontsize=5.5, ncol=1, borderaxespad=0); lg.keep_position = True
 lab(ax, 'f')
 save(fig, 'Fig2_cis_layer'); print('Fig2_cis_layer ok')

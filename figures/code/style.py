@@ -101,14 +101,15 @@ def _place_letters(fig):
             fig.text(x0, top + 0.004, s, fontsize=9, fontweight='bold', ha='left', va='bottom')
 
 
-def save(fig, name):
-    """Save at exactly 180 mm width (Nature double column) without rescaling text: the figure is scaled (width and height together,
+def save(fig, name, width=None):
+    """Save at exactly 180 mm width (or `width`, in inches, e.g. 89 mm for a single column) (Nature double column) without rescaling text: the figure is scaled (width and height together,
     keeping its aspect ratio) until the tight bounding box is W wide, so font sizes in the code are the final printed sizes. Raster elements at 600 ppi."""
+    Wt = W if width is None else width
     fig.canvas.draw(); _fix_legends(fig); _place_letters(fig)
     for _ in range(6):
         fig.canvas.draw(); bb = fig.get_tightbbox(fig.canvas.get_renderer()).padded(0.02)
-        if abs(bb.width - W) < 0.002: break
-        w0 = fig.get_figwidth(); w1 = w0 + (W - bb.width)
+        if abs(bb.width - Wt) < 0.002: break
+        w0 = fig.get_figwidth(); w1 = w0 + (Wt - bb.width)
         fig.set_size_inches(w1, fig.get_figheight() * w1 / w0, forward=True)          # keep the aspect ratio of the layout
         fig.canvas.draw(); _place_letters(fig)
     fig.savefig(OUT + name + '.pdf', bbox_inches='tight', pad_inches=0.02, dpi=600)

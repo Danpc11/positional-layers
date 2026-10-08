@@ -8,8 +8,8 @@ P4 = pd.read_csv(OUTDIR + 'p4_domain_scale_tests.csv'); Lz = pd.read_csv(OUTDIR 
 GA = pd.read_csv(OUTDIR + 'gc_autocorrelation.csv'); lags_ = GA.lag.values; ac = GA.autocorrelation.tolist()   # scripts/gc_autocorrelation.py
 fig = plt.figure(figsize=(W, W * 0.7)); gs = fig.add_gridspec(2, 4, wspace=0.75, hspace=0.6, height_ratios=[1, 1.05])
 axs = [fig.add_subplot(gs[0, k]) for k in range(4)]
-ax = axs[0]; x = np.arange(len(P4)); ax.bar(x - 0.2, P4.cis_L1, 0.4, color=OI['blue'], label='adjacent (cis)'); ax.bar(x + 0.2, P4.domain_L10_30, 0.4, color=OI['red'], label='10–30 genes (domain)')
-ax.set_xticks(x); ax.set_xticklabels(['raw', '−comp.', '−props', '−5 PCs', '−10 PCs', '−20 PCs'], fontsize=5.5, rotation=45, ha='right'); ax.set_ylabel('Correlation vs permuted order'); ax.set_ylim(0, 0.3); lg = ax.legend(fontsize=5.5, loc='upper right', bbox_to_anchor=(1.16, 1.03), handlelength=1.0, handletextpad=0.4, borderaxespad=0); lg.keep_position = True; lab(ax, 'a')
+ax = axs[0]; x = np.arange(len(P4)); ax.bar(x - 0.2, P4.cis_L1, 0.4, color=OI['blue'], label='adjacent genes'); ax.bar(x + 0.2, P4.domain_L10_30, 0.4, color=OI['red'], label='10–30 genes apart')
+ax.set_xticks(x); ax.set_xticklabels(['no correction', '− cell composition', '− gene properties', '− 5 PCs', '− 10 PCs', '− 20 PCs'], fontsize=5.5, rotation=45, ha='right'); ax.set_ylabel('Correlation above randomised gene order'); ax.set_ylim(0, 0.3); lg = ax.legend(fontsize=5.5, loc='upper right', bbox_to_anchor=(1.16, 1.03), handlelength=1.0, handletextpad=0.4, borderaxespad=0); lg.keep_position = True; lab(ax, 'a')
 ax = axs[1]; dA = Lz.AIC_powerlaw - Lz.AIC_lor2; dB = Lz.AIC_lor1 - Lz.AIC_lor2; ax.scatter(dB, dA, s=16, color=OI['purple'])
 pts = sorted(zip(Lz.tissue, dB, dA), key=lambda z: z[2]); dy = {}
 for i, (t_, b_, a_) in enumerate(pts):                    # separate labels of points that lie close together
@@ -20,18 +20,11 @@ ax.axhline(0, color='0.7', lw=0.5); ax.axvline(0, color='0.7', lw=0.5); ax.set_x
 ax = axs[2]; ax.scatter(E.both_eGenes, 100 * E.share_of_cis_from_shared_eQTL, s=12, color=OI['orange']); ax.set_xlabel('Pairs with both genes eGenes'); ax.set_ylabel('Cis explained by shared eQTLs (%)')
 lab(ax, 'c')
 ax = axs[3]; ax.plot(lags_, ac, color=OI['red'], lw=1.1); ax.axhline(0, color='0.8', lw=0.5); ax.set_xlabel('Distance (genes)'); ax.set_ylabel('GC autocorrelation'); ax.text(0.95, 0.9, f'{ac[0]:.2f} at 1 gene\n{ac[9]:.2f} at 10\n{ac[29]:.2f} at 30', transform=ax.transAxes, ha='right', va='top', fontsize=5.6); lab(ax, 'd')
-# e: coupling against physical distance, with the two-exponential fit (scripts/spectral_rigour.py)
-SR = pd.read_csv(OUTDIR + 'spectral_rigour.csv').set_index('tissue')
-T6 = ['thyroid', 'nerve_tibial', 'skin_sun_exposed_lower_leg', 'cells_cultured_fibroblasts', 'cells_ebv-transformed_lymphocytes', 'muscle_skeletal']
-C6 = [OI['blue'], OI['green'], OI['orange'], OI['red'], OI['purple'], OI['sky']]
-ax = fig.add_subplot(gs[1, 0:2]); xx = np.logspace(np.log10(5e3), np.log10(5e6), 200)
-for t, col in zip(T6, C6):
-    d = pd.read_csv(OUTDIR + f'coupling_by_bp_{t}.csv'); r = SR.loc[t]
-    ax.scatter(d.distance_bp / 1e6, d.coupling_minus_far, s=7, color=col, zorder=3, label=tissue_label(t))
-    ax.plot(xx / 1e6, r.bp_short_amplitude * np.exp(-xx / (r.bp_short_length_kb * 1e3)) + r.bp_long_amplitude * np.exp(-xx / (r.bp_long_length_Mb * 1e6)), color=col, lw=0.8)
-ax.set_xscale('log'); ax.axhline(0, color='0.7', lw=0.5); ax.set_xlabel('Distance between genes (Mb)'); ax.set_ylabel('Coupling minus that of pairs\n20–40 Mb apart')
-ax.text(0.98, 0.62, f"short scale {SR.bp_short_length_kb.min():.0f}–{SR.bp_short_length_kb.max():.0f} kb\nlong scale {SR.bp_long_length_Mb.min():.1f}–{SR.bp_long_length_Mb.max():.1f} Mb", transform=ax.transAxes, ha='right', va='top', fontsize=5.5)
-lg = ax.legend(loc='upper right', fontsize=5.5, ncol=2, handletextpad=0.1, columnspacing=0.6, markerscale=1.2); lg.keep_position = True; lab(ax, 'e')
+# e: covariance spectrum of thyroid with fits of two Lorentzians and a power law (moved from Fig. 2)
+ax = fig.add_subplot(gs[1, 0:2]); sp = np.load(OUTDIR + 'spec_v2_thyroid.npy')
+ax.loglog(sp[0], sp[1], 'o', ms=2.2, color='0.25', label='thyroid, 684 samples'); ax.loglog(sp[0], sp[2], color=OI['blue'], lw=1.2, label='two Lorentzians')
+ax.loglog(sp[0], sp[3], color=OI['red'], lw=0.9, ls='--', label='power law'); ax.set_xlabel('Spatial frequency (cycles per gene)'); ax.set_ylabel('Covariance spectrum')
+lg = ax.legend(loc='lower left', fontsize=5.5); lg.keep_position = True; lab(ax, 'e')
 # f: spectrum of the mean profile against autocorrelation-preserving nulls (scripts/spectral_rigour.py)
 L = pd.read_csv(OUTDIR + 'landscape_null_thyroid_chr1.csv')
 ax = fig.add_subplot(gs[1, 2:4])
